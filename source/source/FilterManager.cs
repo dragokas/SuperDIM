@@ -6,24 +6,38 @@ using System.Threading.Tasks;
 
 namespace DazUnpacker.source
 {
-    internal enum FilterTypes
+    public enum FilterTypes
     {
-        FilterDateType
+        FilterDateType,
+        FilterContentType
     }
 
-    interface IFilter
+    public interface IFilter
     {
-        FilterTypes FilterType { get; }
+        FilterTypes FilterType { get; set; }
     }
 
-    internal class DateFilter : IFilter
+    public enum DateFilterAction
     {
-        public FilterTypes FilterType { get; }
-        internal DateFilterAction Action { get; set; }
-        internal DateFilterDirection Direction { get; set; }
-        internal DateTime Date { get; set; }
+        Created
+    }
 
-        internal DateFilter(DateFilterAction action, DateFilterDirection direction, DateTime date)
+    public enum DateFilterDirection
+    {
+        Before,
+        After,
+        Equal
+    }
+
+    public class DateFilter : IFilter
+    {
+        public FilterTypes FilterType { get; set; }
+        public DateFilterAction Action { get; set; }
+        public DateFilterDirection Direction { get; set; }
+        public DateTime Date { get; set; }
+
+        public DateFilter() { }
+        public DateFilter(DateFilterAction action, DateFilterDirection direction, DateTime date)
         {
             Action = action;
             Direction = direction;
@@ -61,44 +75,62 @@ namespace DazUnpacker.source
         }
     }
 
-    internal enum DateFilterAction
+    public class ContentFilter : IFilter
     {
-        Created
+        public FilterTypes FilterType { get; set; }
+        public ContentTypes ContentType { get; set; }
+
+        public ContentFilter() { }
+        public ContentFilter(ContentTypes contentType)
+        {
+            FilterType = FilterTypes.FilterContentType;
+            ContentType = contentType;
+        }
+
+        internal bool IsPassed(ContentTypes contentType)
+        {
+            return contentType == this.ContentType;
+        }
     }
 
-    internal enum DateFilterDirection
+    public class FilterManager
     {
-        Before,
-        After,
-        Equal
-    }
+        public List<IFilter> FilterList = new List<IFilter>();
+        public bool IsDateFilterEnabled = false;
+        public bool IsContentTypeFilterEnabled = false;
 
-    internal static class FilterManager
-    {
-        private static List<IFilter> filterList = new List<IFilter>();
+        public FilterManager() { }
 
-        internal static void AddDateFilter(DateFilterAction action, DateFilterDirection direction, DateTime date)
+        internal void AddDateFilter(DateFilterAction action, DateFilterDirection direction, DateTime date)
         {
-            filterList.Add(new DateFilter(action, direction, date));
+            FilterList.Add(new DateFilter(action, direction, date));
         }
 
-        internal static void ClearFilters()
+        internal void AddContentTypeFilter(ContentTypes contentType)
         {
-            filterList.Clear();
+            FilterList.Add(new ContentFilter(contentType));
         }
 
-        internal static bool HasFilters()
+        internal void ClearFilters()
         {
-            return filterList.Count > 0;
+            FilterList.Clear();
         }
 
-        internal static bool IsPassed(DateTime dateCreated)
+        internal bool HasFilters()
         {
-            foreach (IFilter filter in filterList)
+            return FilterList.Count > 0;
+        }
+
+        internal bool IsPassed(DateTime dateCreated)
+        {
+            if (!IsDateFilterEnabled)
+                return true;
+
+            foreach (IFilter filter in FilterList)
             {
-                if (filter.FilterType == FilterTypes.FilterDateType)
+                if (filter is DateFilter dateFilter)
                 {
-                    if (!((DateFilter)filter).IsPassed(DateFilterAction.Created, dateCreated))
+                    if (!dateFilter.IsPassed(DateFilterAction.Created, dateCreated))
                     {
                         return false;
                     }
@@ -106,6 +138,25 @@ namespace DazUnpacker.source
             }
             return true;
         }
+
+        internal bool IsPassed(ContentTypes contentType)
+        {
+            if (!IsContentTypeFilterEnabled)
+                return true;
+
+            foreach (IFilter filter in FilterList)
+            {
+                if (filter is ContentFilter contentFilter)
+                {
+                    if (contentFilter.IsPassed(contentType))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
 
     }
 

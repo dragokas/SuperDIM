@@ -30,39 +30,37 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.label1 = new System.Windows.Forms.Label();
             this.buttonAddLibraryPath = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPageSettings = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.checkedListBoxLibraryDirs = new System.Windows.Forms.CheckedListBox();
             this.panelLanguage = new System.Windows.Forms.Panel();
             this.radioButtonLangRussian = new System.Windows.Forms.RadioButton();
-            this.radioButtonLangEnglish = new System.Windows.Forms.RadioButton();
             this.label19 = new System.Windows.Forms.Label();
-            this.panel7 = new System.Windows.Forms.Panel();
-            this.checkedListBoxLibraryDirs = new System.Windows.Forms.CheckedListBox();
+            this.radioButtonLangEnglish = new System.Windows.Forms.RadioButton();
             this.label23 = new System.Windows.Forms.Label();
             this.buttonRemoveLibraryPath = new System.Windows.Forms.Button();
             this.label22 = new System.Windows.Forms.Label();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.label20 = new System.Windows.Forms.Label();
             this.buttonSelectTempFolder = new System.Windows.Forms.Button();
             this.textBoxTempFolder = new System.Windows.Forms.TextBox();
             this.radioButtonTempIsSpecific = new System.Windows.Forms.RadioButton();
             this.radioButtonTempSameAsInstall = new System.Windows.Forms.RadioButton();
-            this.label8 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.label21 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label28 = new System.Windows.Forms.Label();
-            this.comboBoxGender = new System.Windows.Forms.ComboBox();
-            this.label29 = new System.Windows.Forms.Label();
-            this.comboBoxGeneration = new System.Windows.Forms.ComboBox();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.checkBoxGenesis9 = new System.Windows.Forms.CheckBox();
             this.checkBoxGenesis3 = new System.Windows.Forms.CheckBox();
             this.checkBoxGenesis8 = new System.Windows.Forms.CheckBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.comboBoxFallbackGender = new System.Windows.Forms.ComboBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.comboBoxFallbackGeneration = new System.Windows.Forms.ComboBox();
+            this.label24 = new System.Windows.Forms.Label();
             this.tabPageSort = new System.Windows.Forms.TabPage();
             this.label15 = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -91,7 +89,7 @@
             this.radioButtonSpecificSubfolder = new System.Windows.Forms.RadioButton();
             this.textBoxSubfolderForced = new System.Windows.Forms.TextBox();
             this.tabPageInstaller = new System.Windows.Forms.TabPage();
-            this.checkBoxIgnoreRootFolder = new System.Windows.Forms.CheckBox();
+            this.checkBoxHierarhyByRootFolder = new System.Windows.Forms.CheckBox();
             this.checkBoxOverwrite = new System.Windows.Forms.CheckBox();
             this.panel8 = new System.Windows.Forms.Panel();
             this.buttonClear = new System.Windows.Forms.Button();
@@ -108,9 +106,11 @@
             this.radioButtonInstallLibs = new EWSoftware.ListControls.RadioButtonList();
             this.checkBoxDetectContentTypePerFile = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.comboBoxFilterContentTypes = new System.Windows.Forms.ComboBox();
+            this.checkBoxFilterByType = new System.Windows.Forms.CheckBox();
             this.checkBoxDateFilterCreated = new System.Windows.Forms.CheckBox();
             this.dateTimePickerFilterCreated = new System.Windows.Forms.DateTimePicker();
-            this.comboBoxDateFilter = new System.Windows.Forms.ComboBox();
+            this.comboBoxDateFilterDirection = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.radioButtonFullInstall = new System.Windows.Forms.RadioButton();
@@ -130,7 +130,6 @@
             this.comboBoxContentType = new System.Windows.Forms.ComboBox();
             this.label27 = new System.Windows.Forms.Label();
             this.comboBoxContentRootFolder = new System.Windows.Forms.ComboBox();
-            this.label26 = new System.Windows.Forms.Label();
             this.buttonStart = new System.Windows.Forms.Button();
             this.tabPageLogs = new System.Windows.Forms.TabPage();
             this.buttonReInstallAccessDenied = new System.Windows.Forms.Button();
@@ -151,10 +150,11 @@
             this.tabControl.SuspendLayout();
             this.tabPageSettings.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             this.panelLanguage.SuspendLayout();
-            this.panel7.SuspendLayout();
-            this.panel3.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabPageSort.SuspendLayout();
             this.panelSubfolder.SuspendLayout();
@@ -174,19 +174,9 @@
             this.contextMenuCommon.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(4, 0);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(143, 24);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "DAZ Libraries:";
-            // 
             // buttonAddLibraryPath
             // 
+            this.buttonAddLibraryPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.buttonAddLibraryPath.Location = new System.Drawing.Point(9, 402);
             this.buttonAddLibraryPath.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonAddLibraryPath.Name = "buttonAddLibraryPath";
@@ -208,6 +198,7 @@
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(1166, 1117);
             this.tabControl.TabIndex = 3;
+            this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl_Selecting);
             // 
             // tabPageSettings
             // 
@@ -223,9 +214,8 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.panelLanguage);
-            this.panel1.Controls.Add(this.panel7);
-            this.panel1.Controls.Add(this.panel3);
+            this.panel1.Controls.Add(this.groupBox7);
+            this.panel1.Controls.Add(this.groupBox6);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Location = new System.Drawing.Point(9, 10);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -233,73 +223,28 @@
             this.panel1.Size = new System.Drawing.Size(1111, 1058);
             this.panel1.TabIndex = 0;
             // 
-            // panelLanguage
+            // groupBox7
             // 
-            this.panelLanguage.Controls.Add(this.radioButtonLangRussian);
-            this.panelLanguage.Controls.Add(this.radioButtonLangEnglish);
-            this.panelLanguage.Controls.Add(this.label19);
-            this.panelLanguage.Location = new System.Drawing.Point(617, 5);
-            this.panelLanguage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panelLanguage.Name = "panelLanguage";
-            this.panelLanguage.Size = new System.Drawing.Size(490, 32);
-            this.panelLanguage.TabIndex = 13;
-            // 
-            // radioButtonLangRussian
-            // 
-            this.radioButtonLangRussian.AutoSize = true;
-            this.radioButtonLangRussian.Location = new System.Drawing.Point(357, 0);
-            this.radioButtonLangRussian.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonLangRussian.Name = "radioButtonLangRussian";
-            this.radioButtonLangRussian.Size = new System.Drawing.Size(107, 29);
-            this.radioButtonLangRussian.TabIndex = 2;
-            this.radioButtonLangRussian.Text = "Russian";
-            this.radioButtonLangRussian.UseVisualStyleBackColor = true;
-            this.radioButtonLangRussian.CheckedChanged += new System.EventHandler(this.radioButtonLangRussian_CheckedChanged);
-            // 
-            // radioButtonLangEnglish
-            // 
-            this.radioButtonLangEnglish.AutoSize = true;
-            this.radioButtonLangEnglish.Checked = true;
-            this.radioButtonLangEnglish.Location = new System.Drawing.Point(244, 2);
-            this.radioButtonLangEnglish.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonLangEnglish.Name = "radioButtonLangEnglish";
-            this.radioButtonLangEnglish.Size = new System.Drawing.Size(101, 29);
-            this.radioButtonLangEnglish.TabIndex = 1;
-            this.radioButtonLangEnglish.TabStop = true;
-            this.radioButtonLangEnglish.Text = "English";
-            this.radioButtonLangEnglish.UseVisualStyleBackColor = true;
-            this.radioButtonLangEnglish.CheckedChanged += new System.EventHandler(this.radioButtonLangEnglish_CheckedChanged);
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label19.Location = new System.Drawing.Point(4, 2);
-            this.label19.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(218, 24);
-            this.label19.TabIndex = 0;
-            this.label19.Text = "Language of interface:";
-            // 
-            // panel7
-            // 
-            this.panel7.Controls.Add(this.checkedListBoxLibraryDirs);
-            this.panel7.Controls.Add(this.label23);
-            this.panel7.Controls.Add(this.buttonRemoveLibraryPath);
-            this.panel7.Controls.Add(this.label22);
-            this.panel7.Controls.Add(this.buttonAddLibraryPath);
-            this.panel7.Controls.Add(this.label1);
-            this.panel7.Location = new System.Drawing.Point(21, 47);
-            this.panel7.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(1045, 455);
-            this.panel7.TabIndex = 12;
+            this.groupBox7.Controls.Add(this.checkedListBoxLibraryDirs);
+            this.groupBox7.Controls.Add(this.panelLanguage);
+            this.groupBox7.Controls.Add(this.label23);
+            this.groupBox7.Controls.Add(this.buttonRemoveLibraryPath);
+            this.groupBox7.Controls.Add(this.label22);
+            this.groupBox7.Controls.Add(this.buttonAddLibraryPath);
+            this.groupBox7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox7.Location = new System.Drawing.Point(21, 17);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(1043, 465);
+            this.groupBox7.TabIndex = 17;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "DAZ Libraries:";
             // 
             // checkedListBoxLibraryDirs
             // 
             this.checkedListBoxLibraryDirs.AllowDrop = true;
+            this.checkedListBoxLibraryDirs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.checkedListBoxLibraryDirs.FormattingEnabled = true;
-            this.checkedListBoxLibraryDirs.Location = new System.Drawing.Point(24, 35);
+            this.checkedListBoxLibraryDirs.Location = new System.Drawing.Point(25, 47);
             this.checkedListBoxLibraryDirs.Margin = new System.Windows.Forms.Padding(4);
             this.checkedListBoxLibraryDirs.Name = "checkedListBoxLibraryDirs";
             this.checkedListBoxLibraryDirs.Size = new System.Drawing.Size(651, 238);
@@ -308,9 +253,58 @@
             this.checkedListBoxLibraryDirs.DragEnter += new System.Windows.Forms.DragEventHandler(this.checkedListBoxLibraryDirs_DragEnter);
             this.checkedListBoxLibraryDirs.MouseEnter += new System.EventHandler(this.checkedListBoxLibraryDirs_MouseEnter);
             // 
+            // panelLanguage
+            // 
+            this.panelLanguage.Controls.Add(this.radioButtonLangRussian);
+            this.panelLanguage.Controls.Add(this.label19);
+            this.panelLanguage.Controls.Add(this.radioButtonLangEnglish);
+            this.panelLanguage.Location = new System.Drawing.Point(769, 47);
+            this.panelLanguage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.panelLanguage.Name = "panelLanguage";
+            this.panelLanguage.Size = new System.Drawing.Size(256, 138);
+            this.panelLanguage.TabIndex = 13;
+            // 
+            // radioButtonLangRussian
+            // 
+            this.radioButtonLangRussian.AutoSize = true;
+            this.radioButtonLangRussian.Location = new System.Drawing.Point(36, 94);
+            this.radioButtonLangRussian.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioButtonLangRussian.Name = "radioButtonLangRussian";
+            this.radioButtonLangRussian.Size = new System.Drawing.Size(114, 29);
+            this.radioButtonLangRussian.TabIndex = 2;
+            this.radioButtonLangRussian.Text = "Russian";
+            this.radioButtonLangRussian.UseVisualStyleBackColor = true;
+            this.radioButtonLangRussian.CheckedChanged += new System.EventHandler(this.radioButtonLangRussian_CheckedChanged);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label19.Location = new System.Drawing.Point(32, 13);
+            this.label19.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(218, 24);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Language of interface:";
+            // 
+            // radioButtonLangEnglish
+            // 
+            this.radioButtonLangEnglish.AutoSize = true;
+            this.radioButtonLangEnglish.Checked = true;
+            this.radioButtonLangEnglish.Location = new System.Drawing.Point(36, 55);
+            this.radioButtonLangEnglish.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.radioButtonLangEnglish.Name = "radioButtonLangEnglish";
+            this.radioButtonLangEnglish.Size = new System.Drawing.Size(108, 29);
+            this.radioButtonLangEnglish.TabIndex = 1;
+            this.radioButtonLangEnglish.TabStop = true;
+            this.radioButtonLangEnglish.Text = "English";
+            this.radioButtonLangEnglish.UseVisualStyleBackColor = true;
+            this.radioButtonLangEnglish.CheckedChanged += new System.EventHandler(this.radioButtonLangEnglish_CheckedChanged);
+            // 
             // label23
             // 
             this.label23.AutoSize = true;
+            this.label23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label23.Location = new System.Drawing.Point(20, 353);
             this.label23.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label23.Name = "label23";
@@ -320,6 +314,7 @@
             // 
             // buttonRemoveLibraryPath
             // 
+            this.buttonRemoveLibraryPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.buttonRemoveLibraryPath.Location = new System.Drawing.Point(403, 402);
             this.buttonRemoveLibraryPath.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonRemoveLibraryPath.Name = "buttonRemoveLibraryPath";
@@ -332,6 +327,7 @@
             // label22
             // 
             this.label22.AutoSize = true;
+            this.label22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label22.Location = new System.Drawing.Point(20, 312);
             this.label22.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label22.Name = "label22";
@@ -339,25 +335,27 @@
             this.label22.TabIndex = 14;
             this.label22.Text = "Please, add here all DAZ content library folders, you plan to work with.";
             // 
-            // panel3
+            // groupBox6
             // 
-            this.panel3.Controls.Add(this.label20);
-            this.panel3.Controls.Add(this.buttonSelectTempFolder);
-            this.panel3.Controls.Add(this.textBoxTempFolder);
-            this.panel3.Controls.Add(this.radioButtonTempIsSpecific);
-            this.panel3.Controls.Add(this.radioButtonTempSameAsInstall);
-            this.panel3.Controls.Add(this.label8);
-            this.panel3.Location = new System.Drawing.Point(21, 532);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1045, 178);
-            this.panel3.TabIndex = 11;
+            this.groupBox6.Controls.Add(this.label20);
+            this.groupBox6.Controls.Add(this.buttonSelectTempFolder);
+            this.groupBox6.Controls.Add(this.textBoxTempFolder);
+            this.groupBox6.Controls.Add(this.radioButtonTempIsSpecific);
+            this.groupBox6.Controls.Add(this.radioButtonTempSameAsInstall);
+            this.groupBox6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox6.Location = new System.Drawing.Point(21, 499);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(1045, 151);
+            this.groupBox6.TabIndex = 6;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Temporarily folder:";
             // 
             // label20
             // 
             this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label20.ForeColor = System.Drawing.Color.Gray;
-            this.label20.Location = new System.Drawing.Point(304, 74);
+            this.label20.Location = new System.Drawing.Point(296, 57);
             this.label20.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(360, 25);
@@ -367,7 +365,8 @@
             // buttonSelectTempFolder
             // 
             this.buttonSelectTempFolder.Enabled = false;
-            this.buttonSelectTempFolder.Location = new System.Drawing.Point(738, 108);
+            this.buttonSelectTempFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonSelectTempFolder.Location = new System.Drawing.Point(730, 91);
             this.buttonSelectTempFolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonSelectTempFolder.Name = "buttonSelectTempFolder";
             this.buttonSelectTempFolder.Size = new System.Drawing.Size(114, 43);
@@ -379,7 +378,8 @@
             // textBoxTempFolder
             // 
             this.textBoxTempFolder.Enabled = false;
-            this.textBoxTempFolder.Location = new System.Drawing.Point(196, 119);
+            this.textBoxTempFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBoxTempFolder.Location = new System.Drawing.Point(188, 102);
             this.textBoxTempFolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxTempFolder.Name = "textBoxTempFolder";
             this.textBoxTempFolder.Size = new System.Drawing.Size(532, 29);
@@ -389,7 +389,8 @@
             // radioButtonTempIsSpecific
             // 
             this.radioButtonTempIsSpecific.AutoSize = true;
-            this.radioButtonTempIsSpecific.Location = new System.Drawing.Point(20, 120);
+            this.radioButtonTempIsSpecific.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButtonTempIsSpecific.Location = new System.Drawing.Point(12, 103);
             this.radioButtonTempIsSpecific.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.radioButtonTempIsSpecific.Name = "radioButtonTempIsSpecific";
             this.radioButtonTempIsSpecific.Size = new System.Drawing.Size(165, 29);
@@ -402,7 +403,8 @@
             // 
             this.radioButtonTempSameAsInstall.AutoSize = true;
             this.radioButtonTempSameAsInstall.Checked = true;
-            this.radioButtonTempSameAsInstall.Location = new System.Drawing.Point(20, 72);
+            this.radioButtonTempSameAsInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButtonTempSameAsInstall.Location = new System.Drawing.Point(12, 55);
             this.radioButtonTempSameAsInstall.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.radioButtonTempSameAsInstall.Name = "radioButtonTempSameAsInstall";
             this.radioButtonTempSameAsInstall.Size = new System.Drawing.Size(278, 29);
@@ -412,31 +414,72 @@
             this.radioButtonTempSameAsInstall.UseVisualStyleBackColor = true;
             this.radioButtonTempSameAsInstall.CheckedChanged += new System.EventHandler(this.radioButtonTempSameAsInstall_CheckedChanged);
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label8.Location = new System.Drawing.Point(27, 25);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(186, 24);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "Temporarily folder:";
-            // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.groupBox5);
             this.panel2.Controls.Add(this.label21);
             this.panel2.Controls.Add(this.groupBox2);
             this.panel2.Controls.Add(this.label24);
-            this.panel2.Controls.Add(this.label5);
-            this.panel2.Controls.Add(this.checkBoxGenesis9);
-            this.panel2.Controls.Add(this.checkBoxGenesis3);
-            this.panel2.Controls.Add(this.checkBoxGenesis8);
-            this.panel2.Location = new System.Drawing.Point(21, 745);
+            this.panel2.Location = new System.Drawing.Point(4, 658);
             this.panel2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1045, 293);
+            this.panel2.Size = new System.Drawing.Size(1062, 293);
             this.panel2.TabIndex = 10;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.checkBoxGenesis9);
+            this.groupBox5.Controls.Add(this.checkBoxGenesis3);
+            this.groupBox5.Controls.Add(this.checkBoxGenesis8);
+            this.groupBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox5.Location = new System.Drawing.Point(20, 19);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(326, 171);
+            this.groupBox5.TabIndex = 50;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Install these generations only:";
+            // 
+            // checkBoxGenesis9
+            // 
+            this.checkBoxGenesis9.AutoSize = true;
+            this.checkBoxGenesis9.Checked = true;
+            this.checkBoxGenesis9.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxGenesis9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.checkBoxGenesis9.Location = new System.Drawing.Point(25, 129);
+            this.checkBoxGenesis9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxGenesis9.Name = "checkBoxGenesis9";
+            this.checkBoxGenesis9.Size = new System.Drawing.Size(126, 29);
+            this.checkBoxGenesis9.TabIndex = 9;
+            this.checkBoxGenesis9.Text = "Genesis 9";
+            this.checkBoxGenesis9.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxGenesis3
+            // 
+            this.checkBoxGenesis3.AutoSize = true;
+            this.checkBoxGenesis3.Checked = true;
+            this.checkBoxGenesis3.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxGenesis3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.checkBoxGenesis3.Location = new System.Drawing.Point(25, 51);
+            this.checkBoxGenesis3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxGenesis3.Name = "checkBoxGenesis3";
+            this.checkBoxGenesis3.Size = new System.Drawing.Size(126, 29);
+            this.checkBoxGenesis3.TabIndex = 7;
+            this.checkBoxGenesis3.Text = "Genesis 3";
+            this.checkBoxGenesis3.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxGenesis8
+            // 
+            this.checkBoxGenesis8.AutoSize = true;
+            this.checkBoxGenesis8.Checked = true;
+            this.checkBoxGenesis8.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxGenesis8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.142858F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.checkBoxGenesis8.Location = new System.Drawing.Point(25, 90);
+            this.checkBoxGenesis8.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxGenesis8.Name = "checkBoxGenesis8";
+            this.checkBoxGenesis8.Size = new System.Drawing.Size(169, 29);
+            this.checkBoxGenesis8.TabIndex = 8;
+            this.checkBoxGenesis8.Text = "Genesis 8 / 8.1";
+            this.checkBoxGenesis8.UseVisualStyleBackColor = true;
             // 
             // label21
             // 
@@ -444,7 +487,7 @@
             this.label21.Location = new System.Drawing.Point(40, 230);
             this.label21.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(732, 49);
+            this.label21.Size = new System.Drawing.Size(744, 53);
             this.label21.TabIndex = 49;
             this.label21.Text = "* Content types: \"Environment\", \"Props\", \"Scripts\" are mostly version-independent" +
     ". They get installed at first selected Genesis.";
@@ -452,14 +495,14 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.label28);
-            this.groupBox2.Controls.Add(this.comboBoxGender);
+            this.groupBox2.Controls.Add(this.comboBoxFallbackGender);
             this.groupBox2.Controls.Add(this.label29);
-            this.groupBox2.Controls.Add(this.comboBoxGeneration);
-            this.groupBox2.Location = new System.Drawing.Point(738, 40);
+            this.groupBox2.Controls.Add(this.comboBoxFallbackGeneration);
+            this.groupBox2.Location = new System.Drawing.Point(366, 19);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(298, 136);
+            this.groupBox2.Size = new System.Drawing.Size(298, 170);
             this.groupBox2.TabIndex = 48;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "On fail detection (fallback):";
@@ -474,15 +517,15 @@
             this.label28.TabIndex = 31;
             this.label28.Text = "Gender:";
             // 
-            // comboBoxGender
+            // comboBoxFallbackGender
             // 
-            this.comboBoxGender.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxGender.FormattingEnabled = true;
-            this.comboBoxGender.Location = new System.Drawing.Point(128, 48);
-            this.comboBoxGender.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBoxGender.Name = "comboBoxGender";
-            this.comboBoxGender.Size = new System.Drawing.Size(162, 32);
-            this.comboBoxGender.TabIndex = 32;
+            this.comboBoxFallbackGender.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxFallbackGender.FormattingEnabled = true;
+            this.comboBoxFallbackGender.Location = new System.Drawing.Point(128, 48);
+            this.comboBoxFallbackGender.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxFallbackGender.Name = "comboBoxFallbackGender";
+            this.comboBoxFallbackGender.Size = new System.Drawing.Size(162, 32);
+            this.comboBoxFallbackGender.TabIndex = 32;
             // 
             // label29
             // 
@@ -494,15 +537,15 @@
             this.label29.TabIndex = 33;
             this.label29.Text = "Generation:";
             // 
-            // comboBoxGeneration
+            // comboBoxFallbackGeneration
             // 
-            this.comboBoxGeneration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxGeneration.FormattingEnabled = true;
-            this.comboBoxGeneration.Location = new System.Drawing.Point(128, 89);
-            this.comboBoxGeneration.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBoxGeneration.Name = "comboBoxGeneration";
-            this.comboBoxGeneration.Size = new System.Drawing.Size(162, 32);
-            this.comboBoxGeneration.TabIndex = 34;
+            this.comboBoxFallbackGeneration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxFallbackGeneration.FormattingEnabled = true;
+            this.comboBoxFallbackGeneration.Location = new System.Drawing.Point(128, 89);
+            this.comboBoxFallbackGeneration.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxFallbackGeneration.Name = "comboBoxFallbackGeneration";
+            this.comboBoxFallbackGeneration.Size = new System.Drawing.Size(162, 32);
+            this.comboBoxFallbackGeneration.TabIndex = 34;
             // 
             // label24
             // 
@@ -515,59 +558,6 @@
             this.label24.TabIndex = 10;
             this.label24.Text = "* Note: if archive contains both generations, all selected above will be installe" +
     "d.";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(27, 19);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(287, 24);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "Install these generations only:";
-            // 
-            // checkBoxGenesis9
-            // 
-            this.checkBoxGenesis9.AutoSize = true;
-            this.checkBoxGenesis9.Checked = true;
-            this.checkBoxGenesis9.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxGenesis9.Location = new System.Drawing.Point(20, 146);
-            this.checkBoxGenesis9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxGenesis9.Name = "checkBoxGenesis9";
-            this.checkBoxGenesis9.Size = new System.Drawing.Size(126, 29);
-            this.checkBoxGenesis9.TabIndex = 9;
-            this.checkBoxGenesis9.Text = "Genesis 9";
-            this.checkBoxGenesis9.UseVisualStyleBackColor = true;
-            this.checkBoxGenesis9.CheckedChanged += new System.EventHandler(this.checkBoxGenesis9_CheckedChanged);
-            // 
-            // checkBoxGenesis3
-            // 
-            this.checkBoxGenesis3.AutoSize = true;
-            this.checkBoxGenesis3.Checked = true;
-            this.checkBoxGenesis3.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxGenesis3.Location = new System.Drawing.Point(20, 66);
-            this.checkBoxGenesis3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxGenesis3.Name = "checkBoxGenesis3";
-            this.checkBoxGenesis3.Size = new System.Drawing.Size(126, 29);
-            this.checkBoxGenesis3.TabIndex = 7;
-            this.checkBoxGenesis3.Text = "Genesis 3";
-            this.checkBoxGenesis3.UseVisualStyleBackColor = true;
-            this.checkBoxGenesis3.CheckedChanged += new System.EventHandler(this.checkBoxGenesis3_CheckedChanged);
-            // 
-            // checkBoxGenesis8
-            // 
-            this.checkBoxGenesis8.AutoSize = true;
-            this.checkBoxGenesis8.Checked = true;
-            this.checkBoxGenesis8.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxGenesis8.Location = new System.Drawing.Point(20, 108);
-            this.checkBoxGenesis8.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxGenesis8.Name = "checkBoxGenesis8";
-            this.checkBoxGenesis8.Size = new System.Drawing.Size(169, 29);
-            this.checkBoxGenesis8.TabIndex = 8;
-            this.checkBoxGenesis8.Text = "Genesis 8 / 8.1";
-            this.checkBoxGenesis8.UseVisualStyleBackColor = true;
-            this.checkBoxGenesis8.CheckedChanged += new System.EventHandler(this.checkBoxGenesis8_CheckedChanged);
             // 
             // tabPageSort
             // 
@@ -903,7 +893,7 @@
             // tabPageInstaller
             // 
             this.tabPageInstaller.AllowDrop = true;
-            this.tabPageInstaller.Controls.Add(this.checkBoxIgnoreRootFolder);
+            this.tabPageInstaller.Controls.Add(this.checkBoxHierarhyByRootFolder);
             this.tabPageInstaller.Controls.Add(this.checkBoxOverwrite);
             this.tabPageInstaller.Controls.Add(this.panel8);
             this.tabPageInstaller.Controls.Add(this.groupBox4);
@@ -921,7 +911,6 @@
             this.tabPageInstaller.Controls.Add(this.comboBoxContentType);
             this.tabPageInstaller.Controls.Add(this.label27);
             this.tabPageInstaller.Controls.Add(this.comboBoxContentRootFolder);
-            this.tabPageInstaller.Controls.Add(this.label26);
             this.tabPageInstaller.Controls.Add(this.buttonStart);
             this.tabPageInstaller.Location = new System.Drawing.Point(4, 33);
             this.tabPageInstaller.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -932,17 +921,18 @@
             this.tabPageInstaller.Text = "Installer";
             this.tabPageInstaller.UseVisualStyleBackColor = true;
             // 
-            // checkBoxIgnoreRootFolder
+            // checkBoxHierarhyByRootFolder
             // 
-            this.checkBoxIgnoreRootFolder.AutoSize = true;
-            this.checkBoxIgnoreRootFolder.Location = new System.Drawing.Point(1043, 823);
-            this.checkBoxIgnoreRootFolder.Margin = new System.Windows.Forms.Padding(4);
-            this.checkBoxIgnoreRootFolder.Name = "checkBoxIgnoreRootFolder";
-            this.checkBoxIgnoreRootFolder.Size = new System.Drawing.Size(92, 29);
-            this.checkBoxIgnoreRootFolder.TabIndex = 52;
-            this.checkBoxIgnoreRootFolder.Text = "ignore";
-            this.checkBoxIgnoreRootFolder.UseVisualStyleBackColor = true;
-            this.checkBoxIgnoreRootFolder.CheckedChanged += new System.EventHandler(this.checkBoxIgnoreRootFolder_CheckedChanged);
+            this.checkBoxHierarhyByRootFolder.AutoSize = true;
+            this.checkBoxHierarhyByRootFolder.Checked = true;
+            this.checkBoxHierarhyByRootFolder.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxHierarhyByRootFolder.Location = new System.Drawing.Point(43, 823);
+            this.checkBoxHierarhyByRootFolder.Name = "checkBoxHierarhyByRootFolder";
+            this.checkBoxHierarhyByRootFolder.Size = new System.Drawing.Size(241, 29);
+            this.checkBoxHierarhyByRootFolder.TabIndex = 53;
+            this.checkBoxHierarhyByRootFolder.Text = "Hierarhy by Root folder:";
+            this.checkBoxHierarhyByRootFolder.UseVisualStyleBackColor = true;
+            this.checkBoxHierarhyByRootFolder.CheckedChanged += new System.EventHandler(this.checkBoxHierarhyByRootFolder_CheckedChanged);
             // 
             // checkBoxOverwrite
             // 
@@ -963,10 +953,10 @@
             this.panel8.Controls.Add(this.progressBar1);
             this.panel8.Controls.Add(this.buttonAddContentFolder);
             this.panel8.Controls.Add(this.label3);
-            this.panel8.Location = new System.Drawing.Point(31, 335);
+            this.panel8.Location = new System.Drawing.Point(20, 334);
             this.panel8.Margin = new System.Windows.Forms.Padding(4);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(1122, 479);
+            this.panel8.Size = new System.Drawing.Size(1134, 479);
             this.panel8.TabIndex = 50;
             // 
             // buttonClear
@@ -1008,7 +998,7 @@
             this.listViewContent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listViewContent.MultiSelect = false;
             this.listViewContent.Name = "listViewContent";
-            this.listViewContent.Size = new System.Drawing.Size(1109, 363);
+            this.listViewContent.Size = new System.Drawing.Size(1115, 363);
             this.listViewContent.TabIndex = 16;
             this.listViewContent.UseCompatibleStateImageBehavior = false;
             this.listViewContent.View = System.Windows.Forms.View.Details;
@@ -1038,7 +1028,7 @@
             this.progressBar1.Location = new System.Drawing.Point(565, 60);
             this.progressBar1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(551, 29);
+            this.progressBar1.Size = new System.Drawing.Size(556, 29);
             this.progressBar1.TabIndex = 10;
             // 
             // buttonAddContentFolder
@@ -1067,7 +1057,7 @@
             // 
             this.groupBox4.Controls.Add(this.radioButtonInstallLibs);
             this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox4.Location = new System.Drawing.Point(39, 30);
+            this.groupBox4.Location = new System.Drawing.Point(20, 30);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
@@ -1093,7 +1083,7 @@
             this.checkBoxDetectContentTypePerFile.AutoSize = true;
             this.checkBoxDetectContentTypePerFile.Checked = true;
             this.checkBoxDetectContentTypePerFile.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxDetectContentTypePerFile.Location = new System.Drawing.Point(534, 864);
+            this.checkBoxDetectContentTypePerFile.Location = new System.Drawing.Point(585, 864);
             this.checkBoxDetectContentTypePerFile.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxDetectContentTypePerFile.Name = "checkBoxDetectContentTypePerFile";
             this.checkBoxDetectContentTypePerFile.Size = new System.Drawing.Size(356, 29);
@@ -1104,24 +1094,49 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.comboBoxFilterContentTypes);
+            this.groupBox3.Controls.Add(this.checkBoxFilterByType);
             this.groupBox3.Controls.Add(this.checkBoxDateFilterCreated);
             this.groupBox3.Controls.Add(this.dateTimePickerFilterCreated);
-            this.groupBox3.Controls.Add(this.comboBoxDateFilter);
+            this.groupBox3.Controls.Add(this.comboBoxDateFilterDirection);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox3.Location = new System.Drawing.Point(576, 180);
+            this.groupBox3.Location = new System.Drawing.Point(576, 165);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(573, 131);
+            this.groupBox3.Size = new System.Drawing.Size(573, 146);
             this.groupBox3.TabIndex = 47;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Filter by date";
+            this.groupBox3.Text = "Filters";
+            // 
+            // comboBoxFilterContentTypes
+            // 
+            this.comboBoxFilterContentTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxFilterContentTypes.Enabled = false;
+            this.comboBoxFilterContentTypes.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.comboBoxFilterContentTypes.FormattingEnabled = true;
+            this.comboBoxFilterContentTypes.Location = new System.Drawing.Point(145, 92);
+            this.comboBoxFilterContentTypes.Name = "comboBoxFilterContentTypes";
+            this.comboBoxFilterContentTypes.Size = new System.Drawing.Size(240, 32);
+            this.comboBoxFilterContentTypes.TabIndex = 4;
+            // 
+            // checkBoxFilterByType
+            // 
+            this.checkBoxFilterByType.AutoSize = true;
+            this.checkBoxFilterByType.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+            this.checkBoxFilterByType.Location = new System.Drawing.Point(20, 96);
+            this.checkBoxFilterByType.Name = "checkBoxFilterByType";
+            this.checkBoxFilterByType.Size = new System.Drawing.Size(79, 28);
+            this.checkBoxFilterByType.TabIndex = 4;
+            this.checkBoxFilterByType.Text = "Type";
+            this.checkBoxFilterByType.UseVisualStyleBackColor = true;
+            this.checkBoxFilterByType.CheckedChanged += new System.EventHandler(this.checkBoxFilterByType_CheckedChanged);
             // 
             // checkBoxDateFilterCreated
             // 
             this.checkBoxDateFilterCreated.AutoSize = true;
             this.checkBoxDateFilterCreated.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkBoxDateFilterCreated.Location = new System.Drawing.Point(17, 61);
+            this.checkBoxDateFilterCreated.Location = new System.Drawing.Point(20, 42);
             this.checkBoxDateFilterCreated.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxDateFilterCreated.Name = "checkBoxDateFilterCreated";
             this.checkBoxDateFilterCreated.Size = new System.Drawing.Size(102, 28);
@@ -1132,25 +1147,25 @@
             // 
             // dateTimePickerFilterCreated
             // 
+            this.dateTimePickerFilterCreated.Enabled = false;
             this.dateTimePickerFilterCreated.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.dateTimePickerFilterCreated.Location = new System.Drawing.Point(304, 56);
+            this.dateTimePickerFilterCreated.Location = new System.Drawing.Point(307, 39);
             this.dateTimePickerFilterCreated.Margin = new System.Windows.Forms.Padding(4);
             this.dateTimePickerFilterCreated.Name = "dateTimePickerFilterCreated";
             this.dateTimePickerFilterCreated.Size = new System.Drawing.Size(258, 29);
             this.dateTimePickerFilterCreated.TabIndex = 2;
-            this.dateTimePickerFilterCreated.ValueChanged += new System.EventHandler(this.dateTimePickerFilterCreated_ValueChanged);
             // 
-            // comboBoxDateFilter
+            // comboBoxDateFilterDirection
             // 
-            this.comboBoxDateFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxDateFilter.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.comboBoxDateFilter.FormattingEnabled = true;
-            this.comboBoxDateFilter.Location = new System.Drawing.Point(143, 56);
-            this.comboBoxDateFilter.Margin = new System.Windows.Forms.Padding(4);
-            this.comboBoxDateFilter.Name = "comboBoxDateFilter";
-            this.comboBoxDateFilter.Size = new System.Drawing.Size(143, 32);
-            this.comboBoxDateFilter.TabIndex = 1;
-            this.comboBoxDateFilter.SelectedIndexChanged += new System.EventHandler(this.comboBoxDateFilter_SelectedIndexChanged);
+            this.comboBoxDateFilterDirection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxDateFilterDirection.Enabled = false;
+            this.comboBoxDateFilterDirection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.comboBoxDateFilterDirection.FormattingEnabled = true;
+            this.comboBoxDateFilterDirection.Location = new System.Drawing.Point(145, 38);
+            this.comboBoxDateFilterDirection.Margin = new System.Windows.Forms.Padding(4);
+            this.comboBoxDateFilterDirection.Name = "comboBoxDateFilterDirection";
+            this.comboBoxDateFilterDirection.Size = new System.Drawing.Size(143, 32);
+            this.comboBoxDateFilterDirection.TabIndex = 1;
             // 
             // groupBox1
             // 
@@ -1162,7 +1177,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(573, 143);
+            this.groupBox1.Size = new System.Drawing.Size(573, 127);
             this.groupBox1.TabIndex = 46;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Installation method";
@@ -1172,7 +1187,7 @@
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label2.ForeColor = System.Drawing.Color.Gray;
-            this.label2.Location = new System.Drawing.Point(192, 95);
+            this.label2.Location = new System.Drawing.Point(190, 84);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(286, 24);
@@ -1184,7 +1199,7 @@
             this.radioButtonFullInstall.AutoSize = true;
             this.radioButtonFullInstall.Checked = true;
             this.radioButtonFullInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.radioButtonFullInstall.Location = new System.Drawing.Point(35, 43);
+            this.radioButtonFullInstall.Location = new System.Drawing.Point(35, 46);
             this.radioButtonFullInstall.Margin = new System.Windows.Forms.Padding(4);
             this.radioButtonFullInstall.Name = "radioButtonFullInstall";
             this.radioButtonFullInstall.Size = new System.Drawing.Size(117, 28);
@@ -1197,7 +1212,7 @@
             // 
             this.checkBoxInstallDufOnly.AutoSize = true;
             this.checkBoxInstallDufOnly.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkBoxInstallDufOnly.Location = new System.Drawing.Point(35, 92);
+            this.checkBoxInstallDufOnly.Location = new System.Drawing.Point(35, 82);
             this.checkBoxInstallDufOnly.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxInstallDufOnly.Name = "checkBoxInstallDufOnly";
             this.checkBoxInstallDufOnly.Size = new System.Drawing.Size(136, 28);
@@ -1316,7 +1331,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(973, 1033);
+            this.label30.Location = new System.Drawing.Point(961, 1033);
             this.label30.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(91, 25);
@@ -1325,7 +1340,7 @@
             // 
             // numericUpDownThreadsCount
             // 
-            this.numericUpDownThreadsCount.Location = new System.Drawing.Point(1069, 1031);
+            this.numericUpDownThreadsCount.Location = new System.Drawing.Point(1062, 1031);
             this.numericUpDownThreadsCount.Margin = new System.Windows.Forms.Padding(4);
             this.numericUpDownThreadsCount.Maximum = new decimal(new int[] {
             4,
@@ -1349,8 +1364,9 @@
             // comboBoxContentType
             // 
             this.comboBoxContentType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxContentType.Enabled = false;
             this.comboBoxContentType.FormattingEnabled = true;
-            this.comboBoxContentType.Location = new System.Drawing.Point(242, 862);
+            this.comboBoxContentType.Location = new System.Drawing.Point(291, 862);
             this.comboBoxContentType.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxContentType.Name = "comboBoxContentType";
             this.comboBoxContentType.Size = new System.Drawing.Size(267, 32);
@@ -1359,36 +1375,26 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(44, 868);
+            this.label27.Location = new System.Drawing.Point(41, 864);
             this.label27.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(194, 25);
+            this.label27.Size = new System.Drawing.Size(233, 25);
             this.label27.TabIndex = 29;
-            this.label27.Text = "Content type (for all):";
+            this.label27.Text = "Content type (for all files):";
             // 
             // comboBoxContentRootFolder
             // 
             this.comboBoxContentRootFolder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxContentRootFolder.FormattingEnabled = true;
-            this.comboBoxContentRootFolder.Location = new System.Drawing.Point(242, 821);
+            this.comboBoxContentRootFolder.Location = new System.Drawing.Point(291, 821);
             this.comboBoxContentRootFolder.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxContentRootFolder.Name = "comboBoxContentRootFolder";
-            this.comboBoxContentRootFolder.Size = new System.Drawing.Size(792, 32);
+            this.comboBoxContentRootFolder.Size = new System.Drawing.Size(850, 32);
             this.comboBoxContentRootFolder.TabIndex = 28;
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(44, 824);
-            this.label26.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(111, 25);
-            this.label26.TabIndex = 27;
-            this.label26.Text = "Root folder:";
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(980, 940);
+            this.buttonStart.Location = new System.Drawing.Point(972, 944);
             this.buttonStart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(169, 66);
@@ -1596,14 +1602,16 @@
             this.tabControl.ResumeLayout(false);
             this.tabPageSettings.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             this.panelLanguage.ResumeLayout(false);
             this.panelLanguage.PerformLayout();
-            this.panel7.ResumeLayout(false);
-            this.panel7.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tabPageSort.ResumeLayout(false);
@@ -1639,7 +1647,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonAddLibraryPath;
         private System.Windows.Forms.TabPage tabPageSettings;
         private System.Windows.Forms.Panel panel1;
@@ -1654,16 +1661,13 @@
         private System.Windows.Forms.ColumnHeader columnProgress;
         private System.Windows.Forms.ColumnHeader columnSubfolder;
         public System.Windows.Forms.ListView listViewContent;
-        private System.Windows.Forms.Label label5;
         public System.Windows.Forms.CheckBox checkBoxGenesis9;
         public System.Windows.Forms.CheckBox checkBoxGenesis8;
         public System.Windows.Forms.CheckBox checkBoxGenesis3;
         private System.Windows.Forms.TabPage tabPageLogs;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.RadioButton radioButtonTempSameAsInstall;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Panel panel2;
         public System.Windows.Forms.TextBox textBoxTempFolder;
         public System.Windows.Forms.RadioButton radioButtonTempIsSpecific;
@@ -1689,7 +1693,6 @@
         private System.Windows.Forms.Panel panelLanguage;
         private System.Windows.Forms.RadioButton radioButtonLangEnglish;
         private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Label label20;
         public System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.Panel panel9;
@@ -1706,12 +1709,10 @@
         public System.Windows.Forms.RadioButton radioButtonLangRussian;
         public System.Windows.Forms.ListBox listBoxLog;
         private System.Windows.Forms.ComboBox comboBoxContentRootFolder;
-        private System.Windows.Forms.Label label26;
         private System.Windows.Forms.ContextMenuStrip contextMenuCommon;
         private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
         private System.Windows.Forms.TextBox textBoxLogDetails;
         private System.Windows.Forms.CheckBox checkBoxLogDetails;
-        private System.Windows.Forms.ComboBox comboBoxContentType;
         private System.Windows.Forms.Label label27;
         internal System.Windows.Forms.Label labelProgress;
         internal System.Windows.Forms.CheckBox checkBoxDeleteLogOnStart;
@@ -1740,14 +1741,11 @@
         internal System.Windows.Forms.RadioButton checkBoxInstallDufOnly;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label28;
-        private System.Windows.Forms.ComboBox comboBoxGender;
         private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.ComboBox comboBoxGeneration;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.CheckBox checkBoxDateFilterCreated;
-        internal System.Windows.Forms.ComboBox comboBoxDateFilter;
+        internal System.Windows.Forms.ComboBox comboBoxDateFilterDirection;
         internal System.Windows.Forms.DateTimePicker dateTimePickerFilterCreated;
         private System.Windows.Forms.Panel panel8;
         private System.Windows.Forms.GroupBox groupBox4;
@@ -1756,7 +1754,16 @@
         internal System.Windows.Forms.CheckBox checkBoxDetectContentTypePerFile;
         internal EWSoftware.ListControls.RadioButtonList radioButtonInstallLibs;
         internal System.Windows.Forms.CheckedListBox checkedListBoxLibraryDirs;
-        private System.Windows.Forms.CheckBox checkBoxIgnoreRootFolder;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.GroupBox groupBox6;
+        internal System.Windows.Forms.CheckBox checkBoxHierarhyByRootFolder;
+        internal System.Windows.Forms.ComboBox comboBoxFallbackGender;
+        internal System.Windows.Forms.ComboBox comboBoxFallbackGeneration;
+        internal System.Windows.Forms.ComboBox comboBoxContentType;
+        internal System.Windows.Forms.CheckBox checkBoxDateFilterCreated;
+        internal System.Windows.Forms.ComboBox comboBoxFilterContentTypes;
+        internal System.Windows.Forms.CheckBox checkBoxFilterByType;
     }
 }
 

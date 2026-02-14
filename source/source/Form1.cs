@@ -21,6 +21,8 @@ namespace DazUnpacker
     {
         private Stopwatch m_stopWatcher = new Stopwatch();
         private ListViewColumnSorter lvwColumnSorter;
+        private TabPage _previousTab;
+        private bool _isFormLoaded = false;
 
         public Form1()
         {
@@ -33,7 +35,6 @@ namespace DazUnpacker
             Exclusion.Init(this);
             Config.Init(this);
             panelLanguage.Visible = false;
-            UpdateGenesisTypeFilter();
             UpdateTabs();
 
             RegisterDropHandler(tabPageInstaller);
@@ -59,25 +60,8 @@ namespace DazUnpacker
             listViewSkippedContent.ListViewItemSorter = lvwColumnSorter;
             lvwColumnSorter.SortColumn = 1;
             listViewSkippedContent.Sort();
-
-            foreach (string name in Enum.GetNames(typeof(ContentType)))
-            {
-                comboBoxContentType.Items.Add(name);
-            }
-            comboBoxContentType.SelectedIndex = 0;
-
-            foreach (string name in Enum.GetNames(typeof(GenesisGender)))
-            {
-                comboBoxGender.Items.Add(name);
-            }
-            comboBoxGender.SelectedIndex = 0;
-            comboBoxGender.SelectedIndex = comboBoxGender.FindStringExact(GenesisGender.Female.ToString());
-
-            foreach (string name in Enum.GetNames(typeof(GenesisVersion)))
-            {
-                comboBoxGeneration.Items.Add(name);
-            }
-            comboBoxGeneration.SelectedIndex = 2;
+            _previousTab = tabControl.SelectedTab;
+            _isFormLoaded = true;
 
             Log.Init(checkBoxDeleteLogOnStart.Checked);
             Log.SetControlForReport(listBoxLog);
@@ -179,18 +163,6 @@ namespace DazUnpacker
         {
             Config.Storage.TabSettings.TempFolder = textBoxTempFolder.Text;
         }
-        private void checkBoxGenesis3_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateGenesisTypeFilter();
-        }
-        private void checkBoxGenesis8_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateGenesisTypeFilter();
-        }
-        private void checkBoxGenesis9_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateGenesisTypeFilter();
-        }
         private void UpdateGenesisTypeFilter()
         {
             Config.Storage.TabSettings.genesisVersionFilter = Config.GetGenesisVersionFilter();
@@ -291,7 +263,7 @@ namespace DazUnpacker
             string grandParentDir = FileSys.GetParentDir(FileSys.GetParentDir(file));
             comboBoxContentRootFolder.SelectedIndex = comboBoxContentRootFolder.FindStringExact(grandParentDir);
 
-            ContentType contentType = Unpacker.DetectContentType(file);
+            ContentTypes contentType = Unpacker.DetectContentType(file);
             comboBoxContentType.SelectedIndex = comboBoxContentType.FindStringExact(contentType.ToString());
         }
 
@@ -333,19 +305,22 @@ namespace DazUnpacker
                 Statistics.Done = 0;
                 Library.Skipped.RemoveAll();
 
+                UpdateGenesisTypeFilter();
+                Config.SaveFiltersFromForm();
+
                 buttonStart.Enabled = false;
                 progressBar1.Value = 0;
                 m_stopWatcher.Restart();
 
                 UnpackInfo unpackInfo = new UnpackInfo();
 
-                unpackInfo.contentType = (ContentType)Enum.Parse(typeof(ContentType), comboBoxContentType.Text);
+                unpackInfo.contentType = (ContentTypes)Enum.Parse(typeof(ContentTypes), comboBoxContentType.Text);
                 unpackInfo.contentTypeDetectIndividually = checkBoxDetectContentTypePerFile.Checked;
-                unpackInfo.suggestedVersion = (GenesisVersion)Enum.Parse(typeof(GenesisVersion), comboBoxGeneration.Text);
-                unpackInfo.suggestedGender = (GenesisGender)Enum.Parse(typeof(GenesisGender), comboBoxGender.Text);
+                unpackInfo.suggestedVersion = (GenesisVersion)Enum.Parse(typeof(GenesisVersion), comboBoxFallbackGeneration.Text);
+                unpackInfo.suggestedGender = (GenesisGenders)Enum.Parse(typeof(GenesisGenders), comboBoxFallbackGender.Text);
                 unpackInfo.contentLibDir = Library.Install.GetPath();
                 unpackInfo.userSelectedRootDir = comboBoxContentRootFolder.Text;
-                unpackInfo.ignoreRootDir = checkBoxIgnoreRootFolder.Checked;
+                unpackInfo.ignoreRootDir = !checkBoxHierarhyByRootFolder.Checked;
                 unpackInfo.overwriteExisting = checkBoxOverwrite.Checked;
                 unpackInfo.subfolderPrefix = "";
                 if (checkBoxCreateRootSubfolder.Checked)
@@ -375,7 +350,7 @@ namespace DazUnpacker
 
         private List<string> FilterFilesList(List<string> list)
         {
-            if (!FilterManager.HasFilters())
+            if (!Config.Storage.TabInstaller.Filters.HasFilters())
             {
                 return list;
             }
@@ -383,7 +358,7 @@ namespace DazUnpacker
             List<string> filteredList = new List<string>();
             foreach (string file in list)
             {
-                if (FilterManager.IsPassed(new FileInfo(file).CreationTime))
+                if (Config.Storage.TabInstaller.Filters.IsPassed(new FileInfo(file).CreationTime))
                 {
                     filteredList.Add(file);
                 }
@@ -497,7 +472,7 @@ namespace DazUnpacker
             try
             {
                 TimeSpan elapsed = m_stopWatcher.Elapsed;
-                labelTimeElapsed.Text = elapsed.TotalSeconds.ToString() + " s.";
+                labelTimeElapsed.Text = ((int)elapsed.TotalSeconds).ToString() + " s.";
                 if (elapsed.TotalSeconds != 0)
                 {
                     int countDone = Statistics.Done;
@@ -612,32 +587,6 @@ namespace DazUnpacker
             else e.Effect = DragDropEffects.None;
         }
 
-        private void RefreshFilters()
-        {
-            FilterManager.ClearFilters();
-
-            if (checkBoxDateFilterCreated.Checked)
-            {
-                DateFilterDirection direction = (DateFilterDirection)Enum.Parse(typeof(DateFilterDirection), comboBoxDateFilter.Text);
-                FilterManager.AddDateFilter(DateFilterAction.Created, direction, dateTimePickerFilterCreated.Value);
-            }
-        }
-
-        private void checkBoxDateFilterCreated_CheckedChanged(object sender, EventArgs e)
-        {
-            RefreshFilters();
-        }
-
-        private void comboBoxDateFilter_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            RefreshFilters();
-        }
-
-        private void dateTimePickerFilterCreated_ValueChanged(object sender, EventArgs e)
-        {
-            RefreshFilters();
-        }
-
         private void checkBoxDetectContentTypePerFile_CheckedChanged(object sender, EventArgs e)
         {
             comboBoxContentType.Enabled = !checkBoxDetectContentTypePerFile.Checked;
@@ -648,14 +597,61 @@ namespace DazUnpacker
             Config.Storage.TabInstaller.InstallDufOnly = checkBoxInstallDufOnly.Checked;
         }
 
-        private void checkBoxIgnoreRootFolder_CheckedChanged(object sender, EventArgs e)
-        {
-            comboBoxContentRootFolder.Enabled = !checkBoxIgnoreRootFolder.Checked;
-        }
-
         private void checkBoxCreateRootSubfolder_CheckedChanged(object sender, EventArgs e)
         {
             textBoxRootSubfolder.Enabled = checkBoxCreateRootSubfolder.Checked;
         }
+
+        private void checkBoxFilterByType_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxFilterByType.Checked)
+            {
+                checkBoxDetectContentTypePerFile.Checked = true;
+            }
+            comboBoxFilterContentTypes.Enabled = checkBoxFilterByType.Checked;
+        }
+
+        private void checkBoxHierarhyByRootFolder_CheckedChanged(object sender, EventArgs e)
+        {
+            comboBoxContentRootFolder.Enabled = checkBoxHierarhyByRootFolder.Checked;
+        }
+
+        private void tabControl_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            if (_isFormLoaded)
+            {
+                if (_previousTab == tabPageSettings)
+                {
+                    if (!CheckTempFolderForValidInput())
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+            }
+            _previousTab = tabControl.SelectedTab;
+        }
+
+        private bool CheckTempFolderForValidInput()
+        {
+            if (radioButtonTempIsSpecific.Checked)
+            {
+                string dir = textBoxTempFolder.Text;
+                if (String.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+                {
+                    MessageBox.Show("Incorrect temporarily folder specified!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    this.BeginInvoke((MethodInvoker)(() => textBoxTempFolder.Focus()));
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void checkBoxDateFilterCreated_CheckedChanged(object sender, EventArgs e)
+        {
+            comboBoxDateFilterDirection.Enabled = checkBoxDateFilterCreated.Checked;
+            dateTimePickerFilterCreated.Enabled = checkBoxDateFilterCreated.Checked;
+        }
+
     }
 }

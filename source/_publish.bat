@@ -7,6 +7,8 @@ set prj=DazUnpacker
 set exename=SuperDIM
 set release_dir=%~dp0bin\Release
 
+rd /s /q "%release_dir%"
+
 :: Compile project if needed
 if not exist "%release_dir%\%exename%.exe" (
   set DOTNET_CLI_TELEMETRY_OPTOUT=1
@@ -21,7 +23,7 @@ if not exist "%release_dir%\%exename%.exe" (
 cd /d "%release_dir%"
 
 :: Remove logfile
-del "app.log"
+del "app.log" 2>NUL
 
 :: Prepare release archive
 if exist "%exename%.zip" del "%exename%.zip"

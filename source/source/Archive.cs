@@ -33,8 +33,8 @@ namespace DazUnpacker
         {
             internal string topDirectory = "";
             internal GenesisVersion genesisVersion = GenesisVersion.Unknown;
-            internal ContentType contentType = ContentType.Unknown;
-            internal GenesisGender gender = GenesisGender.Unknown;
+            internal ContentTypes contentType = ContentTypes.Unknown;
+            internal GenesisGenders gender = GenesisGenders.Unknown;
 
             internal bool isSingleGenesisVersion()
             {
@@ -365,7 +365,7 @@ namespace DazUnpacker
             rootDirs = new List<string>();
 
             GenesisVersion genesisVersionCommon = GenesisVersion.Unknown;
-            GenesisGender genderCommon = GenesisGender.Unknown;
+            GenesisGenders genderCommon = GenesisGenders.Unknown;
 
             if (!IsArchiveExtension(zipPath))
             {
@@ -422,7 +422,7 @@ namespace DazUnpacker
                         foreach (string topDir in topDirs)
                         {
                             GenesisVersion genesisVersion = GenesisVersion.Unknown;
-                            GenesisGender gender = GenesisGender.Unknown;
+                            GenesisGenders gender = GenesisGenders.Unknown;
 
                             //Unpacker.IsGenesisFilterAllowed(topDir, out genesisVersion, out gender);
 
@@ -432,7 +432,7 @@ namespace DazUnpacker
                             {
                                 genesisVersion = genesisVersionCommon;
                             }
-                            if (gender == GenesisGender.Unknown)
+                            if (gender == GenesisGenders.Unknown)
                             {
                                 gender = genderCommon;
                             }
@@ -463,7 +463,7 @@ namespace DazUnpacker
                         foreach (string file in Directory.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories))
                         {
                             GenesisVersion genesisVersion2 = GenesisVersion.Unknown;
-                            GenesisGender gender2 = GenesisGender.Unknown;
+                            GenesisGenders gender2 = GenesisGenders.Unknown;
 
                             if (!IsArchiveExtension(file))
                             {
@@ -507,7 +507,7 @@ namespace DazUnpacker
                                 foreach (string topDir in topDirs)
                                 {
                                     GenesisVersion genesisVersion = GenesisVersion.Unknown;
-                                    GenesisGender gender = GenesisGender.Unknown;
+                                    GenesisGenders gender = GenesisGenders.Unknown;
 
                                     string relativeTopDir = topDir.Substring(rootDir.Length);
 
@@ -522,7 +522,7 @@ namespace DazUnpacker
                                     {
                                         genesisVersion = genesisVersion2;
                                     }
-                                    if (gender == GenesisGender.Unknown)
+                                    if (gender == GenesisGenders.Unknown)
                                     {
                                         gender = gender2;
                                     }
@@ -530,7 +530,7 @@ namespace DazUnpacker
                                     {
                                         genesisVersion = genesisVersionCommon;
                                     }
-                                    if (gender == GenesisGender.Unknown)
+                                    if (gender == GenesisGenders.Unknown)
                                     {
                                         gender = genderCommon;
                                     }

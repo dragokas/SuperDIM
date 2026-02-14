@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DazUnpacker.source;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -16,7 +17,7 @@ namespace DazUnpacker
     {
         public class UnpackInfo
         {
-            public ContentType contentType;
+            public ContentTypes contentType;
             public bool contentTypeDetectIndividually;
             public List<string> contentFiles;
             public string contentLibDir;
@@ -25,7 +26,7 @@ namespace DazUnpacker
             public string subfolderPrefix;
             public string rootFolderName;
             public GenesisVersion suggestedVersion;
-            public GenesisGender suggestedGender;
+            public GenesisGenders suggestedGender;
             public bool overwriteExisting;
             public int threadsCount;
         }
@@ -59,7 +60,7 @@ namespace DazUnpacker
 
                             FileSys.DirectoryDelete(tempDir);
 
-                            ContentType contentType;
+                            ContentTypes contentType;
                             if (unpackInfo.contentTypeDetectIndividually)
                             {
                                 contentType = Unpacker.DetectContentType(path);
@@ -69,24 +70,39 @@ namespace DazUnpacker
                                 contentType = unpackInfo.contentType;
                             }
 
+                            if (contentType != ContentTypes.Unknown) // Earlier content type filter check to skip unpacking stage
+                            {
+                                if (!Config.Storage.TabInstaller.Filters.IsPassed(contentType))
+                                {
+                                    Library.Skipped.Add(path, FindFailReason.CriteriaNotMatch);
+                                    return;
+                                }
+                            }
+
                             if (Archive.ExtractSmart(path, tempDir, true, !isFullInstall, out dufRootInfo, out rootDirList, out failReason))
                             {
-                                if (contentType == ContentType.Unknown)
+                                if (contentType == ContentTypes.Unknown)
                                 {
                                     foreach (Archive.DufRootInfo dufInfo in dufRootInfo)
                                     {
                                         contentType = Unpacker.DetectContentType(dufInfo.topDirectory);
 
-                                        if (contentType != ContentType.Unknown)
+                                        if (contentType != ContentTypes.Unknown)
                                         {
                                             break;
                                         }
                                     }
                                 }
 
-                                if (contentType == ContentType.Unknown)
+                                if (contentType == ContentTypes.Unknown)
                                 {
                                     Library.Skipped.Add(path, FindFailReason.ContentTypeUndefined);
+                                    return;
+                                }
+
+                                if (!Config.Storage.TabInstaller.Filters.IsPassed(contentType)) // second content type filter check
+                                {
+                                    Library.Skipped.Add(path, FindFailReason.CriteriaNotMatch);
                                     return;
                                 }
 
@@ -104,7 +120,7 @@ namespace DazUnpacker
                                     {
                                         dufInfo.genesisVersion = unpackInfo.suggestedVersion;
                                     }
-                                    if (dufInfo.gender == GenesisGender.Unknown)
+                                    if (dufInfo.gender == GenesisGenders.Unknown)
                                     {
                                         dufInfo.gender = unpackInfo.suggestedGender;
                                     }
@@ -291,7 +307,7 @@ namespace DazUnpacker
             return false;
         }
 
-        private static string GetInstallDirByContentType(string contentLibDir, ContentType contentType, GenesisVersion genesisVersion, GenesisGender gender)
+        private static string GetInstallDirByContentType(string contentLibDir, ContentTypes contentType, GenesisVersion genesisVersion, GenesisGenders gender)
         {
             string middle = "";
             string genesisStr = "";
@@ -323,11 +339,11 @@ namespace DazUnpacker
                 genesisStr = "Genesis 9";
             }
             else {
-                if (gender == GenesisGender.Female)
+                if (gender == GenesisGenders.Female)
                 {
                     genesisStr = String.Format("Genesis{0} Female", genesisIndexStr);
                 }
-                else if (gender == GenesisGender.Male)
+                else if (gender == GenesisGenders.Male)
                 {
                     genesisStr = String.Format("Genesis{0} Male", genesisIndexStr);
                 }
@@ -339,129 +355,129 @@ namespace DazUnpacker
 
             switch (contentType)
             {
-                case ContentType.Accessory: { middle = String.Format("People\\{0}\\Accessories", genesisStr); break; }
-                case ContentType.Anatomy: { middle = String.Format("People\\{0}\\Anatomy", genesisStr); break; }
-                case ContentType.Animation: { middle = String.Format("People\\{0}\\Animations", genesisStr); break; }
-                case ContentType.Character: { middle = String.Format("People\\{0}\\Characters", genesisStr); break; }
-                case ContentType.Dress: { middle = String.Format("People\\{0}\\Clothing", genesisStr); break; }
-                case ContentType.Environment: { middle = String.Format("Environments"); break; }
-                case ContentType.Expression: { middle = String.Format("People\\{0}\\Expressions", genesisStr); break; }
-                case ContentType.Hair: { middle = String.Format("People\\{0}\\Hair", genesisStr); break; }
-                case ContentType.Light: { middle = String.Format("Light Presets"); break; }
-                case ContentType.Material: { middle = String.Format("People\\{0}\\Materials", genesisStr); break; }
-                case ContentType.Morph: { middle = String.Format("People\\{0}\\Shapes", genesisStr); break; }
-                case ContentType.Pose: { middle = String.Format("People\\{0}\\Poses", genesisStr); break; }
-                case ContentType.Prop: { middle = String.Format("People\\{0}\\Props", genesisStr); break; }
-                case ContentType.Script: { middle = String.Format("scripts"); break; }
+                case ContentTypes.Accessory: { middle = String.Format("People\\{0}\\Accessories", genesisStr); break; }
+                case ContentTypes.Anatomy: { middle = String.Format("People\\{0}\\Anatomy", genesisStr); break; }
+                case ContentTypes.Animation: { middle = String.Format("People\\{0}\\Animations", genesisStr); break; }
+                case ContentTypes.Character: { middle = String.Format("People\\{0}\\Characters", genesisStr); break; }
+                case ContentTypes.Dress: { middle = String.Format("People\\{0}\\Clothing", genesisStr); break; }
+                case ContentTypes.Environment: { middle = String.Format("Environments"); break; }
+                case ContentTypes.Expression: { middle = String.Format("People\\{0}\\Expressions", genesisStr); break; }
+                case ContentTypes.Hair: { middle = String.Format("People\\{0}\\Hair", genesisStr); break; }
+                case ContentTypes.Light: { middle = String.Format("Light Presets"); break; }
+                case ContentTypes.Material: { middle = String.Format("People\\{0}\\Materials", genesisStr); break; }
+                case ContentTypes.Morph: { middle = String.Format("People\\{0}\\Shapes", genesisStr); break; }
+                case ContentTypes.Pose: { middle = String.Format("People\\{0}\\Poses", genesisStr); break; }
+                case ContentTypes.Prop: { middle = String.Format("People\\{0}\\Props", genesisStr); break; }
+                case ContentTypes.Script: { middle = String.Format("scripts"); break; }
                 default: { middle = "_Unknown"; break; }
             }
 
             return contentLibDir + "\\" + middle;
         }
 
-        public static ContentType DetectContentType(string path)
+        public static ContentTypes DetectContentType(string path)
         {
-            ContentType contentType = ContentType.Unknown;
+            ContentTypes contentType = ContentTypes.Unknown;
 
             if (Globals.StringContains(path, "Accessor") || Globals.StringContains(path, "Jewel"))
             {
-                contentType = ContentType.Accessory;
+                contentType = ContentTypes.Accessory;
             }
             else if (Globals.StringContains(path, "Anatom"))
             {
-                contentType = ContentType.Anatomy;
+                contentType = ContentTypes.Anatomy;
             }
             else if (Globals.StringContains(path, "Animat"))
             {
-                contentType = ContentType.Animation;
+                contentType = ContentTypes.Animation;
             }
             else if (Globals.StringContains(path, "Charact"))
             {
-                contentType = ContentType.Character;
+                contentType = ContentTypes.Character;
             }
             else if (Globals.StringContains(path, "Outfit") || Globals.StringContains(path, "Cloth") 
                 || Globals.StringContains(path, "Dress") || Globals.StringContains(path, "Suit"))
             {
-                contentType = ContentType.Dress;
+                contentType = ContentTypes.Dress;
             }
             else if (Globals.StringContains(path, "Environ") || Globals.StringContains(path, "Buildi"))
             {
-                contentType = ContentType.Environment;
+                contentType = ContentTypes.Environment;
             }
             else if (Globals.StringContains(path, "Express"))
             {
-                contentType = ContentType.Expression;
+                contentType = ContentTypes.Expression;
             }
             else if (Globals.StringContains(path, "Hair"))
             {
                 if (Globals.StringContains(path, "Chair"))
                 {
-                    contentType = ContentType.Prop;
+                    contentType = ContentTypes.Prop;
                 }
                 else
                 {
-                    contentType = ContentType.Hair;
+                    contentType = ContentTypes.Hair;
                 }
             }
             else if (Globals.StringContains(path, "Light") || Globals.StringContains(path, "IRay"))
             {
-                contentType = ContentType.Light;
+                contentType = ContentTypes.Light;
             }
             else if (Globals.StringContains(path, "Materia"))
             {
-                contentType = ContentType.Material;
+                contentType = ContentTypes.Material;
             }
             else if (Globals.StringContains(path, "Shape") || Globals.StringContains(path, "Morph"))
             {
-                contentType = ContentType.Morph;
+                contentType = ContentTypes.Morph;
             }
             else if (Globals.StringContains(path, "Pose"))
             {
-                contentType = ContentType.Pose;
+                contentType = ContentTypes.Pose;
             }
             else if (Globals.StringContains(path, "Prop"))
             {
-                contentType = ContentType.Prop;
+                contentType = ContentTypes.Prop;
             }
             else if (Globals.StringContains(path, "Script"))
             {
-                contentType = ContentType.Script;
+                contentType = ContentTypes.Script;
             }
             return contentType;
         }
 
-        private static bool IsGenesisX(string name, string version, out GenesisGender gender)
+        private static bool IsGenesisX(string name, string version, out GenesisGenders gender)
         {
-            gender = GenesisGender.Unknown;
+            gender = GenesisGenders.Unknown;
 
             if (name.IndexOf("female", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                gender = GenesisGender.Female;
+                gender = GenesisGenders.Female;
             }
             else if (name.IndexOf("male", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                gender = GenesisGender.Male;
+                gender = GenesisGenders.Male;
             }
 
             name = name.ToLower();
             if (name.Contains("g" + version + "f"))
             {
-                gender = GenesisGender.Female;
+                gender = GenesisGenders.Female;
                 return true;
             }
             if (name.Contains("g" + version + "m"))
             {
-                gender = GenesisGender.Male;
+                gender = GenesisGenders.Male;
                 return true;
             }
             if (name.Contains("gf" + version))
             {
-                gender = GenesisGender.Female;
+                gender = GenesisGenders.Female;
                 return true;
             }
             if (name.Contains("gm" + version))
             {
-                gender = GenesisGender.Male;
+                gender = GenesisGenders.Male;
                 return true;
             }
             if (name.Contains("genesis" + version))
@@ -570,10 +586,10 @@ namespace DazUnpacker
             return false;
         }
 
-        public static void GetGenesisVersionsByName(string name, out GenesisVersion genesisVersion, out GenesisGender gender)
+        public static void GetGenesisVersionsByName(string name, out GenesisVersion genesisVersion, out GenesisGenders gender)
         {
             genesisVersion = GenesisVersion.Unknown;
-            gender = GenesisGender.Unknown;
+            gender = GenesisGenders.Unknown;
 
             if (IsGenesisX(name, "8", out gender))
             {
@@ -589,10 +605,10 @@ namespace DazUnpacker
             }
         }
 
-        public static bool IsGenesisFilterAllowed(string name, out GenesisVersion genesisVersion, out GenesisGender gender)
+        public static bool IsGenesisFilterAllowed(string name, out GenesisVersion genesisVersion, out GenesisGenders gender)
         {
             genesisVersion = GenesisVersion.Unknown;
-            gender = GenesisGender.Unknown;
+            gender = GenesisGenders.Unknown;
 
             if ((0 != (Config.Storage.TabSettings.genesisVersionFilter & GenesisVersion.Genesis_8)) && IsGenesisX(name, "8", out gender))
             {

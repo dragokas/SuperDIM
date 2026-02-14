@@ -20,14 +20,14 @@ namespace DazUnpacker
         Genesis_Any = -1
     }
 
-    public enum GenesisGender
+    public enum GenesisGenders
     {
         Unknown,
         Male,
         Female
     }
 
-    public enum ContentType
+    public enum ContentTypes
     {
         Unknown,
         Accessory, // Jewelry
@@ -61,7 +61,7 @@ namespace DazUnpacker
                 return;
             }
             FileInfo fi = new FileInfo(file);
-            if (FilterManager.IsPassed(fi.CreationTime))
+            if (Config.Storage.TabInstaller.Filters.IsPassed(fi.CreationTime))
             {
                 Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), 0, "", true);
             }
@@ -122,14 +122,14 @@ namespace DazUnpacker
             list.AddRange(grandParentList.ToArray());
             return list;
         }
-        public static bool IsVersionIndependentType(ContentType type)
+        public static bool IsVersionIndependentType(ContentTypes type)
         {
             switch (type)
             {
-                case ContentType.Environment:
-                case ContentType.Light:
-                case ContentType.Prop:
-                case ContentType.Script:
+                case ContentTypes.Environment:
+                case ContentTypes.Light:
+                case ContentTypes.Prop:
+                case ContentTypes.Script:
                     return true;
             }
             return false;
