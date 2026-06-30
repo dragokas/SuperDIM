@@ -299,7 +299,10 @@ namespace DazUnpacker
                     }
                     else
                     {
-                        topDirs.Add(dufDir);
+                        if (!Globals.StringContains(dufDir, "\\data\\"))
+                        {
+                            topDirs.Add(dufDir);
+                        }
                     }
                 }
             }
