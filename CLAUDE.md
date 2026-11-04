@@ -111,6 +111,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   `Unpacker.UnpackAll` пишет результат в БД, ошибки каталога установку не ломают. Так список файлов полный и в режиме Partial (где `data`/`Runtime` не распаковываются).
 - БД: один писатель (общий `lock`), WAL; чтение — отдельными соединениями. Грид виртуальный: `DbRowSource` держит `long[] ids` (результат фильтра/сортировки)
   и подгружает строки страницами по Id. Фильтр запускается через 1 с после ввода (`Timer`), устаревшие запросы отбрасываются по номеру.
+- **Unique archive** (чекбокс): в гриде только первая (по `Id`) подходящая строка каждого бандла — `WHERE Id IN (SELECT MIN(Id) ... GROUP BY ArchivePath)`; работает вместе с фильтром и сортировкой.
 - Search & Install: `Form1.ReplaceInstallList` (очистка списка установки + `AddFile` только для существующих на диске бандлов + переход на вкладку Installer).
   Если на диске нет ни одного бандла — список установки не трогается.
 
@@ -143,6 +144,8 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   и собирает общий список `dufRootInfo`/`rootDirs`. Код ошибки/exit code внешних утилит не проверяется (`ExtractSingle*` возвращает true, если процесс стартовал).
 - **Ошибки в рабочих потоках** гасятся: `Globals.ReportError(ex, false)` только пишет в лог. `AccessDenied` помечается в `Library.Skipped`
   и позволяет кнопку «Re-install access denied» (повторно добавляет такие архивы и жмёт Install).
+- **Размер окна:** `Form1` изменяемого размера (`MinimumSize` = размер дизайна), контролы вкладок Installer/Logs расставлены якорями (Anchor) в дизайнере,
+  Catalog растягивается через Dock/TableLayoutPanel. Кнопка `buttonFullScreen` / F11 — режим без рамки на весь экран, Esc — выход (`Form1.SetFullScreen`).
 - **Вкладки:** порядок Settings, Installer, Catalog, Logs. Installer и Logs добавляются/убираются в `UpdateTabs` (когда есть хотя бы одна библиотека),
   Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс,
   поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
