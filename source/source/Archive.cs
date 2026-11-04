@@ -358,10 +358,12 @@ namespace DazUnpacker
             }
         }
 
-        internal static bool ExtractSmart(string zipPath, string destinationDir, bool recursively, bool skipDataDir, 
+        // catalog (optional) receives the file lists of the archive and of all nested archives before they are unpacked
+        internal static bool ExtractSmart(string zipPath, string destinationDir, bool recursively, bool skipDataDir,
             out List<DufRootInfo> dufRootInfo,
             out List<string> rootDirs,
-            out FindFailReason failReason)
+            out FindFailReason failReason,
+            CatalogCollector catalog = null)
         {
             failReason = FindFailReason.Unknown;
             dufRootInfo = new List<DufRootInfo>();
@@ -397,6 +399,10 @@ namespace DazUnpacker
                 skipObjects.Add("ReadMe's");
                 skipObjects.Add("Templates");
                 skipObjects.Add("Dokumentation");
+            }
+            if (catalog != null)
+            {
+                catalog.Add(zipPath);
             }
             ExtractSingle(zipPath, destinationDir, skipObjects);
 
@@ -489,6 +495,10 @@ namespace DazUnpacker
 
                             ++dirIndex;
                             string tempDir = destinationDir + "\\Daz" + dirIndex.ToString();
+                            if (catalog != null)
+                            {
+                                catalog.Add(file); // the nested archive is deleted right after unpacking
+                            }
                             ExtractSingle(file, tempDir, skipObjects);
                             File.Delete(file);
                             nestedDirs.Add(tempDir);

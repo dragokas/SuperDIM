@@ -79,7 +79,11 @@ namespace DazUnpacker
                                 }
                             }
 
-                            if (Archive.ExtractSmart(path, tempDir, true, !isFullInstall, out dufRootInfo, out rootDirList, out failReason))
+                            CatalogCollector catalog = new CatalogCollector(path);
+                            bool isExtracted = Archive.ExtractSmart(path, tempDir, true, !isFullInstall, out dufRootInfo, out rootDirList, out failReason, catalog);
+                            SaveCatalog(catalog);
+
+                            if (isExtracted)
                             {
                                 if (contentType == ContentTypes.Unknown)
                                 {
@@ -194,6 +198,19 @@ namespace DazUnpacker
                         Statistics.DoneIncrement();
                     }
                 });
+            }
+        }
+
+        // Stores the file list collected while unpacking in the catalog; a catalog error must not break the installation
+        private static void SaveCatalog(CatalogCollector catalog)
+        {
+            try
+            {
+                catalog.Save();
+            }
+            catch (Exception ex)
+            {
+                Globals.ReportError(ex, false, "Catalog update");
             }
         }
 
