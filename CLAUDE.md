@@ -146,7 +146,8 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   секундомер. Пропущенные на этапе `FilterFilesList` архивы тоже считаются через `DoneIncrement`.
 - **Временные папки:** установщик (`Unpacker.UnpackAll` → `Archive.PrepareTempDir`) всегда распаковывает в `<корень диска целевой библиотеки>\Temp\Daz<N>`
   (N — номер архива в этом запуске; пустая папка `Temp\Daz` тоже создаётся; вложенные архивы — в `Daz<N>\Daz<M>`; так `Directory.Move` остаётся переименованием,
-  а не копированием) и настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
+  а не копированием). Папка `Daz<N>` удаляется в `finally` лямбды `UnpackAll` при любом исходе (в том числе `ContentTypeUndefined`, `CriteriaNotMatch`, исключение);
+  `FileSys.DirectoryDelete` при ошибке снимает ReadOnly со всего дерева и повторяет удаление. Установщик настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
   (`groupBox6`, `TabSettings.UseSpecificTempFolder/TempFolder`) на установку не влияет, хотя форма проверяет путь при уходе с вкладки (`CheckTempFolderForValidInput`).
   Эта настройка действует только в сканировании каталога (`CatalogScanner`, ~строка 84): указанная папка, если режим включён и она существует,
   иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Не вызываются нигде (заготовки очистки): `Globals.ClearTempFolder`, `Archive.ClearTemp`. По решению пользователя код и интерфейс не менялись.

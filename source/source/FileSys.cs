@@ -107,21 +107,42 @@ namespace DazUnpacker
             }
         }
 
+        // Deletes the directory with its content, read-only files (common in unpacked archives) do not stop it.
+        // Returns false if the directory does not exist or cannot be deleted.
         public static bool DirectoryDelete(string dir)
         {
-            try
-            {
-                if (Directory.Exists(dir))
-                {
-                    Directory.Delete(dir, true);
-                    return true;
-                }
-            }
-            catch (Exception) // shitty C# IO Access denied Exception on delete dir
+            if (!Directory.Exists(dir))
             {
                 return false;
             }
-            return false;
+            try
+            {
+                Directory.Delete(dir, true);
+                return true;
+            }
+            catch (Exception)
+            {
+                // most likely a read-only file or folder: clear the attributes and try once more
+            }
+            try
+            {
+                ClearReadOnly(dir);
+                Directory.Delete(dir, true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static void ClearReadOnly(string dir)
+        {
+            foreach (string path in Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(path, FileAttributes.Normal);
+            }
+            File.SetAttributes(dir, FileAttributes.Normal);
         }
 
         public enum FsCopyStatus

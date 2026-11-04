@@ -45,6 +45,7 @@ namespace DazUnpacker
                 Parallel.ForEach(unpackInfo.contentFiles, parallelOptions, path =>
                 {
                     string status = Library.Content.StatusFail; // shown in the Status column when the archive is finished
+                    string tempDir = null; // the unpacked archive, deleted in "finally" whatever the result is
                     try
                     {
                         if (File.Exists(path))
@@ -59,9 +60,9 @@ namespace DazUnpacker
 
                             FindFailReason failReason;
                             int index = Interlocked.Increment(ref indexTmpDir);
-                            string tempDir = baseTempDir + index.ToString();
+                            tempDir = baseTempDir + index.ToString();
 
-                            FileSys.DirectoryDelete(tempDir);
+                            FileSys.DirectoryDelete(tempDir); // a leftover of a previous run
 
                             ContentTypes contentType;
                             if (unpackInfo.contentTypeDetectIndividually)
@@ -230,7 +231,6 @@ namespace DazUnpacker
                                 }
                                 status = GetFinalStatus(archiverFailed, failReason);
                             }
-                            FileSys.DirectoryDelete(tempDir);
                         }
                         else
                         {
@@ -244,6 +244,10 @@ namespace DazUnpacker
                     }
                     finally
                     {
+                        if (tempDir != null)
+                        {
+                            FileSys.DirectoryDelete(tempDir);
+                        }
                         Library.Content.SetStatus(path, status);
                         Statistics.DoneIncrement();
                     }
