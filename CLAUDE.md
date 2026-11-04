@@ -2,7 +2,7 @@
 
 Windows-приложение (WinForms, .NET Framework 4.8, C#) для массовой установки контент-архивов DAZ Studio
 (zip / 7z / rar) в структуру Content Library. Распаковка делегируется внешним утилитам `7z.exe` (полный 7-Zip, умеет и rar) и `UnRAR.exe`.
-Лицензия GPL-3.0; репозиторий: https://github.com/dragokas/SuperDIM (открытых issues нет; единственный TODO из README —
+Лицензия GPL-3.0; репозиторий: https://github.com/dragokas/SuperDIM (issues нет; единственный TODO из README —
 режим Full install может работать некорректно). Описание для пользователей — в `README.md`. Здесь — только то, что нужно для работы с кодом.
 `7z.exe`+`7z.dll`/`UnRAR.exe` — сторонние официальные бинарники (7-Zip, WinRAR), их не изменяем.
 
@@ -62,7 +62,8 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
     Parallel.ForEach(архивы, MaxDegreeOfParallelism = threadsCount):
       1. определить ContentType (по имени архива: DetectContentType, либо общий тип из UI)
       2. ранний фильтр по типу (FilterManager.IsPassed(ContentTypes)) -> Skipped(CriteriaNotMatch)
-      3. Archive.ExtractSmart -> распаковка во временную папку + рекурсивно вложенные архивы
+      3. Archive.ExtractSmart -> сначала отсев по имени без распаковки (NotArchive, BlackName, фильтр поколений),
+         затем распаковка во временную папку <диск библиотеки>\Temp\Daz<N> + рекурсивно вложенные архивы
          + поиск "top-директорий" с *.duf + определение Genesis-версии/пола
       4. если тип всё ещё Unknown — определить по top-директории; повторный фильтр по типу
       5. для каждой версии Genesis (3/8/9) из фильтра: InstallDuf -> целевой путь в библиотеке
@@ -71,27 +72,27 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 ```
 
 Целевой путь для .duf: `<Library>\People\<Genesis X [Male|Female]>\<Clothing|Hair|Poses|…>\[rootFolderName]\<dirGroup>\<имя top-папки>`
-(`Unpacker.GetInstallDirByContentType`). `dirGroup` — относительный путь архива от «Root folder» (зеркалирование иерархии),
+(`Unpacker.GetInstallDirByContentType`; у Genesis 9 папка без Male/Female). `dirGroup` — относительный путь архива от «Root folder» (зеркалирование иерархии),
 к каждому компоненту может добавляться префикс. Environment/Light/Prop/Script — «version-independent»
-(`Content.IsVersionIndependentType`): кладутся вне папки Genesis (`Environments`, `Light Presets`, `scripts`)
-или один раз, без перебора версий.
+(`Content.IsVersionIndependentType`): цикл по версиям Genesis прерывается после первой версии, разрешённой фильтром (ставится один раз). Environment/Light/Script
+кладутся вне папки Genesis (`Environments`, `Light Presets`, `scripts`); Prop — в `People\<Genesis …>\Props` первой разрешённой фильтром версии (порядок 3, 8, 9).
 
 ### Модули (`source/source/`)
 
 | Файл | Роль |
 |---|---|
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())` |
-| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования, «Re-install access denied» |
+| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования (Copy / Copy All для `listBoxLog` и `listViewSkippedContent`), «Re-install access denied» (после добавления архивов переходит на вкладку Logs и сам жмёт Install) |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
 | `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` с проверкой кода возврата, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`), `GetParentFolders` для combobox «Root folder» |
-| `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов), `Basic` (DAZ-библиотеки), `Search`, `Exclude`, `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
-| `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabInstaller/_TabCatalog/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к утилитам; `Init` заполняет комбобоксы, `ApplyStorage` форма←конфиг, `SaveConfig` форма→конфиг (вызывается в `FormClosing`) |
-| `FilterManager.cs` | Фильтры установки: `IFilter`, `DateFilter` (Before/After/Equal по CreationTime архива), `ContentFilter` (один выбранный `ContentTypes`), `FilterManager` (флаги включения + список). Полиморфно сериализуется Json.NET (`TypeNameHandling.Auto`) |
-| `FileSys.cs` | Файловые хелперы: `CopyFolderRecursively` (+`FsCopyStatus`), `DirectoryDelete`, `EnumDirectory`, `GetParentDir`, `PathInsertPrefixToAllComponents`, `StripFilename` |
+| `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов и колонка Status), `Basic` (DAZ-библиотеки), `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
+| `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabInstaller/_TabCatalog/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к `7z.exe`/`UnRAR.exe` и `%Temp%\Daz`; `Init` (`LoadCommonData`, `LoadDefaults` — заполняет комбобоксы, `LoadStorage`, `ApplyStorage` форма←конфиг), `SaveConfig` форма→конфиг (вызывается в `FormClosing`), `LoadFiltersOnForm`/`SaveFiltersFromForm`/`GetGenesisVersionFilter` |
+| `FilterManager.cs` | Фильтры установки: `IFilter`, `DateFilter` (Before/After/Equal по CreationTime архива, сравнивается только дата без времени), `ContentFilter` (один выбранный `ContentTypes`), `FilterManager` (флаги включения + список). Полиморфно сериализуется Json.NET (`TypeNameHandling.Auto`) |
+| `FileSys.cs` | Файловые хелперы: `CopyFolderRecursively` (+`FsCopyStatus`), `FileDelete` (снимает ReadOnly), `DirectoryDelete` (не бросает исключений), `EnumDirectory`, `GetParentDir`, `PathInsertPrefixToAllComponents`, `PathInsertPostfix`, `StripFilename`, `Unquote`, `FindFileNameAvailable`/`FindDirNameAvailable` |
 | `Statistics.cs` | Счётчики `Total/Done` (Interlocked) и вывод в `labelProgress` через `BeginInvoke` |
 | `Logger.cs` | Статический `Log` (Info/Warning/Error/Trace), вывод в `app.log` и `listBoxLog`; потокобезопасный, `DisableCache(true)` => запись сразу |
-| `Globals.cs` | `AppDir`, `AppName`, `ReportError` (лог + MessageBox), `StringContains` (ignore-case), `OpenTextFile` |
+| `Globals.cs` | `AppDir`, `AppName`, `ReportError(ex, interactive, context)` (лог; MessageBox только при `interactive = true`), `FormatException`, `StringContains` (ignore-case), `OpenTextFile`, `ClearTempFolder` (не вызывается) |
 | `ArchiveLister.cs` | Чтение содержимого архива через `7z.exe`: `ListFiles` (`7z l -slt -ba`, только оглавление, без распаковки), `ExtractNestedArchives` (`7z x -r -i!*.zip -i!*.rar -i!*.7z` — только вложенные архивы), `FindArchives` |
 | `CatalogDb.cs` | SQLite-слой каталога (`catalog.db`): таблица `Files`, `ReplaceBundle` (атомарная замена строк бандла), `QueryIds` (фильтр/сортировка), `GetRows`, `FindByTails`, `ImportRows`, `Clear`. Класс `CatalogRow` (6 полей), `CatalogColumn` |
 | `CatalogScanner.cs` | `CatalogScanner` — Scan папки (потоки `Parallel.ForEach`, вложенные архивы рекурсивно); `CatalogCollector` — сбор листинга во время установки (хук в `Archive.ExtractSmart`) |
@@ -105,7 +106,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 ### Каталог файлов в архивах (вкладка Catalog)
 
 - **Бандл** — архив на диске (его путь `ArchivePath` хранится в БД и именно он добавляется в список установки). Внутри могут лежать другие архивы
-  (любой глубины, `MaxNestingDepth = 8`). В БД попадают файлы всех уровней; вложенные архивы-контейнеры как строки не пишутся.
+  (любой глубины, `MaxNestingDepth = 8`). В БД попадают файлы всех уровней; вложенные архивы-контейнеры как строки не пишутся, кроме случая,
+  когда сканер не смог их открыть (или превышена глубина) — тогда они остаются обычными строками. Хук установщика вложенный архив в строки не пишет никогда
+  (его содержимое листится отдельным вызовом `catalog.Add`).
 - `FilePath` — путь внутри (листового) архива **как есть**, с `/` и ведущим `/` (например, `/Content/data/Daz 3D/...`, `/Pinme-for-.../Studio/My Library/Presets/Poses/...`).
   Корень библиотеки DAZ не вычисляется. Массовый поиск (Search & Install) — по **хвосту** пути; фильтр на вкладке — по **вхождению**.
 - **Ignore case** (чекбокс, по умолчанию выкл): выкл — всё регистрозависимо; вкл — полностью регистронезависимо, включая кириллицу.
@@ -121,16 +124,16 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - БД: один писатель (общий `lock`), WAL; чтение — отдельными соединениями. Грид виртуальный: `DbRowSource` держит `long[] ids` (результат фильтра/сортировки)
   и подгружает строки страницами по Id. Фильтр запускается через 1 с после ввода (`Timer`), устаревшие запросы отбрасываются по номеру.
 - **Unique archive** (чекбокс): в гриде только первая (по `Id`) подходящая строка каждого бандла — `WHERE Id IN (SELECT MIN(Id) ... GROUP BY ArchivePath)`; работает вместе с фильтром и сортировкой.
-- Search & Install: `Form1.ReplaceInstallList` (очистка списка установки + `AddFile` только для существующих на диске бандлов + переход на вкладку Installer).
-  Если на диске нет ни одного бандла — список установки не трогается.
+- Search & Install: `Form1.ReplaceInstallList` (очистка списка установки + `AddFile` только для существующих на диске бандлов, прошедших фильтр даты, + переход на вкладку Installer).
+  Если на диске нет ни одного бандла — список установки не трогается (проверка в `Form1Catalog` до вызова: `ReplaceInstallList` сам список всегда очищает).
 
 ### Конфигурация
 
 - `config.txt` рядом с exe, Json.NET, `Formatting.Indented`. Читается в `Config.Init` (конструктор формы), пишется в `Form1_FormClosing`.
 - Пути к `7z.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7z.exe`, `tools\WinRAR\UnRAR.exe`
   (в git каталог называется `WinRar` — регистр не важен на Windows).
-- Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation` и т.п.)
-  и **Full** (копируются и остальные корневые папки).
+- Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation`, `Documents`, `Readme`, `ReadMe's`,
+  `Templates`, `Dokumentation`, список в `ExtractSmart`) и **Full** (копируются и остальные корневые папки из `DazRootDirs`).
 
 ## Подводные камни и особенности (важно при доработке)
 
@@ -140,8 +143,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   значения для установки перед стартом синхронизируются из формы (`UpdateGenesisTypeFilter`, `SaveFiltersFromForm` в `buttonStart_Click`).
 - **Завершение установки определяется косвенно:** `labelProgress_TextChanged` сравнивает `Statistics.Done == Total`,
   останавливает секундомер и включает кнопку Install. Пропущенные на этапе `FilterFilesList` архивы тоже считаются через `DoneIncrement`.
-- **Временные папки:** установщик (`Unpacker.UnpackAll` → `Archive.PrepareTempDir`) всегда распаковывает в `<корень диска целевой библиотеки>\Temp\Daz`
-  (чтобы `Directory.Move` был переименованием, а не копированием) и настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
+- **Временные папки:** установщик (`Unpacker.UnpackAll` → `Archive.PrepareTempDir`) всегда распаковывает в `<корень диска целевой библиотеки>\Temp\Daz<N>`
+  (N — номер архива в этом запуске; пустая папка `Temp\Daz` тоже создаётся; вложенные архивы — в `Daz<N>\Daz<M>`; так `Directory.Move` остаётся переименованием,
+  а не копированием) и настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
   (`groupBox6`, `TabSettings.UseSpecificTempFolder/TempFolder`) на установку не влияет, хотя форма проверяет путь при уходе с вкладки (`CheckTempFolderForValidInput`).
   Эта настройка действует только в сканировании каталога (`CatalogScanner`, ~строка 84): указанная папка, если режим включён и она существует,
   иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Не вызываются нигде (заготовки очистки): `Globals.ClearTempFolder`, `Archive.ClearTemp`. По решению пользователя код и интерфейс не менялись.
@@ -149,8 +153,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   и «Create root subfolder» стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller` (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`).
   Старый ключ `TabSort` в `config.txt` Json.NET игнорирует. Остальные наследия: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries`.
 - **Эвристики определения типа/версии хрупкие** (подстроки в пути архива/папки): `DetectContentType` (порядок `else if` важен —
-  например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray`, `\data\`, `Characters`).
+  например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray` и `\data\`), `InstallDuf` (папка `Characters`).
   Любая правка должна учитывать порядок проверок и регрессии на реальных архивах — автотестов нет.
+  `GenesisVersion.Genesis_8_1` есть в enum и в `GetInstallDirByContentType`, но определение версии его не выставляет: имена с «8.1» / «81» / «8_1» считаются Genesis 8.
 - **Вложенные архивы:** `ExtractSmart` в цикле распаковывает найденные внутри архивы в `destDir\Daz<N>`, удаляя исходный вложенный архив,
   и собирает общий список `dufRootInfo`/`rootDirs`.
 - **Коды возврата распаковщиков проверяются** (`Archive.RunExtractor`, запуск через общий `ArchiveLister.RunTool`, stdin закрыт — запрос пароля не вешает поток):
@@ -169,7 +174,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс,
   поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
 - **Локализация:** UI на английском, русский вариант не реализован. Комментарии в коде — английские.
-- **Кодировка исходников:** файлы в UTF-8 с BOM, CRLF (перед правкой полагаться на хуки File Guard, см. глобальные правила).
+- **Кодировка исходников:** `*.cs` и `.csproj` — UTF-8 с BOM, CRLF; `.slnx` — UTF-8 без BOM; `_publish.bat` — без BOM, CRLF (перед правкой полагаться на хуки File Guard, см. глобальные правила).
 
 ## Рабочие соглашения для этого проекта
 
