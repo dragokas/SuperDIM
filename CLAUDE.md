@@ -8,21 +8,25 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 
 ## Сборка и запуск
 
-Решение: `source/DazUnpacker.sln`, проект `source/DazUnpacker.csproj` (старый формат, не SDK-style).
+Решение: `source/DazUnpacker.sln`, проект `source/DazUnpacker.csproj` (SDK-style: `Microsoft.NET.Sdk`, `net48`, `UseWindowsForms`).
 Корневой namespace `DazUnpacker`, имя сборки `SuperDIM`, точка входа `Program.Main`.
 
-- `dotnet build` **не работает**: ресурсы `.resx` с не-строковыми данными требуют полноценного MSBuild.
+- `dotnet build` **не работает**: ресурсы `.resx` с не-строковыми данными (картинки, иконки формы) дают `MSB3822/MSB3823`, нужен полноценный MSBuild
+  (обход — пакет `System.Resources.Extensions` + `GenerateResourceUsePreserializedResources`, не включён: добавляет DLL в поставку).
+  Из-за этого `_publish.bat` (вызывает `dotnet build`) тоже не соберёт проект с нуля.
 - Рабочая команда (проверена, Debug), из каталога `source/`:
 
 ```powershell
 & 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' DazUnpacker.sln -p:Configuration=Debug '-p:Platform=Any CPU' -restore -nologo -v:q
 ```
 
-- Результат: `source/bin/Debug/SuperDIM.exe`. Папка `tools/` копируется в выход автоматически (`<Content Include=".\tools\**">`).
-- NuGet: `EWSoftware.ListControls` (кастомный список-радиокнопки `radioButtonInstallLibs`), `Newtonsoft.Json` (конфиг),
-  `System.Data.SQLite.Core` (БД каталога; нативные `x86\`/`x64\SQLite.Interop.dll` копирует `.targets` пакета `Stub.System.Data.SQLite.Core.NetFramework`).
-  Пакеты лежат в `source/packages/`. На чистом клоне (нет `source/packages/`) первую сборку делай с `-p:RestorePackagesConfig=true`
-  (иначе `-restore` не восстанавливает `packages.config`) и затем повтори сборку обычной командой.
+- Результат: `source/bin/Debug/SuperDIM.exe` (`AppendTargetFrameworkToOutputPath=false` — без подпапки `net48`). Папка `tools/` копируется в выход автоматически
+  (`<Content Include="tools\**">`).
+- NuGet (`PackageReference` в csproj, `packages.config` нет): `EWSoftware.ListControls` (кастомный список-радиокнопки `radioButtonInstallLibs`), `Newtonsoft.Json` (конфиг),
+  `System.Data.SQLite.Core` (БД каталога; нативные `x86\`/`x64\SQLite.Interop.dll` копирует `.targets` транзитивного пакета `Stub.System.Data.SQLite.Core.NetFramework`).
+  Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Старая папка `source/packages/` не используется (исключена из сборки
+  через `DefaultItemExcludes`, в git не лежит) — её можно удалить.
+- Версия и описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) заданы в csproj; `AssemblyInfo.cs` нет.
 - Тестов в проекте нет. `source/_publish.bat` собирает Release и пакует zip (без `config.txt`, `catalog.db*` и `app.log`).
 - Релизная сборка блокируется запущенным Release-процессом пользователя — всегда собирай Debug (см. глобальные правила).
 
@@ -31,11 +35,11 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 ```
 README.md, LICENSE, .gitignore
 source/
-  DazUnpacker.sln / .csproj     проект; файлы перечислены в csproj явно (новый .cs надо добавлять в <Compile>)
-  Properties/                   AssemblyInfo, Resources, Settings (Settings пустой)
+  DazUnpacker.sln / .csproj     проект SDK-style: все *.cs и *.resx подхватываются по маске, в csproj их перечислять не нужно
+  Properties/                   Resources, Settings (Settings пустой)
   source/                       весь код приложения (папка называется "source" внутри "source")
   tools/7z/{7z.exe,7z.dll}, tools/WinRar/UnRAR.exe   внешние распаковщики
-  dci.ico, _publish.bat, packages.config
+  dci.ico, _publish.bat
 ```
 
 Артефакты рядом с exe при работе: `config.txt` (настройки, JSON), `app.log`, `catalog.db` (SQLite, + `-wal`/`-shm`).
@@ -161,14 +165,13 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
 - **Локализация:** UI на английском, русский вариант не реализован. Комментарии в коде — английские.
 - **Кодировка исходников:** файлы в UTF-8 с BOM, CRLF (перед правкой полагаться на хуки File Guard, см. глобальные правила).
-- Несоответствие в зависимостях: `packages.config` в `source/` ссылается только на `EWSoftware.ListControls`,
-  `Newtonsoft.Json` описан в `source/source/packages.config` (net472); в csproj обе ссылки идут через `packages\...` (restore работает).
 
 ## Рабочие соглашения для этого проекта
 
 - Общие правила стиля/git/сборки берутся из глобального `~/.claude/CLAUDE.md` (фигурные скобки везде, комментарии на английском,
   один оператор на строку, коммит локально после каждой правки, push только по явной просьбе).
-- Новый `.cs` файл нужно вручную добавить в `<Compile Include=...>` в `source/DazUnpacker.csproj`.
+- Новый `.cs` файл в csproj добавлять не нужно (SDK-style подхватывает `**/*.cs`). Исключение — `DependentUpon` для вложенности в Solution Explorer и
+  `.resx` формы: у `Form1.resx` оно задано в csproj явно (от него зависит имя ресурса `DazUnpacker.Form1.resources`; у новой формы с `.resx` проверяй имя ресурса).
 - Проверка UI без ручного запуска: копию `bin\Debug` запускать из scratchpad (чужие/пользовательские процессы SuperDIM не трогать — завершать только по своему PID),
   управлять через UI Automation (элементы ищутся по `Name`, перед кликом окно нужно активировать, `Microsoft.VisualBasic.Interaction.AppActivate`).
 - Если логика новой функции > ~500 строк — выносить в отдельную форму/класс с именем, начинающимся на `Form1…` (правило из глобальных инструкций).

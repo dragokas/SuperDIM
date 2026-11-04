@@ -1,155 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B47705D3-FB3C-4037-BA92-75476B6F944B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>DazUnpacker</RootNamespace>
     <AssemblyName>SuperDIM</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationManifest>source\app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>dci.ico</ApplicationIcon>
+    <!-- Keep the output in bin\<Configuration>\ (without the net48 subfolder) -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- The old NuGet packages folder is no longer used; do not pick up its files -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);packages\**</DefaultItemExcludes>
+    <AssemblyTitle>DazUnpacker</AssemblyTitle>
+    <Product>DazUnpacker</Product>
+    <Copyright>Copyright © 2023</Copyright>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="EWSoftware.ListControls, Version=2023.4.9.0, Culture=neutral, PublicKeyToken=74660aaee20da427, processorArchitecture=MSIL">
-      <HintPath>packages\EWSoftware.ListControls.2023.4.9\lib\net40\EWSoftware.ListControls.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.119.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\lib\net46\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="EWSoftware.ListControls" Version="2023.4.9" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="source\Archive.cs" />
-    <Compile Include="source\ArchiveLister.cs" />
-    <Compile Include="source\CatalogDb.cs" />
-    <Compile Include="source\CatalogRowSource.cs" />
-    <Compile Include="source\CatalogScanner.cs" />
-    <Compile Include="source\CsvHelper.cs" />
-    <Compile Include="source\Config.cs" />
-    <Compile Include="source\Content.cs" />
-    <Compile Include="source\FileSys.cs" />
-    <Compile Include="source\FilterManager.cs" />
-    <Compile Include="source\FolderPicker.cs" />
-    <Compile Include="source\Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="source\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="source\Form1Catalog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="source\Form1Catalog.Designer.cs">
-      <DependentUpon>Form1Catalog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="source\Form1CatalogGrid.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="source\Form1CatalogGrid.Designer.cs">
-      <DependentUpon>Form1CatalogGrid.cs</DependentUpon>
-    </Compile>
-    <Compile Include="source\Form1CatalogResult.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="source\Form1CatalogResult.Designer.cs">
-      <DependentUpon>Form1CatalogResult.cs</DependentUpon>
-    </Compile>
-    <Compile Include="source\Form1CatalogSearch.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="source\Form1CatalogSearch.Designer.cs">
-      <DependentUpon>Form1CatalogSearch.cs</DependentUpon>
-    </Compile>
-    <Compile Include="source\Geometry.cs" />
-    <Compile Include="source\Globals.cs" />
-    <Compile Include="source\Library.cs" />
-    <Compile Include="source\ListViewColumnSorter.cs" />
-    <Compile Include="source\Logger.cs" />
-    <Compile Include="source\Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="source\Statistics.cs" />
-    <Compile Include="source\Unpacker.cs" />
-    <EmbeddedResource Include="source\Form1.resx">
+    <EmbeddedResource Update="source\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="packages.config" />
-    <None Include="source\app.manifest" />
-    <None Include="source\packages.config" />
-    <None Include="Properties\Settings.settings">
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Properties\Settings.Designer.cs">
+    <Compile Update="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="source\App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include=".\tools\**">
+    <None Remove="tools\**" />
+    <Content Include="tools\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="dci.ico" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+
 </Project>
