@@ -66,7 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="source\Archive.cs" />
+    <Compile Include="source\ArchiveLister.cs" />
     <Compile Include="source\CatalogDb.cs" />
+    <Compile Include="source\CatalogScanner.cs" />
     <Compile Include="source\Config.cs" />
     <Compile Include="source\Content.cs" />
     <Compile Include="source\Exclusion.cs" />
