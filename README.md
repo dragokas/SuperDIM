@@ -50,7 +50,7 @@ It provides the advanced fetures to install content archives of any type in conv
  
  - Visual Studio 2019 or newer
  - Copy "tools" dir to the release dir
-   - tools\7z must have the official [7zip Extra](https://www.7-zip.org/download.html) package files: 7za.dll, 7za.exe, 7zxa.dll
+   - tools\7z must have the official [7-Zip](https://www.7-zip.org/download.html) (full version, not "Extra") files: 7z.exe, 7z.dll
    - tools\WinRar must have the official [WinRar](https://www.rarlab.com/download.htm) UnRAR.exe file
 
 ## TODO

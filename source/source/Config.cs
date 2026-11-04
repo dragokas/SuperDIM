@@ -96,7 +96,7 @@ namespace DazUnpacker
         private static void LoadCommonData()
         {
             Data.UnpackerTool7z = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
-                @"\tools\7z\7za.exe";
+                @"\tools\7z\7z.exe";
             if (!File.Exists(Data.UnpackerTool7z))
             {
                 MessageBox.Show("Failed to find unpacker: " + Data.UnpackerTool7z);

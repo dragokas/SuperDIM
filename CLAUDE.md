@@ -1,10 +1,10 @@
 # SuperDIM — заметки для Claude
 
 Windows-приложение (WinForms, .NET Framework 4.8, C#) для массовой установки контент-архивов DAZ Studio
-(zip / 7z / rar) в структуру Content Library. Распаковка делегируется внешним утилитам `7za.exe` и `UnRAR.exe`.
+(zip / 7z / rar) в структуру Content Library. Распаковка делегируется внешним утилитам `7z.exe` (полный 7-Zip, умеет и rar) и `UnRAR.exe`.
 Лицензия GPL-3.0; репозиторий: https://github.com/dragokas/SuperDIM (открытых issues нет; единственный TODO из README —
 режим Full install может работать некорректно). Описание для пользователей — в `README.md`. Здесь — только то, что нужно для работы с кодом.
-`7za.exe`/`UnRAR.exe` — сторонние официальные бинарники (7-Zip Extra, WinRAR), их не изменяем.
+`7z.exe`+`7z.dll`/`UnRAR.exe` — сторонние официальные бинарники (7-Zip, WinRAR), их не изменяем.
 
 ## Сборка и запуск
 
@@ -31,7 +31,7 @@ source/
   DazUnpacker.sln / .csproj     проект; файлы перечислены в csproj явно (новый .cs надо добавлять в <Compile>)
   Properties/                   AssemblyInfo, Resources, Settings (Settings пустой)
   source/                       весь код приложения (папка называется "source" внутри "source")
-  tools/7z/{7za.exe,7za.dll,7zxa.dll}, tools/WinRar/UnRAR.exe   внешние распаковщики
+  tools/7z/{7z.exe,7z.dll}, tools/WinRar/UnRAR.exe   внешние распаковщики
   dci.ico, _publish.bat, packages.config
 ```
 
@@ -73,7 +73,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())` |
 | `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, (Sort — **удалена из UI в конструкторе**), Installer, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования, «Re-install access denied» |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
-| `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7za.exe`/`UnRAR.exe` через `Process`, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
+| `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` через `Process`, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`), `GetParentFolders` для combobox «Root folder» |
 | `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов), `Basic` (DAZ-библиотеки), `Search`, `Exclude`, `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
 | `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabSort/_TabInstaller/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к утилитам; `Init` заполняет комбобоксы, `ApplyStorage` форма←конфиг, `SaveConfig` форма→конфиг (вызывается в `FormClosing`) |
@@ -90,7 +90,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 ### Конфигурация
 
 - `config.txt` рядом с exe, Json.NET, `Formatting.Indented`. Читается в `Config.Init` (конструктор формы), пишется в `Form1_FormClosing`.
-- Пути к `7za.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7za.exe`, `tools\WinRAR\UnRAR.exe`
+- Пути к `7z.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7z.exe`, `tools\WinRAR\UnRAR.exe`
   (в git каталог называется `WinRar` — регистр не важен на Windows).
 - Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation` и т.п.)
   и **Full** (копируются и остальные корневые папки).
