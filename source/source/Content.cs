@@ -81,8 +81,8 @@ namespace DazUnpacker
 
         public static void AddFolder(string folder)
         {
-            var list = FileSys.EnumDirectory(folder + "\\*.*").ToList();
-            foreach (string file in list)
+            // FindArchives skips the folders which cannot be read (System Volume Information, $RECYCLE.BIN, ...)
+            foreach (string file in ArchiveLister.FindArchives(folder))
             {
                 AddFile(file);
             }

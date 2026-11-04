@@ -27,9 +27,23 @@ namespace DazUnpacker
 
             Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
+
+            // The error goes to the log and to a message box instead of the standard "Unhandled exception" dialog
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += (sender, e) => ReportUnhandled(e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => ReportUnhandled(e.ExceptionObject as Exception);
+
             Application.Run(new Form1());
 
             mutex.ReleaseMutex();
+        }
+
+        private static void ReportUnhandled(Exception ex)
+        {
+            if (ex != null)
+            {
+                Globals.ReportError(ex, true, "Unhandled exception");
+            }
         }
     }
 }
