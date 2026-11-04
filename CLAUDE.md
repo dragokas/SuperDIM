@@ -57,7 +57,7 @@ source/
 
 ```
 Drag&Drop / "Select Folder"  ->  Content.AddObject/AddFolder/AddFile  ->  listViewContent (Library.Content)
-    (фильтр по дате применяется уже на добавлении)
+    (фильтр по дате применяется уже на добавлении; перед добавлением `Form1` вызывает `Config.SaveFiltersFromForm()`, иначе берётся устаревшее сохранённое состояние)
 buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контролов  ->  новый Thread -> Unpacker.UnpackAll
     Parallel.ForEach(архивы, MaxDegreeOfParallelism = threadsCount):
       1. определить ContentType (по имени архива: DetectContentType, либо общий тип из UI)

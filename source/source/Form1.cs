@@ -208,6 +208,7 @@ namespace DazUnpacker
 
         private void AcceptDropEvent(DragEventArgs e)
         {
+            Config.SaveFiltersFromForm(); // the filters of the form (not the saved ones) are applied to the added archives
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string file in files)
             {
@@ -242,6 +243,7 @@ namespace DazUnpacker
 
         private void AddFolder(string path, bool dDetectContentType = true)
         {
+            Config.SaveFiltersFromForm();
             Content.AddFolder(path);
             Statistics.Total = Library.Content.Count;
             if (dDetectContentType)
@@ -561,6 +563,7 @@ namespace DazUnpacker
         internal int ReplaceInstallList(IEnumerable<string> archives)
         {
             ClearInstallList();
+            Config.SaveFiltersFromForm();
             foreach (string path in archives)
             {
                 if (File.Exists(path))
@@ -583,6 +586,7 @@ namespace DazUnpacker
 
             List<string> paths = Library.Skipped.GetFiles(FindFailReason.AccessDenied);
 
+            Config.SaveFiltersFromForm();
             foreach (var path in paths.Distinct())
             {
                 AddFile(path);
