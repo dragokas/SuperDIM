@@ -23,6 +23,7 @@ namespace DazUnpacker
         private ListViewColumnSorter lvwColumnSorter;
         private TabPage _previousTab;
         private bool _isFormLoaded = false;
+        private volatile bool m_installRunning = false;
 
         internal Form1Catalog CatalogForm { get; private set; }
 
@@ -307,6 +308,8 @@ namespace DazUnpacker
                 if (unpackInfo.contentFiles.Count > 0)
                 {
                     Thread t = new Thread(() => RunInstall(unpackInfo));
+                    t.IsBackground = true; // the work must not keep the process alive after the window is closed
+                    m_installRunning = true;
                     t.Start();
                 }
                 else
@@ -343,6 +346,7 @@ namespace DazUnpacker
 
         private void OnInstallFinished()
         {
+            m_installRunning = false;
             m_stopWatcher.Stop();
             buttonStart.Enabled = true;
         }
@@ -380,6 +384,17 @@ namespace DazUnpacker
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (m_installRunning && e.CloseReason == CloseReason.UserClosing)
+            {
+                // the worker thread is a background one: closing the window stops the installation at once
+                DialogResult answer = MessageBox.Show(this, "The installation is in progress. Stop it and exit?", Globals.AppName,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+                if (answer != DialogResult.Yes)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
             CatalogForm.Shutdown();
             Config.SaveConfig();
         }
