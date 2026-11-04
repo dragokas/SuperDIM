@@ -152,9 +152,11 @@ namespace DazUnpacker
             CopyNoChanges
         }
 
+        // Copies the content of sourceDir to targetDir. An error of one file does not stop the others, but the result is CopyFailed then.
         public static FsCopyStatus CopyFolderRecursively(string sourceDir, string targetDir, bool overwrite)
         {
             bool hasReplaces = false;
+            bool hasFailures = false;
             try
             {
                 if (!Directory.Exists(targetDir))
@@ -172,17 +174,17 @@ namespace DazUnpacker
                 foreach (string sourceFile in Directory.EnumerateFiles(sourceDir, "*.*", SearchOption.AllDirectories))
                 {
                     string targetFile = Path.Combine(targetDir, sourceFile.Substring(sourceDir.Length + 1));
-                    if (overwrite)
+                    if (overwrite || !File.Exists(targetFile))
                     {
-                        File.Copy(sourceFile, targetFile, true);
-                        hasReplaces = true;
-                    }
-                    else
-                    {
-                        if (!File.Exists(targetFile))
+                        try
                         {
-                            File.Copy(sourceFile, targetFile, true);
+                            CopyFile(sourceFile, targetFile);
                             hasReplaces = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            hasFailures = true;
+                            Globals.ReportError(ex, false, "Copy: " + sourceFile);
                         }
                     }
                 }
@@ -192,7 +194,25 @@ namespace DazUnpacker
                 Globals.ReportError(ex, false);
                 return FsCopyStatus.CopyFailed;
             }
+            if (hasFailures)
+            {
+                return FsCopyStatus.CopyFailed;
+            }
             return hasReplaces ? FsCopyStatus.CopySuccess : FsCopyStatus.CopyNoChanges;
+        }
+
+        // Overwrites the target file even if it is read-only (files installed from archives often are)
+        private static void CopyFile(string sourceFile, string targetFile)
+        {
+            if (File.Exists(targetFile))
+            {
+                FileAttributes attributes = File.GetAttributes(targetFile);
+                if ((attributes & FileAttributes.ReadOnly) != 0)
+                {
+                    File.SetAttributes(targetFile, attributes & ~FileAttributes.ReadOnly);
+                }
+            }
+            File.Copy(sourceFile, targetFile, true);
         }
 
         public static IEnumerable<string> EnumDirectory(string path, Func<FileInfo, bool> checkFile = null)
