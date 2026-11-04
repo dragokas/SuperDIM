@@ -8,16 +8,16 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 
 ## Сборка и запуск
 
-Решение: `source/DazUnpacker.sln`, проект `source/DazUnpacker.csproj` (SDK-style: `Microsoft.NET.Sdk`, `net48`, `UseWindowsForms`).
+Решение: `source/DazUnpacker.slnx` (новый XML-формат, нужен VS 2022 17.13+ / MSBuild из VS или dotnet SDK 9+), проект `source/DazUnpacker.csproj` (SDK-style: `Microsoft.NET.Sdk`, `net48`, `UseWindowsForms`).
 Корневой namespace `DazUnpacker`, имя сборки `SuperDIM`, точка входа `Program.Main`.
 
 - `dotnet build` **не работает**: ресурсы `.resx` с не-строковыми данными (картинки, иконки формы) дают `MSB3822/MSB3823`, нужен полноценный MSBuild
   (обход — пакет `System.Resources.Extensions` + `GenerateResourceUsePreserializedResources`, не включён: добавляет DLL в поставку).
-  Из-за этого `_publish.bat` (вызывает `dotnet build`) тоже не соберёт проект с нуля.
+  Поэтому `_publish.bat` находит MSBuild из Visual Studio через `vswhere` (если его нет — сообщает и выходит, не трогая `bin\Release`).
 - Рабочая команда (проверена, Debug), из каталога `source/`:
 
 ```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' DazUnpacker.sln -p:Configuration=Debug '-p:Platform=Any CPU' -restore -nologo -v:q
+& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' DazUnpacker.slnx -p:Configuration=Debug '-p:Platform=Any CPU' -restore -nologo -v:q
 ```
 
 - Результат: `source/bin/Debug/SuperDIM.exe` (`AppendTargetFrameworkToOutputPath=false` — без подпапки `net48`). Папка `tools/` копируется в выход автоматически
@@ -27,7 +27,8 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
   Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Старая папка `source/packages/` не используется (исключена из сборки
   через `DefaultItemExcludes`, в git не лежит) — её можно удалить.
 - Версия и описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) заданы в csproj; `AssemblyInfo.cs` нет.
-- Тестов в проекте нет. `source/_publish.bat` собирает Release и пакует zip (без `config.txt`, `catalog.db*` и `app.log`).
+- Тестов в проекте нет. `source/_publish.bat` собирает Release (MSBuild из VS) и пакует zip (без `config.txt`, `catalog.db*` и `app.log`);
+  существующий `bin\Release` на время сборки откладывается в `bin\Release.bak` и возвращается после. Проверять bat нужно на копии репозитория, не на рабочем каталоге.
 - Релизная сборка блокируется запущенным Release-процессом пользователя — всегда собирай Debug (см. глобальные правила).
 
 ## Структура репозитория
@@ -35,7 +36,7 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 ```
 README.md, LICENSE, .gitignore
 source/
-  DazUnpacker.sln / .csproj     проект SDK-style: все *.cs и *.resx подхватываются по маске, в csproj их перечислять не нужно
+  DazUnpacker.slnx / .csproj    проект SDK-style: все *.cs и *.resx подхватываются по маске, в csproj их перечислять не нужно
   Properties/                   Resources, Settings (Settings пустой)
   source/                       весь код приложения (папка называется "source" внутри "source")
   tools/7z/{7z.exe,7z.dll}, tools/WinRar/UnRAR.exe   внешние распаковщики
