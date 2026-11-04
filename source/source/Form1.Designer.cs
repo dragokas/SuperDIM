@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.buttonAddLibraryPath = new System.Windows.Forms.Button();
+            this.buttonFullScreen = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPageSettings = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -195,6 +196,9 @@
             this.tabControl.Controls.Add(this.tabPageInstaller);
             this.tabControl.Controls.Add(this.tabPageCatalog);
             this.tabControl.Controls.Add(this.tabPageLogs);
+            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl.Location = new System.Drawing.Point(17, 18);
             this.tabControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabControl.Name = "tabControl";
@@ -929,6 +933,7 @@
             this.checkBoxHierarhyByRootFolder.AutoSize = true;
             this.checkBoxHierarhyByRootFolder.Checked = true;
             this.checkBoxHierarhyByRootFolder.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxHierarhyByRootFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxHierarhyByRootFolder.Location = new System.Drawing.Point(43, 823);
             this.checkBoxHierarhyByRootFolder.Name = "checkBoxHierarhyByRootFolder";
             this.checkBoxHierarhyByRootFolder.Size = new System.Drawing.Size(241, 29);
@@ -940,6 +945,7 @@
             // checkBoxOverwrite
             // 
             this.checkBoxOverwrite.AutoSize = true;
+            this.checkBoxOverwrite.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxOverwrite.Location = new System.Drawing.Point(43, 923);
             this.checkBoxOverwrite.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxOverwrite.Name = "checkBoxOverwrite";
@@ -956,6 +962,9 @@
             this.panel8.Controls.Add(this.progressBar1);
             this.panel8.Controls.Add(this.buttonAddContentFolder);
             this.panel8.Controls.Add(this.label3);
+            this.panel8.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel8.Location = new System.Drawing.Point(20, 334);
             this.panel8.Margin = new System.Windows.Forms.Padding(4);
             this.panel8.Name = "panel8";
@@ -964,6 +973,7 @@
             // 
             // buttonClear
             // 
+            this.buttonClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonClear.Location = new System.Drawing.Point(970, 422);
             this.buttonClear.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonClear.Name = "buttonClear";
@@ -997,6 +1007,9 @@
             this.listViewContent.FullRowSelect = true;
             this.listViewContent.GridLines = true;
             this.listViewContent.HideSelection = false;
+            this.listViewContent.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewContent.Location = new System.Drawing.Point(6, 98);
             this.listViewContent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listViewContent.MultiSelect = false;
@@ -1028,6 +1041,7 @@
             // 
             // progressBar1
             // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Location = new System.Drawing.Point(565, 60);
             this.progressBar1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.progressBar1.Name = "progressBar1";
@@ -1086,6 +1100,7 @@
             this.checkBoxDetectContentTypePerFile.AutoSize = true;
             this.checkBoxDetectContentTypePerFile.Checked = true;
             this.checkBoxDetectContentTypePerFile.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxDetectContentTypePerFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxDetectContentTypePerFile.Location = new System.Drawing.Point(585, 864);
             this.checkBoxDetectContentTypePerFile.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxDetectContentTypePerFile.Name = "checkBoxDetectContentTypePerFile";
@@ -1103,6 +1118,7 @@
             this.groupBox3.Controls.Add(this.dateTimePickerFilterCreated);
             this.groupBox3.Controls.Add(this.comboBoxDateFilterDirection);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Location = new System.Drawing.Point(576, 165);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
@@ -1176,6 +1192,7 @@
             this.groupBox1.Controls.Add(this.radioButtonFullInstall);
             this.groupBox1.Controls.Add(this.checkBoxInstallDufOnly);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Location = new System.Drawing.Point(576, 30);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
@@ -1228,6 +1245,7 @@
             // 
             this.panel6.Controls.Add(this.textBoxSubfolderPrefix);
             this.panel6.Controls.Add(this.checkBoxSubfolderPrefix);
+            this.panel6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.panel6.Location = new System.Drawing.Point(39, 1013);
             this.panel6.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel6.Name = "panel6";
@@ -1263,6 +1281,7 @@
             // 
             this.panel4.Controls.Add(this.textBoxRootSubfolder);
             this.panel4.Controls.Add(this.checkBoxCreateRootSubfolder);
+            this.panel4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.panel4.Location = new System.Drawing.Point(39, 960);
             this.panel4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel4.Name = "panel4";
@@ -1294,6 +1313,7 @@
             // labelSpeed
             // 
             this.labelSpeed.AutoSize = true;
+            this.labelSpeed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelSpeed.Location = new System.Drawing.Point(801, 1049);
             this.labelSpeed.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelSpeed.Name = "labelSpeed";
@@ -1304,6 +1324,7 @@
             // labelTimeElapsed
             // 
             this.labelTimeElapsed.AutoSize = true;
+            this.labelTimeElapsed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelTimeElapsed.Location = new System.Drawing.Point(801, 1009);
             this.labelTimeElapsed.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTimeElapsed.Name = "labelTimeElapsed";
@@ -1314,6 +1335,7 @@
             // label32
             // 
             this.label32.AutoSize = true;
+            this.label32.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label32.Location = new System.Drawing.Point(716, 1049);
             this.label32.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label32.Name = "label32";
@@ -1324,6 +1346,7 @@
             // label31
             // 
             this.label31.AutoSize = true;
+            this.label31.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label31.Location = new System.Drawing.Point(659, 1009);
             this.label31.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label31.Name = "label31";
@@ -1334,6 +1357,7 @@
             // label30
             // 
             this.label30.AutoSize = true;
+            this.label30.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label30.Location = new System.Drawing.Point(961, 1033);
             this.label30.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label30.Name = "label30";
@@ -1343,6 +1367,7 @@
             // 
             // numericUpDownThreadsCount
             // 
+            this.numericUpDownThreadsCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.numericUpDownThreadsCount.Location = new System.Drawing.Point(1062, 1031);
             this.numericUpDownThreadsCount.Margin = new System.Windows.Forms.Padding(4);
             this.numericUpDownThreadsCount.Maximum = new decimal(new int[] {
@@ -1369,6 +1394,7 @@
             this.comboBoxContentType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxContentType.Enabled = false;
             this.comboBoxContentType.FormattingEnabled = true;
+            this.comboBoxContentType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.comboBoxContentType.Location = new System.Drawing.Point(291, 862);
             this.comboBoxContentType.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxContentType.Name = "comboBoxContentType";
@@ -1378,6 +1404,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
+            this.label27.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label27.Location = new System.Drawing.Point(41, 864);
             this.label27.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label27.Name = "label27";
@@ -1389,6 +1416,8 @@
             // 
             this.comboBoxContentRootFolder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxContentRootFolder.FormattingEnabled = true;
+            this.comboBoxContentRootFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxContentRootFolder.Location = new System.Drawing.Point(291, 821);
             this.comboBoxContentRootFolder.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxContentRootFolder.Name = "comboBoxContentRootFolder";
@@ -1397,6 +1426,7 @@
             // 
             // buttonStart
             // 
+            this.buttonStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonStart.Location = new System.Drawing.Point(972, 944);
             this.buttonStart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonStart.Name = "buttonStart";
@@ -1440,6 +1470,7 @@
             // 
             // buttonReInstallAccessDenied
             // 
+            this.buttonReInstallAccessDenied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonReInstallAccessDenied.Location = new System.Drawing.Point(832, 4);
             this.buttonReInstallAccessDenied.Margin = new System.Windows.Forms.Padding(4);
             this.buttonReInstallAccessDenied.Name = "buttonReInstallAccessDenied";
@@ -1459,6 +1490,8 @@
             this.listViewSkippedContent.FullRowSelect = true;
             this.listViewSkippedContent.GridLines = true;
             this.listViewSkippedContent.HideSelection = false;
+            this.listViewSkippedContent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewSkippedContent.Location = new System.Drawing.Point(24, 53);
             this.listViewSkippedContent.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listViewSkippedContent.MultiSelect = false;
@@ -1483,6 +1516,7 @@
             // 
             // buttonDeleteLog
             // 
+            this.buttonDeleteLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonDeleteLog.Location = new System.Drawing.Point(966, 415);
             this.buttonDeleteLog.Margin = new System.Windows.Forms.Padding(4);
             this.buttonDeleteLog.Name = "buttonDeleteLog";
@@ -1506,6 +1540,7 @@
             // checkBoxDeleteLogOnStart
             // 
             this.checkBoxDeleteLogOnStart.AutoSize = true;
+            this.checkBoxDeleteLogOnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxDeleteLogOnStart.Location = new System.Drawing.Point(705, 424);
             this.checkBoxDeleteLogOnStart.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxDeleteLogOnStart.Name = "checkBoxDeleteLogOnStart";
@@ -1518,6 +1553,7 @@
             // 
             this.checkBoxLogDetails.AutoSize = true;
             this.checkBoxLogDetails.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.checkBoxLogDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxLogDetails.Location = new System.Drawing.Point(24, 960);
             this.checkBoxLogDetails.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxLogDetails.Name = "checkBoxLogDetails";
@@ -1555,6 +1591,9 @@
             this.listBoxLog.FormattingEnabled = true;
             this.listBoxLog.HorizontalScrollbar = true;
             this.listBoxLog.ItemHeight = 25;
+            this.listBoxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxLog.Location = new System.Drawing.Point(24, 468);
             this.listBoxLog.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listBoxLog.Name = "listBoxLog";
@@ -1566,6 +1605,9 @@
             // textBoxLogDetails
             // 
             this.textBoxLogDetails.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.textBoxLogDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxLogDetails.Location = new System.Drawing.Point(24, 468);
             this.textBoxLogDetails.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxLogDetails.Multiline = true;
@@ -1597,21 +1639,35 @@
             this.copyAllToolStripMenuItem.Text = "Copy All";
             this.copyAllToolStripMenuItem.Click += new System.EventHandler(this.copyAllToolStripMenuItem_Click);
             // 
+            // buttonFullScreen
+            //
+            this.buttonFullScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonFullScreen.Location = new System.Drawing.Point(1022, 16);
+            this.buttonFullScreen.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonFullScreen.Name = "buttonFullScreen";
+            this.buttonFullScreen.Size = new System.Drawing.Size(158, 34);
+            this.buttonFullScreen.TabIndex = 4;
+            this.buttonFullScreen.Text = "Full screen";
+            this.buttonFullScreen.UseVisualStyleBackColor = true;
+            this.buttonFullScreen.Click += new System.EventHandler(this.buttonFullScreen_Click);
+            //
             // Form1
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1192, 1151);
+            this.Controls.Add(this.buttonFullScreen);
             this.Controls.Add(this.tabControl);
             this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Super DAZ Content Install Manager";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl.ResumeLayout(false);
             this.tabPageSettings.ResumeLayout(false);
@@ -1663,6 +1719,7 @@
 
         #endregion
         private System.Windows.Forms.Button buttonAddLibraryPath;
+        private System.Windows.Forms.Button buttonFullScreen;
         private System.Windows.Forms.TabPage tabPageSettings;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabPage tabPageInstaller;
