@@ -11,14 +11,16 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 Решение: `source/DazUnpacker.slnx` (новый XML-формат, нужен VS 2022 17.13+ / MSBuild из VS или dotnet SDK 9+), проект `source/DazUnpacker.csproj` (SDK-style: `Microsoft.NET.Sdk`, `net48`, `UseWindowsForms`).
 Корневой namespace `DazUnpacker`, имя сборки `SuperDIM`, точка входа `Program.Main`.
 
-- `dotnet build` **не работает**: ресурсы `.resx` с не-строковыми данными (картинки, иконки формы) дают `MSB3822/MSB3823`, нужен полноценный MSBuild
-  (обход — пакет `System.Resources.Extensions` + `GenerateResourceUsePreserializedResources`, не включён: добавляет DLL в поставку).
-  Поэтому `_publish.bat` находит MSBuild из Visual Studio через `vswhere` (если его нет — сообщает и выходит, не трогая `bin\Release`).
-- Рабочая команда (проверена, Debug), из каталога `source/`:
+- Рабочая команда (проверена, Debug), из каталога `source/` (`-restore` вызывается сам):
 
 ```powershell
-& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' DazUnpacker.slnx -p:Configuration=Debug '-p:Platform=Any CPU' -restore -nologo -v:q
+dotnet build DazUnpacker.slnx --configuration Debug '-p:Platform=Any CPU' -nologo -v:m
 ```
+
+- Полный MSBuild из VS тоже работает: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' DazUnpacker.slnx -p:Configuration=Debug '-p:Platform=Any CPU' -restore -nologo -v:m`.
+- Единственный не-строковый ресурс — иконка формы `$this.Icon` в `Form1.resx`. Чтобы её собирал `dotnet build` (иначе `MSB3822/MSB3823`), в csproj заданы
+  `GenerateResourceUsePreserializedResources=true` и пакет `System.Resources.Extensions`: он нужен и в рантайме (+ его зависимости `System.Memory`, `System.Buffers`,
+  `System.Numerics.Vectors`, `System.Runtime.CompilerServices.Unsafe` лежат рядом с exe и в zip; binding redirect пишется в `SuperDIM.exe.config` автоматически).
 
 - Результат: `source/bin/Debug/SuperDIM.exe` (`AppendTargetFrameworkToOutputPath=false` — без подпапки `net48`). Папка `tools/` копируется в выход автоматически
   (`<Content Include="tools\**">`).
@@ -27,7 +29,7 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
   Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Старая папка `source/packages/` не используется (исключена из сборки
   через `DefaultItemExcludes`, в git не лежит) — её можно удалить.
 - Версия и описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) заданы в csproj; `AssemblyInfo.cs` нет.
-- Тестов в проекте нет. `source/_publish.bat` собирает Release (MSBuild из VS) и пакует zip (без `config.txt`, `catalog.db*` и `app.log`);
+- Тестов в проекте нет. `source/_publish.bat` собирает Release (`dotnet build`) и пакует zip (без `config.txt`, `catalog.db*` и `app.log`);
   существующий `bin\Release` на время сборки откладывается в `bin\Release.bak` и возвращается после. Проверять bat нужно на копии репозитория, не на рабочем каталоге.
 - Релизная сборка блокируется запущенным Release-процессом пользователя — всегда собирай Debug (см. глобальные правила).
 

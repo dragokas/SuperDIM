@@ -12,6 +12,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!-- The old NuGet packages folder is no longer used; do not pick up its files -->
     <DefaultItemExcludes>$(DefaultItemExcludes);packages\**</DefaultItemExcludes>
+    <!-- Lets "dotnet build" compile non-string .resx resources (the form icon); needs System.Resources.Extensions at runtime -->
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <AssemblyTitle>DazUnpacker</AssemblyTitle>
     <Product>DazUnpacker</Product>
     <Copyright>Copyright © 2023</Copyright>
@@ -22,6 +24,7 @@
     <PackageReference Include="EWSoftware.ListControls" Version="2023.4.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
