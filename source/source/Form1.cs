@@ -300,16 +300,45 @@ namespace DazUnpacker
 
                 if (unpackInfo.contentFiles.Count > 0)
                 {
-                    Thread t = new Thread(() =>
-                        Unpacker.UnpackAll(unpackInfo)
-                    );
+                    Thread t = new Thread(() => RunInstall(unpackInfo));
                     t.Start();
+                }
+                else
+                {
+                    buttonStart.Enabled = true; // nothing to install
                 }
             }
             catch (Exception ex)
             {
+                buttonStart.Enabled = true;
                 Globals.ReportError(ex);
             }
+        }
+
+        // Worker thread: the Install button is enabled again when the work is over, whatever its result
+        private void RunInstall(UnpackInfo unpackInfo)
+        {
+            try
+            {
+                Unpacker.UnpackAll(unpackInfo);
+            }
+            catch (Exception ex)
+            {
+                Globals.ReportError(ex, false, "Install");
+            }
+            finally
+            {
+                if (!IsDisposed && IsHandleCreated)
+                {
+                    BeginInvoke(new MethodInvoker(OnInstallFinished));
+                }
+            }
+        }
+
+        private void OnInstallFinished()
+        {
+            m_stopWatcher.Stop();
+            buttonStart.Enabled = true;
         }
 
         private List<string> FilterFilesList(List<string> list)
@@ -454,7 +483,6 @@ namespace DazUnpacker
                 {
                     m_stopWatcher.Stop();
                     progressBar1.Value = 100;
-                    buttonStart.Enabled = true;
                 }
             }
             catch { }

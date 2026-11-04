@@ -141,8 +141,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   Новые настройки добавляются в три места: контрол в дизайнере → поле в `Config.Storage` → `ApplyStorage` + `SaveConfig`.
 - **Статический глобальный `Config.Storage` читается из рабочих потоков** `Parallel.ForEach` (фильтры, `genesisVersionFilter`) —
   значения для установки перед стартом синхронизируются из формы (`UpdateGenesisTypeFilter`, `SaveFiltersFromForm` в `buttonStart_Click`).
-- **Завершение установки определяется косвенно:** `labelProgress_TextChanged` сравнивает `Statistics.Done == Total`,
-  останавливает секундомер и включает кнопку Install. Пропущенные на этапе `FilterFilesList` архивы тоже считаются через `DoneIncrement`.
+- **Завершение установки:** поток установки (`Form1.RunInstall`) в `finally` сам включает кнопку Install через `BeginInvoke(OnInstallFinished)`, что бы ни случилось
+  (пустой список, сбой `PrepareTempDir`, исключение). `labelProgress_TextChanged` только показывает время, скорость и прогресс (по `Statistics.Done`/`Total`) и останавливает
+  секундомер. Пропущенные на этапе `FilterFilesList` архивы тоже считаются через `DoneIncrement`.
 - **Временные папки:** установщик (`Unpacker.UnpackAll` → `Archive.PrepareTempDir`) всегда распаковывает в `<корень диска целевой библиотеки>\Temp\Daz<N>`
   (N — номер архива в этом запуске; пустая папка `Temp\Daz` тоже создаётся; вложенные архивы — в `Daz<N>\Daz<M>`; так `Directory.Move` остаётся переименованием,
   а не копированием) и настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
