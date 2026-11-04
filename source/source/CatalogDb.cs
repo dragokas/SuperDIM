@@ -78,6 +78,32 @@ namespace DazUnpacker
         }
     }
 
+    // Size and modification time of a bundle at the moment its file list was read
+    public class BundleStamp
+    {
+        public long Size;
+        public long ModifiedTicks;
+
+        // null if the file does not exist
+        public static BundleStamp FromFile(string path)
+        {
+            FileInfo info = new FileInfo(path);
+            if (!info.Exists)
+            {
+                return null;
+            }
+            BundleStamp stamp = new BundleStamp();
+            stamp.Size = info.Length;
+            stamp.ModifiedTicks = info.LastWriteTimeUtc.Ticks;
+            return stamp;
+        }
+
+        public bool IsSameAs(BundleStamp other)
+        {
+            return other != null && Size == other.Size && ModifiedTicks == other.ModifiedTicks;
+        }
+    }
+
     // Rows found in the catalog for one line typed by the user
     public class CatalogTailMatch
     {
@@ -124,6 +150,12 @@ namespace DazUnpacker
                         "NameKey TEXT NOT NULL)"); // lower-cased FileName, for the lookup by name
                     Execute(con, "CREATE INDEX IF NOT EXISTS ix_files_namekey ON Files(NameKey)");
                     Execute(con, "CREATE INDEX IF NOT EXISTS ix_files_archive ON Files(ArchivePath)");
+                    // bundles whose file list is in the catalog; used to skip unchanged archives on the next scan
+                    Execute(con,
+                        "CREATE TABLE IF NOT EXISTS Bundles(" +
+                        "ArchivePath TEXT PRIMARY KEY, " +
+                        "Size INTEGER NOT NULL, " +
+                        "ModifiedTicks INTEGER NOT NULL)");
                 }
             }
         }
@@ -157,8 +189,9 @@ namespace DazUnpacker
             }
         }
 
-        // Atomically replaces everything known about the bundle
-        public static void ReplaceBundle(string bundlePath, IList<CatalogRow> rows)
+        // Atomically replaces everything known about the bundle.
+        // stamp is the state of the bundle file when its content was read (null: not remembered, the bundle is rescanned next time).
+        public static void ReplaceBundle(string bundlePath, IList<CatalogRow> rows, BundleStamp stamp)
         {
             lock (writeLock)
             {
@@ -167,9 +200,44 @@ namespace DazUnpacker
                 {
                     DeleteBundle(con, bundlePath);
                     InsertRows(con, rows);
+                    SaveStamp(con, bundlePath, stamp);
                     tran.Commit();
                 }
             }
+        }
+
+        private static void SaveStamp(SQLiteConnection con, string bundlePath, BundleStamp stamp)
+        {
+            if (stamp == null)
+            {
+                return;
+            }
+            using (SQLiteCommand cmd = new SQLiteCommand("INSERT OR REPLACE INTO Bundles(ArchivePath, Size, ModifiedTicks) VALUES(@p, @s, @m)", con))
+            {
+                cmd.Parameters.AddWithValue("@p", bundlePath);
+                cmd.Parameters.AddWithValue("@s", stamp.Size);
+                cmd.Parameters.AddWithValue("@m", stamp.ModifiedTicks);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // Stamps of all bundles which are in the catalog (the key ignores case, as Windows paths do)
+        public static Dictionary<string, BundleStamp> LoadBundleStamps()
+        {
+            Dictionary<string, BundleStamp> stamps = new Dictionary<string, BundleStamp>(StringComparer.OrdinalIgnoreCase);
+            using (SQLiteConnection con = OpenConnection())
+            using (SQLiteCommand cmd = new SQLiteCommand("SELECT ArchivePath, Size, ModifiedTicks FROM Bundles", con))
+            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    BundleStamp stamp = new BundleStamp();
+                    stamp.Size = reader.GetInt64(1);
+                    stamp.ModifiedTicks = reader.GetInt64(2);
+                    stamps[reader.GetString(0)] = stamp;
+                }
+            }
+            return stamps;
         }
 
         // Replaces the rows of every bundle mentioned in the stream, other bundles stay untouched
@@ -201,9 +269,10 @@ namespace DazUnpacker
             return count;
         }
 
+        // Removes the rows and the stamp of the bundle (a bundle without a stamp is scanned again)
         private static void DeleteBundle(SQLiteConnection con, string bundlePath)
         {
-            using (SQLiteCommand cmd = new SQLiteCommand("DELETE FROM Files WHERE ArchivePath = @p", con))
+            using (SQLiteCommand cmd = new SQLiteCommand("DELETE FROM Files WHERE ArchivePath = @p; DELETE FROM Bundles WHERE ArchivePath = @p", con))
             {
                 cmd.Parameters.AddWithValue("@p", bundlePath);
                 cmd.ExecuteNonQuery();
@@ -257,6 +326,7 @@ namespace DazUnpacker
                 using (SQLiteConnection con = OpenConnection())
                 {
                     Execute(con, "DELETE FROM Files");
+                    Execute(con, "DELETE FROM Bundles");
                     Execute(con, "VACUUM");
                 }
             }

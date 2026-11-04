@@ -235,7 +235,7 @@ namespace DazUnpacker
             {
                 CatalogScanner scanner = new CatalogScanner(threads, ReportProgress);
                 int total = scanner.Run(folder, token);
-                return "Scanned archives: " + total;
+                return "Archives: " + total + ", skipped as unchanged: " + scanner.SkippedCount;
             }, null);
         }
 

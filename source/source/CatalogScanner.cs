@@ -11,10 +11,12 @@ namespace DazUnpacker
     {
         internal readonly string BundlePath;
         internal readonly List<CatalogRow> Rows = new List<CatalogRow>();
+        private readonly BundleStamp stamp; // the state of the file before it is read
 
         internal CatalogCollector(string bundlePath)
         {
             BundlePath = bundlePath;
+            stamp = BundleStamp.FromFile(bundlePath);
         }
 
         // Lists the archive (outer or nested) right before it is unpacked.
@@ -45,7 +47,7 @@ namespace DazUnpacker
             {
                 if (Rows.Count != 0)
                 {
-                    CatalogDb.ReplaceBundle(BundlePath, Rows);
+                    CatalogDb.ReplaceBundle(BundlePath, Rows, stamp);
                 }
             }
         }
@@ -60,6 +62,13 @@ namespace DazUnpacker
         private readonly int threadsCount;
         private readonly Action<int, int> progress;
         private int doneCount;
+        private int skippedCount;
+
+        // Number of bundles of the last Run which were not read, because they had not been changed since the previous scan
+        internal int SkippedCount
+        {
+            get { return skippedCount; }
+        }
 
         // progress(done, total) is called from worker threads
         internal CatalogScanner(int threadsCount, Action<int, int> progress)
@@ -85,6 +94,8 @@ namespace DazUnpacker
             List<string> bundles = ArchiveLister.FindArchives(folder);
             int total = bundles.Count;
             doneCount = 0;
+            skippedCount = 0;
+            Dictionary<string, BundleStamp> knownStamps = CatalogDb.LoadBundleStamps();
             progress(0, total);
 
             ParallelOptions options = new ParallelOptions();
@@ -95,10 +106,17 @@ namespace DazUnpacker
             {
                 try
                 {
+                    BundleStamp stamp = BundleStamp.FromFile(bundle);
+                    BundleStamp knownStamp;
+                    if (knownStamps.TryGetValue(bundle, out knownStamp) && knownStamp.IsSameAs(stamp))
+                    {
+                        Interlocked.Increment(ref skippedCount);
+                        return;
+                    }
                     List<CatalogRow> rows = ScanBundle(bundle, token);
                     if (rows != null)
                     {
-                        CatalogDb.ReplaceBundle(bundle, rows);
+                        CatalogDb.ReplaceBundle(bundle, rows, stamp);
                     }
                 }
                 catch (OperationCanceledException)
