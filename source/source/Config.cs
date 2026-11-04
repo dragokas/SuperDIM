@@ -22,22 +22,6 @@ namespace DazUnpacker
         public bool UseLanguageRu;
     }
 
-    public class _TabSort
-    {
-        public List<string> BlockNames = new List<string>();
-        public List<int> BlockNamesIdx = new List<int>();
-        public bool UsePrefix = false;
-        public string PrefixName = "";
-        public bool UseForcedSubfolder = false;
-        public string ForcedSubfolderName = "";
-        public bool UseSubfolder;
-        public bool UseSubfolderZipLocation;
-        public bool UsePriorityZipLocation;
-        public bool UseSubfolderOldLibrary;
-        public string RootSubfolder;
-        public bool CreateRootSubfolder;
-    }
-
     public class _TabInstaller
     {
         public int IntallLibrary = -1;
@@ -47,6 +31,10 @@ namespace DazUnpacker
         public bool DetectContentTypePerFile = true;
         public int ThreadsCount = 1;
         public bool IgnoreRootFolder = false;
+        public bool UsePrefix = false;
+        public string PrefixName = "";
+        public bool CreateRootSubfolder = false;
+        public string RootSubfolder = "";
         public FilterManager Filters = new FilterManager();
     }
     public class _TabLog
@@ -65,7 +53,6 @@ namespace DazUnpacker
     public class ConfigStorage
     {
         public _TabSettings TabSettings = new _TabSettings();
-        public _TabSort TabSort = new _TabSort();
         public _TabInstaller TabInstaller = new _TabInstaller();
         public _TabCatalog TabCatalog = new _TabCatalog();
         public _TabLog TabLog = new _TabLog();
@@ -177,17 +164,6 @@ namespace DazUnpacker
 
         private static void ApplyStorage()
         {
-            // Tab Sort?
-            foreach (string item in Storage.TabSort.BlockNames)
-            {
-                Exclusion.Add(item);
-            }
-            Exclusion.UnSelectAll();
-            foreach (int item in Storage.TabSort.BlockNamesIdx)
-            {
-                Exclusion.Select(item);
-            }
-
             // General
             form.tabControl.SelectedIndex = Storage.TabNumber;
 
@@ -207,19 +183,11 @@ namespace DazUnpacker
             form.comboBoxFallbackGeneration.Text = Storage.TabSettings.genesisVersionFallback.ToString();
             form.comboBoxFallbackGender.Text = Storage.TabSettings.genesisGenderFallback.ToString();
 
-            // Tab Sort
-            form.checkBoxUseSubfolder.Checked = Storage.TabSort.UseSubfolder;
-            form.radioButtonSpecificSubfolder.Checked = Storage.TabSort.UseForcedSubfolder;
-            form.textBoxSubfolderForced.Text = Storage.TabSort.ForcedSubfolderName;
-            form.checkBoxSubfolderAsZipLocation.Checked = Storage.TabSort.UseSubfolderZipLocation;
-            form.radioButtonPrioritySubfolderZipLocation.Checked = Storage.TabSort.UsePriorityZipLocation;
-            form.checkBoxSearchSubfolder.Checked = Storage.TabSort.UseSubfolderOldLibrary;
-            form.checkBoxSubfolderPrefix.Checked = Storage.TabSort.UsePrefix;
-            form.textBoxSubfolderPrefix.Text = Storage.TabSort.PrefixName;
-            form.textBoxRootSubfolder.Text = Storage.TabSort.RootSubfolder;
-            form.checkBoxCreateRootSubfolder.Checked = Storage.TabSort.CreateRootSubfolder;
-
             // Tab Installer
+            form.checkBoxSubfolderPrefix.Checked = Storage.TabInstaller.UsePrefix;
+            form.textBoxSubfolderPrefix.Text = Storage.TabInstaller.PrefixName;
+            form.textBoxRootSubfolder.Text = Storage.TabInstaller.RootSubfolder;
+            form.checkBoxCreateRootSubfolder.Checked = Storage.TabInstaller.CreateRootSubfolder;
             form.checkBoxDetectContentTypePerFile.Checked = Storage.TabInstaller.DetectContentTypePerFile;
             form.checkBoxInstallDufOnly.Checked = Storage.TabInstaller.InstallDufOnly;
             form.numericUpDownThreadsCount.Value = Storage.TabInstaller.ThreadsCount;
@@ -257,19 +225,11 @@ namespace DazUnpacker
             Storage.TabInstaller.OverwriteExisting = form.checkBoxOverwrite.Checked;
             Storage.TabInstaller.ThreadsCount = (int)form.numericUpDownThreadsCount.Value;
             Storage.TabInstaller.IgnoreRootFolder = !form.checkBoxHierarhyByRootFolder.Checked;
+            Storage.TabInstaller.UsePrefix = form.checkBoxSubfolderPrefix.Checked;
+            Storage.TabInstaller.PrefixName = form.textBoxSubfolderPrefix.Text;
+            Storage.TabInstaller.CreateRootSubfolder = form.checkBoxCreateRootSubfolder.Checked;
+            Storage.TabInstaller.RootSubfolder = form.textBoxRootSubfolder.Text;
             SaveFiltersFromForm();
-
-            // Tab Sort
-            foreach (string item in Exclusion.GetList())
-            {
-                Storage.TabSort.BlockNames.Add(item);
-            }
-            foreach (int item in Exclusion.GetIndeces())
-            {
-                Storage.TabSort.BlockNamesIdx.Add(item);
-            }
-            Storage.TabSort.RootSubfolder = form.textBoxRootSubfolder.Text;
-            Storage.TabSort.CreateRootSubfolder = form.checkBoxCreateRootSubfolder.Checked;
 
             // Tab Catalog
             form.CatalogForm.SaveSettings(Storage.TabCatalog);

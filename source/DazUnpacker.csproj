@@ -73,7 +73,6 @@
     <Compile Include="source\CsvHelper.cs" />
     <Compile Include="source\Config.cs" />
     <Compile Include="source\Content.cs" />
-    <Compile Include="source\Exclusion.cs" />
     <Compile Include="source\FileSys.cs" />
     <Compile Include="source\FilterManager.cs" />
     <Compile Include="source\FolderPicker.cs" />

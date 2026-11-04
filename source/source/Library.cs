@@ -116,7 +116,6 @@ namespace DazUnpacker
                         string shortName = Path.GetFileName(path);
                         form.checkedListBoxLibraryDirs.Items.Add(path, false);
                         form.radioButtonInstallLibs.Items.Add(shortName);
-                        form.checkedListBoxSearchLibs.Items.Add(shortName, true);
 
                         if (!DirToNameMap.ContainsKey(shortName))
                         {
@@ -134,7 +133,6 @@ namespace DazUnpacker
                 {
                     form.checkedListBoxLibraryDirs.Items.RemoveAt(index);
                     form.radioButtonInstallLibs.Items.RemoveAt(index);
-                    form.checkedListBoxSearchLibs.Items.RemoveAt(index);
                 }
             }
             public static IEnumerable<string> GetLibraries()
@@ -156,51 +154,6 @@ namespace DazUnpacker
                     return form.checkedListBoxLibraryDirs.Items[index].ToString();
                 }
                 return string.Empty;
-            }
-        }
-
-        public static class Search
-        {
-            public static IEnumerable<int> GetLibraries()
-            {
-                for (int i = 0; i < form.checkedListBoxSearchLibs.Items.Count; i++)
-                {
-                    if (form.checkedListBoxSearchLibs.GetItemChecked(i))
-                    {
-                        yield return i;
-                    }
-                }
-            }
-
-            public static void Select(int index)
-            {
-                form.checkedListBoxSearchLibs.SetItemChecked(index, true);
-            }
-
-            public static void UnSelectAll()
-            {
-                for (int i = 0; i < form.checkedListBoxSearchLibs.Items.Count; i++)
-                {
-                    form.checkedListBoxSearchLibs.SetItemChecked(i, false);
-                }
-            }
-        }
-
-        public static class Exclude
-        {
-            public static IEnumerable<int> GetLibraries()
-            {
-                return Exclusion.GetIndeces();
-            }
-
-            public static void Select(int index)
-            {
-                Exclusion.Select(index);
-            }
-
-            public static void UnSelectAll()
-            {
-                Exclusion.UnSelectAll();
             }
         }
 

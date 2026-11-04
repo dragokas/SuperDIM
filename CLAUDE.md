@@ -42,7 +42,7 @@ source/
 
 ## Архитектура
 
-Один главный `Form1` (partial: `Form1.cs` + `Form1.Designer.cs`, вкладки Settings, Installer, Catalog, Logs; Sort удалена) и набор **статических классов-фасадов**,
+Один главный `Form1` (partial: `Form1.cs` + `Form1.Designer.cs`, вкладки Settings, Installer, Catalog, Logs) и набор **статических классов-фасадов**,
 каждый из которых получает ссылку на форму через `Init(Form1)` и работает с её контролами напрямую.
 Слоёв «модель / представление» нет: состояние живёт в контролах формы и в `Config.Storage`.
 
@@ -74,12 +74,12 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | Файл | Роль |
 |---|---|
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())` |
-| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, (Sort — **удалена из UI в конструкторе**), Installer, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования, «Re-install access denied» |
+| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования, «Re-install access denied» |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
 | `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` через `Process`, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`), `GetParentFolders` для combobox «Root folder» |
 | `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов), `Basic` (DAZ-библиотеки), `Search`, `Exclude`, `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
-| `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabSort/_TabInstaller/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к утилитам; `Init` заполняет комбобоксы, `ApplyStorage` форма←конфиг, `SaveConfig` форма→конфиг (вызывается в `FormClosing`) |
+| `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabInstaller/_TabCatalog/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к утилитам; `Init` заполняет комбобоксы, `ApplyStorage` форма←конфиг, `SaveConfig` форма→конфиг (вызывается в `FormClosing`) |
 | `FilterManager.cs` | Фильтры установки: `IFilter`, `DateFilter` (Before/After/Equal по CreationTime архива), `ContentFilter` (один выбранный `ContentTypes`), `FilterManager` (флаги включения + список). Полиморфно сериализуется Json.NET (`TypeNameHandling.Auto`) |
 | `FileSys.cs` | Файловые хелперы: `CopyFolderRecursively` (+`FsCopyStatus`), `DirectoryDelete`, `EnumDirectory`, `GetParentDir`, `PathInsertPrefixToAllComponents`, `StripFilename` |
 | `Statistics.cs` | Счётчики `Total/Done` (Interlocked) и вывод в `labelProgress` через `BeginInvoke` |
@@ -91,7 +91,6 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
 | `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180) |
 | `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата) |
-| `Exclusion.cs` | Фасад над `checkedListBoxSubfolderBlock` (блоклист подпапок — относится к удалённой вкладке Sort) |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
 | `Geometry.cs` | Поиск контрола под курсором (для контекстного меню Copy) |
 | `ListViewColumnSorter.cs` | `IComparer` для сортировки `listViewSkippedContent` (глобальный класс без namespace) |
@@ -137,9 +136,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - **Временные папки:** `Archive.PrepareTempDir` всегда использует `<корень диска целевой библиотеки>\Temp\Daz` (чтобы `Directory.Move`
   был переименованием, а не копированием). Настройка «Specific temp folder» (`TabSettings.TempFolder/UseSpecificTempFolder`),
   `Config.Data.TempFolder`, `Globals.ClearTempFolder` и `Archive.ClearTemp` — **не используются при распаковке / нигде не вызываются** (заготовки или недоделки).
-- **Вкладка Sort и связанный код** (`_TabSort`, `Exclusion`, `Library.Search/Exclude`, обработчики в регионе `Sort`) — наследие:
-  вкладка удаляется из `tabControl` в конструкторе `Form1`; настройки Sort сохраняются/загружаются, но установка их не использует.
-  Аналогично `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries`.
+- **Вкладка Sort удалена** (вместе с `_TabSort`, `Exclusion`, `Library.Search/Exclude`). Её настройки установка не использовала. Живые поля «Prefix to append to subfolders»
+  и «Create root subfolder» стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller` (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`).
+  Старый ключ `TabSort` в `config.txt` Json.NET игнорирует. Остальные наследия: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries`.
 - **Эвристики определения типа/версии хрупкие** (подстроки в пути архива/папки): `DetectContentType` (порядок `else if` важен —
   например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray`, `\data\`, `Characters`).
   Любая правка должна учитывать порядок проверок и регрессии на реальных архивах — автотестов нет.

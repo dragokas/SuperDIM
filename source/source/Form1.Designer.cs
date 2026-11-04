@@ -61,33 +61,6 @@
             this.label29 = new System.Windows.Forms.Label();
             this.comboBoxFallbackGeneration = new System.Windows.Forms.ComboBox();
             this.label24 = new System.Windows.Forms.Label();
-            this.tabPageSort = new System.Windows.Forms.TabPage();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.checkBoxUseSubfolder = new System.Windows.Forms.CheckBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.panelSubfolder = new System.Windows.Forms.Panel();
-            this.panelSubfolderAutoDetect = new System.Windows.Forms.Panel();
-            this.label33 = new System.Windows.Forms.Label();
-            this.checkBoxSearchSubfolder = new System.Windows.Forms.CheckBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.checkBoxSubfolderAsZipLocation = new System.Windows.Forms.CheckBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.checkedListBoxSearchLibs = new System.Windows.Forms.CheckedListBox();
-            this.panel5 = new System.Windows.Forms.Panel();
-            this.label18 = new System.Windows.Forms.Label();
-            this.checkedListBoxSubfolderBlock = new System.Windows.Forms.CheckedListBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.panel9 = new System.Windows.Forms.Panel();
-            this.radioButtonPrioritySubfolderZipLocation = new System.Windows.Forms.RadioButton();
-            this.radioButtonPrioritySubfolderOldLibrary = new System.Windows.Forms.RadioButton();
-            this.radioButtonAutoDetectSubfolder = new System.Windows.Forms.RadioButton();
-            this.label9 = new System.Windows.Forms.Label();
-            this.radioButtonSpecificSubfolder = new System.Windows.Forms.RadioButton();
-            this.textBoxSubfolderForced = new System.Windows.Forms.TextBox();
             this.tabPageInstaller = new System.Windows.Forms.TabPage();
             this.checkBoxHierarhyByRootFolder = new System.Windows.Forms.CheckBox();
             this.checkBoxOverwrite = new System.Windows.Forms.CheckBox();
@@ -157,11 +130,6 @@
             this.panel2.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.tabPageSort.SuspendLayout();
-            this.panelSubfolder.SuspendLayout();
-            this.panelSubfolderAutoDetect.SuspendLayout();
-            this.panel5.SuspendLayout();
-            this.panel9.SuspendLayout();
             this.tabPageInstaller.SuspendLayout();
             this.panel8.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -191,7 +159,6 @@
             // tabControl
             // 
             this.tabControl.Controls.Add(this.tabPageSettings);
-            this.tabControl.Controls.Add(this.tabPageSort);
             this.tabControl.Controls.Add(this.tabPageInstaller);
             this.tabControl.Controls.Add(this.tabPageCatalog);
             this.tabControl.Controls.Add(this.tabPageLogs);
@@ -564,338 +531,7 @@
             this.label24.TabIndex = 10;
             this.label24.Text = "* Note: if archive contains both generations, all selected above will be installe" +
     "d.";
-            // 
-            // tabPageSort
-            // 
-            this.tabPageSort.Controls.Add(this.label15);
-            this.tabPageSort.Controls.Add(this.label13);
-            this.tabPageSort.Controls.Add(this.label12);
-            this.tabPageSort.Controls.Add(this.checkBoxUseSubfolder);
-            this.tabPageSort.Controls.Add(this.label11);
-            this.tabPageSort.Controls.Add(this.label10);
-            this.tabPageSort.Controls.Add(this.panelSubfolder);
-            this.tabPageSort.Location = new System.Drawing.Point(4, 33);
-            this.tabPageSort.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabPageSort.Name = "tabPageSort";
-            this.tabPageSort.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabPageSort.Size = new System.Drawing.Size(1158, 1080);
-            this.tabPageSort.TabIndex = 3;
-            this.tabPageSort.Text = "Sort";
-            this.tabPageSort.UseVisualStyleBackColor = true;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.ForeColor = System.Drawing.Color.Gray;
-            this.label15.Location = new System.Drawing.Point(396, 230);
-            this.label15.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(368, 25);
-            this.label15.TabIndex = 23;
-            this.label15.Text = "(*.duf contents folder will be placed there)";
-            // 
-            // label13
-            // 
-            this.label13.Location = new System.Drawing.Point(33, 155);
-            this.label13.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(1095, 70);
-            this.label13.TabIndex = 22;
-            this.label13.Text = "You can also use the folder name, where zip-file (to be installed) is located, as" +
-    " a subfolder name. Exclusions can be defined.";
-            // 
-            // label12
-            // 
-            this.label12.Location = new System.Drawing.Point(33, 102);
-            this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(1095, 53);
-            this.label12.TabIndex = 21;
-            this.label12.Text = resources.GetString("label12.Text");
-            // 
-            // checkBoxUseSubfolder
-            // 
-            this.checkBoxUseSubfolder.AutoSize = true;
-            this.checkBoxUseSubfolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkBoxUseSubfolder.Location = new System.Drawing.Point(54, 228);
-            this.checkBoxUseSubfolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxUseSubfolder.Name = "checkBoxUseSubfolder";
-            this.checkBoxUseSubfolder.Size = new System.Drawing.Size(320, 28);
-            this.checkBoxUseSubfolder.TabIndex = 17;
-            this.checkBoxUseSubfolder.Text = "Which subfolder name to use?";
-            this.checkBoxUseSubfolder.UseVisualStyleBackColor = true;
-            this.checkBoxUseSubfolder.CheckedChanged += new System.EventHandler(this.checkBoxUseSubfolder_CheckedChanged);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(33, 59);
-            this.label11.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(824, 25);
-            this.label11.TabIndex = 20;
-            this.label11.Text = "It is convenient to store them in subfolders by groups, like \"Props/Sport\", \"Prop" +
-    "s/Learning\", etc.";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(33, 22);
-            this.label10.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(477, 25);
-            this.label10.TabIndex = 19;
-            this.label10.Text = "You can define rules, where you want to put *.duf files.";
-            // 
-            // panelSubfolder
-            // 
-            this.panelSubfolder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelSubfolder.Controls.Add(this.panelSubfolderAutoDetect);
-            this.panelSubfolder.Controls.Add(this.radioButtonAutoDetectSubfolder);
-            this.panelSubfolder.Controls.Add(this.label9);
-            this.panelSubfolder.Controls.Add(this.radioButtonSpecificSubfolder);
-            this.panelSubfolder.Controls.Add(this.textBoxSubfolderForced);
-            this.panelSubfolder.Enabled = false;
-            this.panelSubfolder.Location = new System.Drawing.Point(37, 266);
-            this.panelSubfolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panelSubfolder.Name = "panelSubfolder";
-            this.panelSubfolder.Size = new System.Drawing.Size(1109, 801);
-            this.panelSubfolder.TabIndex = 18;
-            // 
-            // panelSubfolderAutoDetect
-            // 
-            this.panelSubfolderAutoDetect.Controls.Add(this.label33);
-            this.panelSubfolderAutoDetect.Controls.Add(this.checkBoxSearchSubfolder);
-            this.panelSubfolderAutoDetect.Controls.Add(this.label17);
-            this.panelSubfolderAutoDetect.Controls.Add(this.checkBoxSubfolderAsZipLocation);
-            this.panelSubfolderAutoDetect.Controls.Add(this.label16);
-            this.panelSubfolderAutoDetect.Controls.Add(this.label14);
-            this.panelSubfolderAutoDetect.Controls.Add(this.checkedListBoxSearchLibs);
-            this.panelSubfolderAutoDetect.Controls.Add(this.panel5);
-            this.panelSubfolderAutoDetect.Controls.Add(this.panel9);
-            this.panelSubfolderAutoDetect.Location = new System.Drawing.Point(23, 119);
-            this.panelSubfolderAutoDetect.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panelSubfolderAutoDetect.Name = "panelSubfolderAutoDetect";
-            this.panelSubfolderAutoDetect.Size = new System.Drawing.Size(1091, 676);
-            this.panelSubfolderAutoDetect.TabIndex = 29;
-            // 
-            // label33
-            // 
-            this.label33.ForeColor = System.Drawing.Color.Gray;
-            this.label33.Location = new System.Drawing.Point(458, 578);
-            this.label33.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(605, 28);
-            this.label33.TabIndex = 30;
-            this.label33.Text = "* e.g.: C:/.../DazContent/Outfit/<RootSubfolderName>/Night/.../*";
-            // 
-            // checkBoxSearchSubfolder
-            // 
-            this.checkBoxSearchSubfolder.AutoSize = true;
-            this.checkBoxSearchSubfolder.Location = new System.Drawing.Point(34, 19);
-            this.checkBoxSearchSubfolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxSearchSubfolder.Name = "checkBoxSearchSubfolder";
-            this.checkBoxSearchSubfolder.Size = new System.Drawing.Size(438, 29);
-            this.checkBoxSearchSubfolder.TabIndex = 28;
-            this.checkBoxSearchSubfolder.Text = "find previous name in the \"Old libraries\" below:";
-            this.checkBoxSearchSubfolder.UseVisualStyleBackColor = true;
-            this.checkBoxSearchSubfolder.CheckedChanged += new System.EventHandler(this.checkBoxSearchSubfolder_CheckedChanged);
-            // 
-            // label17
-            // 
-            this.label17.ForeColor = System.Drawing.Color.Gray;
-            this.label17.Location = new System.Drawing.Point(131, 278);
-            this.label17.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(937, 62);
-            this.label17.TabIndex = 24;
-            this.label17.Text = "(e.g.: if you\'re installing C:/.../DazBackup/Dress/Night/PrettyShortsG8F.zip, thi" +
-    "s content will be installed at \"Night\" subfolder as: <DazLibrary>/People/Genesis" +
-    " 8 Female/Outfit/Night/<ContentName>/*)";
-            // 
-            // checkBoxSubfolderAsZipLocation
-            // 
-            this.checkBoxSubfolderAsZipLocation.AutoSize = true;
-            this.checkBoxSubfolderAsZipLocation.Checked = true;
-            this.checkBoxSubfolderAsZipLocation.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxSubfolderAsZipLocation.Location = new System.Drawing.Point(34, 245);
-            this.checkBoxSubfolderAsZipLocation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkBoxSubfolderAsZipLocation.Name = "checkBoxSubfolderAsZipLocation";
-            this.checkBoxSubfolderAsZipLocation.Size = new System.Drawing.Size(548, 29);
-            this.checkBoxSubfolderAsZipLocation.TabIndex = 23;
-            this.checkBoxSubfolderAsZipLocation.Text = "Use folder name where zip-file located as a subfolder name";
-            this.checkBoxSubfolderAsZipLocation.UseVisualStyleBackColor = true;
-            this.checkBoxSubfolderAsZipLocation.CheckedChanged += new System.EventHandler(this.checkBoxSubfolderAsZipLocation_CheckedChanged);
-            // 
-            // label16
-            // 
-            this.label16.ForeColor = System.Drawing.Color.Gray;
-            this.label16.Location = new System.Drawing.Point(571, 545);
-            this.label16.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(496, 22);
-            this.label16.TabIndex = 22;
-            this.label16.Text = "* If none of rules matched, the subfolder is not used.";
-            // 
-            // label14
-            // 
-            this.label14.ForeColor = System.Drawing.Color.Gray;
-            this.label14.Location = new System.Drawing.Point(131, 178);
-            this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(937, 62);
-            this.label14.TabIndex = 21;
-            this.label14.Text = "(e.g.: if /ContentName/*.duf will be found in /OldLibrary/Props/Sport/ContentName" +
-    "/*.duf, it will be installed in \"Sport\" subfolder: /<NewLibrary>/Props/Sport/Con" +
-    "tentName/*.duf)";
-            // 
-            // checkedListBoxSearchLibs
-            // 
-            this.checkedListBoxSearchLibs.CheckOnClick = true;
-            this.checkedListBoxSearchLibs.ColumnWidth = 200;
-            this.checkedListBoxSearchLibs.Enabled = false;
-            this.checkedListBoxSearchLibs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkedListBoxSearchLibs.FormattingEnabled = true;
-            this.checkedListBoxSearchLibs.Location = new System.Drawing.Point(134, 62);
-            this.checkedListBoxSearchLibs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkedListBoxSearchLibs.MultiColumn = true;
-            this.checkedListBoxSearchLibs.Name = "checkedListBoxSearchLibs";
-            this.checkedListBoxSearchLibs.Size = new System.Drawing.Size(928, 60);
-            this.checkedListBoxSearchLibs.TabIndex = 20;
-            this.checkedListBoxSearchLibs.SelectedIndexChanged += new System.EventHandler(this.checkedListBoxSearchLibraries_SelectedIndexChanged);
-            this.checkedListBoxSearchLibs.MouseEnter += new System.EventHandler(this.checkedListBoxSearchLibraries_MouseEnter);
-            // 
-            // panel5
-            // 
-            this.panel5.Controls.Add(this.label18);
-            this.panel5.Controls.Add(this.checkedListBoxSubfolderBlock);
-            this.panel5.Controls.Add(this.label4);
-            this.panel5.Location = new System.Drawing.Point(21, 347);
-            this.panel5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(1047, 193);
-            this.panel5.TabIndex = 19;
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.ForeColor = System.Drawing.Color.Gray;
-            this.label18.Location = new System.Drawing.Point(224, 13);
-            this.label18.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(481, 25);
-            this.label18.TabIndex = 19;
-            this.label18.Text = "(if planned subfolder matches this name, it is not used)";
-            // 
-            // checkedListBoxSubfolderBlock
-            // 
-            this.checkedListBoxSubfolderBlock.ColumnWidth = 200;
-            this.checkedListBoxSubfolderBlock.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkedListBoxSubfolderBlock.FormattingEnabled = true;
-            this.checkedListBoxSubfolderBlock.Location = new System.Drawing.Point(112, 42);
-            this.checkedListBoxSubfolderBlock.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.checkedListBoxSubfolderBlock.MultiColumn = true;
-            this.checkedListBoxSubfolderBlock.Name = "checkedListBoxSubfolderBlock";
-            this.checkedListBoxSubfolderBlock.Size = new System.Drawing.Size(928, 88);
-            this.checkedListBoxSubfolderBlock.TabIndex = 15;
-            this.checkedListBoxSubfolderBlock.SelectedIndexChanged += new System.EventHandler(this.checkedListBoxSubfolderExclude_SelectedIndexChanged);
-            this.checkedListBoxSubfolderBlock.MouseEnter += new System.EventHandler(this.checkedListBoxSubfolderExclude_MouseEnter);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(11, 13);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(187, 24);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "Subfolder blocklist:";
-            // 
-            // panel9
-            // 
-            this.panel9.Controls.Add(this.radioButtonPrioritySubfolderZipLocation);
-            this.panel9.Controls.Add(this.radioButtonPrioritySubfolderOldLibrary);
-            this.panel9.Location = new System.Drawing.Point(777, 19);
-            this.panel9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.panel9.Name = "panel9";
-            this.panel9.Size = new System.Drawing.Size(291, 322);
-            this.panel9.TabIndex = 26;
-            // 
-            // radioButtonPrioritySubfolderZipLocation
-            // 
-            this.radioButtonPrioritySubfolderZipLocation.AutoSize = true;
-            this.radioButtonPrioritySubfolderZipLocation.Location = new System.Drawing.Point(7, 226);
-            this.radioButtonPrioritySubfolderZipLocation.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonPrioritySubfolderZipLocation.Name = "radioButtonPrioritySubfolderZipLocation";
-            this.radioButtonPrioritySubfolderZipLocation.Size = new System.Drawing.Size(168, 29);
-            this.radioButtonPrioritySubfolderZipLocation.TabIndex = 1;
-            this.radioButtonPrioritySubfolderZipLocation.Text = "Priority this rule";
-            this.radioButtonPrioritySubfolderZipLocation.UseVisualStyleBackColor = true;
-            this.radioButtonPrioritySubfolderZipLocation.CheckedChanged += new System.EventHandler(this.radioButtonPrioritySubfolderZipLocation_CheckedChanged);
-            // 
-            // radioButtonPrioritySubfolderOldLibrary
-            // 
-            this.radioButtonPrioritySubfolderOldLibrary.AutoSize = true;
-            this.radioButtonPrioritySubfolderOldLibrary.Checked = true;
-            this.radioButtonPrioritySubfolderOldLibrary.Location = new System.Drawing.Point(7, 5);
-            this.radioButtonPrioritySubfolderOldLibrary.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonPrioritySubfolderOldLibrary.Name = "radioButtonPrioritySubfolderOldLibrary";
-            this.radioButtonPrioritySubfolderOldLibrary.Size = new System.Drawing.Size(168, 29);
-            this.radioButtonPrioritySubfolderOldLibrary.TabIndex = 0;
-            this.radioButtonPrioritySubfolderOldLibrary.TabStop = true;
-            this.radioButtonPrioritySubfolderOldLibrary.Text = "Priority this rule";
-            this.radioButtonPrioritySubfolderOldLibrary.UseVisualStyleBackColor = true;
-            this.radioButtonPrioritySubfolderOldLibrary.CheckedChanged += new System.EventHandler(this.radioButtonPrioritySubfolderOldLibrary_CheckedChanged);
-            // 
-            // radioButtonAutoDetectSubfolder
-            // 
-            this.radioButtonAutoDetectSubfolder.AutoSize = true;
-            this.radioButtonAutoDetectSubfolder.Checked = true;
-            this.radioButtonAutoDetectSubfolder.Location = new System.Drawing.Point(15, 90);
-            this.radioButtonAutoDetectSubfolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonAutoDetectSubfolder.Name = "radioButtonAutoDetectSubfolder";
-            this.radioButtonAutoDetectSubfolder.Size = new System.Drawing.Size(195, 29);
-            this.radioButtonAutoDetectSubfolder.TabIndex = 27;
-            this.radioButtonAutoDetectSubfolder.TabStop = true;
-            this.radioButtonAutoDetectSubfolder.Text = "auto-detect name:";
-            this.radioButtonAutoDetectSubfolder.UseVisualStyleBackColor = true;
-            this.radioButtonAutoDetectSubfolder.CheckedChanged += new System.EventHandler(this.radioButtonAutoDetectSubfolder_CheckedChanged);
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.ForeColor = System.Drawing.Color.Gray;
-            this.label9.Location = new System.Drawing.Point(154, 61);
-            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(921, 25);
-            this.label9.TabIndex = 18;
-            this.label9.Text = "(e.g.: \"Sport\" => will be created as \"<LibraryPath>/People/Genesis X/Outfit/Sport" +
-    "/<ContentName>/*.duf\")";
-            // 
-            // radioButtonSpecificSubfolder
-            // 
-            this.radioButtonSpecificSubfolder.AutoSize = true;
-            this.radioButtonSpecificSubfolder.Location = new System.Drawing.Point(15, 25);
-            this.radioButtonSpecificSubfolder.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.radioButtonSpecificSubfolder.Name = "radioButtonSpecificSubfolder";
-            this.radioButtonSpecificSubfolder.Size = new System.Drawing.Size(162, 29);
-            this.radioButtonSpecificSubfolder.TabIndex = 16;
-            this.radioButtonSpecificSubfolder.Text = "specific name:";
-            this.radioButtonSpecificSubfolder.UseVisualStyleBackColor = true;
-            this.radioButtonSpecificSubfolder.CheckedChanged += new System.EventHandler(this.radioButtonSpecificSubfolder_CheckedChanged_1);
-            // 
-            // textBoxSubfolderForced
-            // 
-            this.textBoxSubfolderForced.Enabled = false;
-            this.textBoxSubfolderForced.Location = new System.Drawing.Point(187, 23);
-            this.textBoxSubfolderForced.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.textBoxSubfolderForced.Name = "textBoxSubfolderForced";
-            this.textBoxSubfolderForced.Size = new System.Drawing.Size(214, 29);
-            this.textBoxSubfolderForced.TabIndex = 12;
-            this.textBoxSubfolderForced.TextChanged += new System.EventHandler(this.textBoxSubfolderForced_TextChanged);
-            // 
+            //
             // tabPageInstaller
             // 
             this.tabPageInstaller.AllowDrop = true;
@@ -1260,7 +896,6 @@
             this.textBoxSubfolderPrefix.TabIndex = 5;
             this.textBoxSubfolderPrefix.Text = "_";
             this.textBoxSubfolderPrefix.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.textBoxSubfolderPrefix.TextChanged += new System.EventHandler(this.textBoxSubfolderPrefix_TextChanged);
             // 
             // checkBoxSubfolderPrefix
             // 
@@ -1668,16 +1303,6 @@
             this.groupBox5.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.tabPageSort.ResumeLayout(false);
-            this.tabPageSort.PerformLayout();
-            this.panelSubfolder.ResumeLayout(false);
-            this.panelSubfolder.PerformLayout();
-            this.panelSubfolderAutoDetect.ResumeLayout(false);
-            this.panelSubfolderAutoDetect.PerformLayout();
-            this.panel5.ResumeLayout(false);
-            this.panel5.PerformLayout();
-            this.panel9.ResumeLayout(false);
-            this.panel9.PerformLayout();
             this.tabPageInstaller.ResumeLayout(false);
             this.tabPageInstaller.PerformLayout();
             this.panel8.ResumeLayout(false);
@@ -1728,37 +1353,11 @@
         public System.Windows.Forms.TextBox textBoxTempFolder;
         public System.Windows.Forms.RadioButton radioButtonTempIsSpecific;
         private System.Windows.Forms.Button buttonSelectTempFolder;
-        private System.Windows.Forms.TabPage tabPageSort;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Panel panelSubfolder;
-        private System.Windows.Forms.Panel panel5;
-        public System.Windows.Forms.CheckedListBox checkedListBoxSubfolderBlock;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label9;
-        public System.Windows.Forms.RadioButton radioButtonSpecificSubfolder;
-        public System.Windows.Forms.TextBox textBoxSubfolderForced;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Label label14;
-        public System.Windows.Forms.CheckedListBox checkedListBoxSearchLibs;
-        private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Panel panelLanguage;
         private System.Windows.Forms.RadioButton radioButtonLangEnglish;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label20;
         public System.Windows.Forms.TabControl tabControl;
-        private System.Windows.Forms.Panel panel9;
-        public System.Windows.Forms.RadioButton radioButtonAutoDetectSubfolder;
-        public System.Windows.Forms.CheckBox checkBoxSearchSubfolder;
-        private System.Windows.Forms.Panel panelSubfolderAutoDetect;
-        public System.Windows.Forms.CheckBox checkBoxUseSubfolder;
-        public System.Windows.Forms.CheckBox checkBoxSubfolderAsZipLocation;
-        public System.Windows.Forms.RadioButton radioButtonPrioritySubfolderZipLocation;
-        public System.Windows.Forms.RadioButton radioButtonPrioritySubfolderOldLibrary;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.Label label24;
@@ -1798,7 +1397,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.Label label33;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.GroupBox groupBox3;
         internal System.Windows.Forms.ComboBox comboBoxDateFilterDirection;

@@ -36,12 +36,10 @@ namespace DazUnpacker
         {
             InitializeComponent();
             MinimumSize = Size; // the layout is designed for this size
-            tabControl.TabPages.Remove(tabPageSort);
             Globals.Init();
             Archive.Init();
             Library.Init(this);
             Content.Init(this);
-            Exclusion.Init(this);
 
             CatalogForm = new Form1Catalog(this);
             CatalogForm.Dock = DockStyle.Fill;
@@ -196,72 +194,12 @@ namespace DazUnpacker
         #endregion
 
 
-        #region Sort
-        private void checkBoxUseSubfolder_CheckedChanged(object sender, EventArgs e)
-        {
-            panelSubfolder.Enabled = checkBoxUseSubfolder.Checked;
-            Config.Storage.TabSort.UseSubfolder = checkBoxUseSubfolder.Checked;
-        }
-        private void radioButtonSpecificSubfolder_CheckedChanged_1(object sender, EventArgs e)
-        {
-            textBoxSubfolderForced.Enabled = radioButtonSpecificSubfolder.Checked;
-            Config.Storage.TabSort.UseForcedSubfolder = radioButtonSpecificSubfolder.Checked;
-        }
-        private void textBoxSubfolderForced_TextChanged(object sender, EventArgs e)
-        {
-            Config.Storage.TabSort.ForcedSubfolderName = textBoxSubfolderForced.Text;
-        }
-        private void radioButtonAutoDetectSubfolder_CheckedChanged(object sender, EventArgs e)
-        {
-            panelSubfolderAutoDetect.Enabled = radioButtonAutoDetectSubfolder.Checked;
-            Config.Storage.TabSort.UseForcedSubfolder = !radioButtonAutoDetectSubfolder.Checked;
-        }
-        private void checkBoxSearchSubfolder_CheckedChanged(object sender, EventArgs e)
-        {
-            checkedListBoxSearchLibs.Enabled = checkBoxSearchSubfolder.Checked;
-            Config.Storage.TabSort.UseSubfolderOldLibrary = checkBoxSearchSubfolder.Checked;
-        }
-        private void checkedListBoxSearchLibraries_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        #region Installer
 
-        }
-        private void checkedListBoxSearchLibraries_MouseEnter(object sender, EventArgs e)
-        {
-            this.ActiveControl = checkedListBoxSearchLibs;
-        }
-        private void radioButtonPrioritySubfolderOldLibrary_CheckedChanged(object sender, EventArgs e)
-        {
-            Config.Storage.TabSort.UsePriorityZipLocation = !radioButtonPrioritySubfolderOldLibrary.Checked;
-        }
-        private void radioButtonPrioritySubfolderZipLocation_CheckedChanged(object sender, EventArgs e)
-        {
-            Config.Storage.TabSort.UsePriorityZipLocation = radioButtonPrioritySubfolderZipLocation.Checked;
-        }
-        private void checkBoxSubfolderAsZipLocation_CheckedChanged(object sender, EventArgs e)
-        {
-            Config.Storage.TabSort.UseSubfolderZipLocation = checkBoxSubfolderAsZipLocation.Checked;
-        }
-        private void checkedListBoxSubfolderExclude_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-        private void checkedListBoxSubfolderExclude_MouseEnter(object sender, EventArgs e)
-        {
-            this.ActiveControl = checkedListBoxSubfolderBlock;
-        }
         private void checkBoxSubfolderPrefix_CheckedChanged(object sender, EventArgs e)
         {
             textBoxSubfolderPrefix.Enabled = checkBoxSubfolderPrefix.Checked;
-            Config.Storage.TabSort.UsePrefix = checkBoxSubfolderPrefix.Checked;
         }
-        private void textBoxSubfolderPrefix_TextChanged(object sender, EventArgs e)
-        {
-            Config.Storage.TabSort.PrefixName = textBoxSubfolderPrefix.Text;
-        }
-        #endregion
-
-
-        #region Installer
 
         private void radioButtonInstallLibs_MouseEnter(object sender, EventArgs e)
         {
