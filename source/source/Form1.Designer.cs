@@ -131,6 +131,7 @@
             this.label27 = new System.Windows.Forms.Label();
             this.comboBoxContentRootFolder = new System.Windows.Forms.ComboBox();
             this.buttonStart = new System.Windows.Forms.Button();
+            this.tabPageCatalog = new System.Windows.Forms.TabPage();
             this.tabPageLogs = new System.Windows.Forms.TabPage();
             this.buttonReInstallAccessDenied = new System.Windows.Forms.Button();
             this.listViewSkippedContent = new System.Windows.Forms.ListView();
@@ -170,6 +171,7 @@
             this.panel6.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreadsCount)).BeginInit();
+            this.tabPageCatalog.SuspendLayout();
             this.tabPageLogs.SuspendLayout();
             this.contextMenuCommon.SuspendLayout();
             this.SuspendLayout();
@@ -191,6 +193,7 @@
             this.tabControl.Controls.Add(this.tabPageSettings);
             this.tabControl.Controls.Add(this.tabPageSort);
             this.tabControl.Controls.Add(this.tabPageInstaller);
+            this.tabControl.Controls.Add(this.tabPageCatalog);
             this.tabControl.Controls.Add(this.tabPageLogs);
             this.tabControl.Location = new System.Drawing.Point(17, 18);
             this.tabControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -1402,9 +1405,20 @@
             this.buttonStart.Text = "Install";
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
-            // 
+            //
+            // tabPageCatalog
+            //
+            this.tabPageCatalog.Location = new System.Drawing.Point(4, 33);
+            this.tabPageCatalog.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tabPageCatalog.Name = "tabPageCatalog";
+            this.tabPageCatalog.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tabPageCatalog.Size = new System.Drawing.Size(1158, 1080);
+            this.tabPageCatalog.TabIndex = 4;
+            this.tabPageCatalog.Text = "Catalog";
+            this.tabPageCatalog.UseVisualStyleBackColor = true;
+            //
             // tabPageLogs
-            // 
+            //
             this.tabPageLogs.Controls.Add(this.buttonReInstallAccessDenied);
             this.tabPageLogs.Controls.Add(this.listViewSkippedContent);
             this.tabPageLogs.Controls.Add(this.buttonDeleteLog);
@@ -1639,6 +1653,7 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownThreadsCount)).EndInit();
+            this.tabPageCatalog.ResumeLayout(false);
             this.tabPageLogs.ResumeLayout(false);
             this.tabPageLogs.PerformLayout();
             this.contextMenuCommon.ResumeLayout(false);
@@ -1665,6 +1680,7 @@
         public System.Windows.Forms.CheckBox checkBoxGenesis8;
         public System.Windows.Forms.CheckBox checkBoxGenesis3;
         private System.Windows.Forms.TabPage tabPageLogs;
+        private System.Windows.Forms.TabPage tabPageCatalog;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.RadioButton radioButtonTempSameAsInstall;

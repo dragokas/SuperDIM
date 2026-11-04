@@ -68,7 +68,9 @@
     <Compile Include="source\Archive.cs" />
     <Compile Include="source\ArchiveLister.cs" />
     <Compile Include="source\CatalogDb.cs" />
+    <Compile Include="source\CatalogRowSource.cs" />
     <Compile Include="source\CatalogScanner.cs" />
+    <Compile Include="source\CsvHelper.cs" />
     <Compile Include="source\Config.cs" />
     <Compile Include="source\Content.cs" />
     <Compile Include="source\Exclusion.cs" />
@@ -80,6 +82,30 @@
     </Compile>
     <Compile Include="source\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="source\Form1Catalog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="source\Form1Catalog.Designer.cs">
+      <DependentUpon>Form1Catalog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="source\Form1CatalogGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="source\Form1CatalogGrid.Designer.cs">
+      <DependentUpon>Form1CatalogGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="source\Form1CatalogResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="source\Form1CatalogResult.Designer.cs">
+      <DependentUpon>Form1CatalogResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="source\Form1CatalogSearch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="source\Form1CatalogSearch.Designer.cs">
+      <DependentUpon>Form1CatalogSearch.cs</DependentUpon>
     </Compile>
     <Compile Include="source\Geometry.cs" />
     <Compile Include="source\Globals.cs" />

@@ -24,6 +24,14 @@ namespace DazUnpacker
         private TabPage _previousTab;
         private bool _isFormLoaded = false;
 
+        internal Form1Catalog CatalogForm { get; private set; }
+
+        // The Installer tab exists only while at least one DAZ library is added
+        internal bool IsInstallerAvailable
+        {
+            get { return tabControl.TabPages.Contains(tabPageInstaller); }
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -33,6 +41,12 @@ namespace DazUnpacker
             Library.Init(this);
             Content.Init(this);
             Exclusion.Init(this);
+
+            CatalogForm = new Form1Catalog(this);
+            CatalogForm.Dock = DockStyle.Fill;
+            tabPageCatalog.Controls.Add(CatalogForm);
+            CatalogForm.Show();
+
             Config.Init(this);
             panelLanguage.Visible = false;
             UpdateTabs();
@@ -135,8 +149,18 @@ namespace DazUnpacker
             }
             else if (!tabControl.TabPages.Contains(tabPageInstaller))
             {
-                tabControl.TabPages.Add(tabPageInstaller);
+                // Order of tabs: Settings, Installer, Catalog, Logs
+                tabControl.TabPages.Insert(tabControl.TabPages.IndexOf(tabPageCatalog), tabPageInstaller);
                 tabControl.TabPages.Add(tabPageLogs);
+            }
+        }
+
+        // Selects the Installer tab (if it is available)
+        internal void ShowInstallerTab()
+        {
+            if (IsInstallerAvailable)
+            {
+                tabControl.SelectedTab = tabPageInstaller;
             }
         }
         private void radioButtonTempSameAsInstall_CheckedChanged(object sender, EventArgs e)
@@ -267,7 +291,7 @@ namespace DazUnpacker
             comboBoxContentType.SelectedIndex = comboBoxContentType.FindStringExact(contentType.ToString());
         }
 
-        private void AddFile(string path, bool dDetectContentType = true)
+        internal void AddFile(string path, bool dDetectContentType = true)
         {
             Content.AddFile(path);
             Statistics.Total = Library.Content.Count;
@@ -380,6 +404,7 @@ namespace DazUnpacker
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            CatalogForm.Shutdown();
             Config.SaveConfig();
         }
 
@@ -552,9 +577,34 @@ namespace DazUnpacker
 
         private void buttonClear_Click(object sender, EventArgs e)
         {
+            ClearInstallList();
+        }
+
+        private void ClearInstallList()
+        {
             Library.Content.RemoveAll();
             Library.Skipped.RemoveAll();
             Statistics.Reset();
+        }
+
+        // Replaces the install list with the given archives (those which exist on disk and pass the filters),
+        // opens the Installer tab, returns the number of archives in the list
+        internal int ReplaceInstallList(IEnumerable<string> archives)
+        {
+            ClearInstallList();
+            foreach (string path in archives)
+            {
+                if (File.Exists(path))
+                {
+                    AddFile(path, false);
+                }
+            }
+            if (Library.Content.Count > 0)
+            {
+                DetectAndShowContentType();
+            }
+            ShowInstallerTab();
+            return Library.Content.Count;
         }
 
         private void buttonReInstallAccessDenied_Click(object sender, EventArgs e)
@@ -571,7 +621,7 @@ namespace DazUnpacker
 
             Library.Skipped.RemoveAll(FindFailReason.AccessDenied);
 
-            tabControl.SelectedIndex = 2;
+            tabControl.SelectedTab = tabPageLogs;
 
             buttonStart.Enabled = true;
             buttonStart.PerformClick();

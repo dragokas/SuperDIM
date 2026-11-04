@@ -54,11 +54,19 @@ namespace DazUnpacker
         public bool DeleteLogOnStart = false;
     }
 
+    public class _TabCatalog
+    {
+        public string ScanFolder = "";
+        public int ThreadsCount = 2;
+        public bool IgnoreCase = false;
+    }
+
     public class ConfigStorage
     {
         public _TabSettings TabSettings = new _TabSettings();
         public _TabSort TabSort = new _TabSort();
         public _TabInstaller TabInstaller = new _TabInstaller();
+        public _TabCatalog TabCatalog = new _TabCatalog();
         public _TabLog TabLog = new _TabLog();
         public int TabNumber = 0;
     }
@@ -218,6 +226,9 @@ namespace DazUnpacker
             form.checkBoxOverwrite.Checked = Storage.TabInstaller.OverwriteExisting;
             form.checkBoxHierarhyByRootFolder.Checked = !Storage.TabInstaller.IgnoreRootFolder;
 
+            // Tab Catalog
+            form.CatalogForm.LoadSettings(Storage.TabCatalog);
+
             // Tab Log
             form.checkBoxDeleteLogOnStart.Checked = Storage.TabLog.DeleteLogOnStart;
         }
@@ -258,6 +269,9 @@ namespace DazUnpacker
             }
             Storage.TabSort.RootSubfolder = form.textBoxRootSubfolder.Text;
             Storage.TabSort.CreateRootSubfolder = form.checkBoxCreateRootSubfolder.Checked;
+
+            // Tab Catalog
+            form.CatalogForm.SaveSettings(Storage.TabCatalog);
 
             // Tab Log
             Storage.TabLog.DeleteLogOnStart = form.checkBoxDeleteLogOnStart.Checked;
