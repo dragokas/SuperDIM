@@ -74,6 +74,7 @@ namespace DazUnpacker
         private long[] ids = new long[0];
         private string filter = "";
         private bool ignoreCase;
+        private bool uniqueArchive;
         private CatalogColumn? sortColumn;
         private bool sortAscending = true;
         private int requestVersion;
@@ -124,14 +125,15 @@ namespace DazUnpacker
         {
             sortColumn = column;
             sortAscending = ascending;
-            Reload(filter, ignoreCase);
+            Reload(filter, ignoreCase, uniqueArchive);
         }
 
         // Runs the query in the background; the result of an outdated query is dropped
-        public void Reload(string filter, bool ignoreCase)
+        public void Reload(string filter, bool ignoreCase, bool uniqueArchive)
         {
             this.filter = filter;
             this.ignoreCase = ignoreCase;
+            this.uniqueArchive = uniqueArchive;
 
             if (cts != null)
             {
@@ -148,7 +150,7 @@ namespace DazUnpacker
             {
                 try
                 {
-                    long[] result = CatalogDb.QueryIds(filter, ignoreCase, column, ascending, current.Token);
+                    long[] result = CatalogDb.QueryIds(filter, ignoreCase, uniqueArchive, column, ascending, current.Token);
                     PostToUi(() => Apply(version, result));
                 }
                 catch (OperationCanceledException)

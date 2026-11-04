@@ -264,14 +264,24 @@ namespace DazUnpacker
 
         // Ids of the rows whose FilePath contains the filter, ordered as requested.
         // sortColumn == null means the order of insertion.
-        public static long[] QueryIds(string filter, bool ignoreCase, CatalogColumn? sortColumn, bool ascending, CancellationToken token)
+        // uniqueArchive: only the first (by Id) matching row of every archive is returned.
+        public static long[] QueryIds(string filter, bool ignoreCase, bool uniqueArchive, CatalogColumn? sortColumn, bool ascending, CancellationToken token)
         {
-            StringBuilder sql = new StringBuilder("SELECT Id FROM Files");
+            StringBuilder sql = new StringBuilder();
             string query = (filter ?? "").Replace('\\', '/');
+            string where = "";
 
             if (query.Length > 0)
             {
-                sql.Append(ignoreCase ? " WHERE instr(PathKey, @q) > 0" : " WHERE instr(FilePath, @q) > 0");
+                where = ignoreCase ? " WHERE instr(PathKey, @q) > 0" : " WHERE instr(FilePath, @q) > 0";
+            }
+            if (uniqueArchive)
+            {
+                sql.Append("SELECT Id FROM Files WHERE Id IN (SELECT MIN(Id) FROM Files").Append(where).Append(" GROUP BY ArchivePath)");
+            }
+            else
+            {
+                sql.Append("SELECT Id FROM Files").Append(where);
             }
             if (sortColumn.HasValue)
             {

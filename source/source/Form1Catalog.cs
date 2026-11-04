@@ -46,6 +46,7 @@ namespace DazUnpacker
             textBoxFolder.Text = settings.ScanFolder;
             numericUpDownThreads.Value = Math.Max(numericUpDownThreads.Minimum, Math.Min(numericUpDownThreads.Maximum, settings.ThreadsCount));
             checkBoxIgnoreCase.Checked = settings.IgnoreCase;
+            checkBoxUniqueArchive.Checked = settings.UniqueArchive;
         }
 
         internal void SaveSettings(_TabCatalog settings)
@@ -53,6 +54,7 @@ namespace DazUnpacker
             settings.ScanFolder = textBoxFolder.Text;
             settings.ThreadsCount = (int)numericUpDownThreads.Value;
             settings.IgnoreCase = checkBoxIgnoreCase.Checked;
+            settings.UniqueArchive = checkBoxUniqueArchive.Checked;
         }
 
         // Stops the running work (the application is closing)
@@ -78,7 +80,7 @@ namespace DazUnpacker
 
         private void ReloadGrid()
         {
-            rows.Reload(textBoxFilter.Text, checkBoxIgnoreCase.Checked);
+            rows.Reload(textBoxFilter.Text, checkBoxIgnoreCase.Checked, checkBoxUniqueArchive.Checked);
         }
 
         // The search starts one second after the last change of the filter

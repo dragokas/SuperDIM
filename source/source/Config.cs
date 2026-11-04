@@ -59,6 +59,7 @@ namespace DazUnpacker
         public string ScanFolder = "";
         public int ThreadsCount = 2;
         public bool IgnoreCase = false;
+        public bool UniqueArchive = false;
     }
 
     public class ConfigStorage

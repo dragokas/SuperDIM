@@ -31,6 +31,7 @@
             this.labelFilter = new System.Windows.Forms.Label();
             this.textBoxFilter = new System.Windows.Forms.TextBox();
             this.checkBoxIgnoreCase = new System.Windows.Forms.CheckBox();
+            this.checkBoxUniqueArchive = new System.Windows.Forms.CheckBox();
             this.labelCount = new System.Windows.Forms.Label();
             this.flowLayoutPanelActions = new System.Windows.Forms.FlowLayoutPanel();
             this.buttonExportCsv = new System.Windows.Forms.Button();
@@ -184,6 +185,7 @@
             this.flowLayoutPanelFilter.Controls.Add(this.labelFilter);
             this.flowLayoutPanelFilter.Controls.Add(this.textBoxFilter);
             this.flowLayoutPanelFilter.Controls.Add(this.checkBoxIgnoreCase);
+            this.flowLayoutPanelFilter.Controls.Add(this.checkBoxUniqueArchive);
             this.flowLayoutPanelFilter.Controls.Add(this.labelCount);
             this.flowLayoutPanelFilter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanelFilter.Location = new System.Drawing.Point(7, 47);
@@ -221,6 +223,18 @@
             this.checkBoxIgnoreCase.Text = "Ignore case";
             this.checkBoxIgnoreCase.UseVisualStyleBackColor = true;
             this.checkBoxIgnoreCase.CheckedChanged += new System.EventHandler(this.FilterChanged);
+            //
+            // checkBoxUniqueArchive
+            //
+            this.checkBoxUniqueArchive.AutoSize = true;
+            this.checkBoxUniqueArchive.Location = new System.Drawing.Point(569, 6);
+            this.checkBoxUniqueArchive.Margin = new System.Windows.Forms.Padding(3, 6, 3, 3);
+            this.checkBoxUniqueArchive.Name = "checkBoxUniqueArchive";
+            this.checkBoxUniqueArchive.Size = new System.Drawing.Size(95, 17);
+            this.checkBoxUniqueArchive.TabIndex = 3;
+            this.checkBoxUniqueArchive.Text = "Unique archive";
+            this.checkBoxUniqueArchive.UseVisualStyleBackColor = true;
+            this.checkBoxUniqueArchive.CheckedChanged += new System.EventHandler(this.FilterChanged);
             //
             // labelCount
             //
@@ -388,6 +402,7 @@
         private System.Windows.Forms.Label labelFilter;
         private System.Windows.Forms.TextBox textBoxFilter;
         internal System.Windows.Forms.CheckBox checkBoxIgnoreCase;
+        internal System.Windows.Forms.CheckBox checkBoxUniqueArchive;
         private System.Windows.Forms.Label labelCount;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelActions;
         private System.Windows.Forms.Button buttonExportCsv;
