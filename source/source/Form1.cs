@@ -215,12 +215,29 @@ namespace DazUnpacker
         {
             Config.SaveFiltersFromForm(); // the filters of the form (not the saved ones) are applied to the added archives
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string file in files)
+            WithoutListRedraw(() =>
             {
-                Content.AddObject(file);
-            }
+                foreach (string file in files)
+                {
+                    Content.AddObject(file);
+                }
+            });
             Statistics.Total = Library.Content.Count;
             DetectAndShowContentType();
+        }
+
+        // Adds many archives without redrawing the list after each one
+        private void WithoutListRedraw(Action action)
+        {
+            listViewContent.BeginUpdate();
+            try
+            {
+                action();
+            }
+            finally
+            {
+                listViewContent.EndUpdate();
+            }
         }
 
         private void DetectAndShowContentType()
@@ -249,7 +266,7 @@ namespace DazUnpacker
         private void AddFolder(string path, bool dDetectContentType = true)
         {
             Config.SaveFiltersFromForm();
-            Content.AddFolder(path);
+            WithoutListRedraw(() => Content.AddFolder(path));
             Statistics.Total = Library.Content.Count;
             if (dDetectContentType)
             {
@@ -583,13 +600,16 @@ namespace DazUnpacker
         {
             ClearInstallList();
             Config.SaveFiltersFromForm();
-            foreach (string path in archives)
+            WithoutListRedraw(() =>
             {
-                if (File.Exists(path))
+                foreach (string path in archives)
                 {
-                    AddFile(path, false);
+                    if (File.Exists(path))
+                    {
+                        AddFile(path, false);
+                    }
                 }
-            }
+            });
             if (Library.Content.Count > 0)
             {
                 DetectAndShowContentType();
