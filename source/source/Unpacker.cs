@@ -44,6 +44,7 @@ namespace DazUnpacker
             {
                 Parallel.ForEach(unpackInfo.contentFiles, parallelOptions, path =>
                 {
+                    string status = Library.Content.StatusFail; // shown in the Status column when the archive is finished
                     try
                     {
                         if (File.Exists(path))
@@ -53,6 +54,8 @@ namespace DazUnpacker
                             List<Archive.DufRootInfo> dufRootInfo;
                             List<string> rootDirList;
                             bool atLeastOneInstalled = false;
+                            bool newContentInstalled = false;
+                            bool accessDenied = false;
 
                             FindFailReason failReason;
                             int index = Interlocked.Increment(ref indexTmpDir);
@@ -75,13 +78,21 @@ namespace DazUnpacker
                                 if (!Config.Storage.TabInstaller.Filters.IsPassed(contentType))
                                 {
                                     Library.Skipped.Add(path, FindFailReason.CriteriaNotMatch);
+                                    status = Library.Content.GetStatusText(FindFailReason.CriteriaNotMatch);
                                     return;
                                 }
                             }
 
                             CatalogCollector catalog = new CatalogCollector(path);
-                            bool isExtracted = Archive.ExtractSmart(path, tempDir, true, !isFullInstall, out dufRootInfo, out rootDirList, out failReason, catalog);
+                            bool archiverFailed;
+                            bool isExtracted = Archive.ExtractSmart(path, tempDir, true, !isFullInstall, out dufRootInfo, out rootDirList, out failReason, out archiverFailed, catalog);
                             SaveCatalog(catalog);
+
+                            if (archiverFailed)
+                            {
+                                // the error itself is in the log; a nested archive could fail while the rest is installed
+                                Library.Skipped.Add(path, FindFailReason.ArchiverError);
+                            }
 
                             if (isExtracted)
                             {
@@ -101,12 +112,14 @@ namespace DazUnpacker
                                 if (contentType == ContentTypes.Unknown)
                                 {
                                     Library.Skipped.Add(path, FindFailReason.ContentTypeUndefined);
+                                    status = GetFinalStatus(archiverFailed, FindFailReason.ContentTypeUndefined);
                                     return;
                                 }
 
                                 if (!Config.Storage.TabInstaller.Filters.IsPassed(contentType)) // second content type filter check
                                 {
                                     Library.Skipped.Add(path, FindFailReason.CriteriaNotMatch);
+                                    status = GetFinalStatus(archiverFailed, FindFailReason.CriteriaNotMatch);
                                     return;
                                 }
 
@@ -155,6 +168,7 @@ namespace DazUnpacker
                                                 dirGroup, unpackInfo.overwriteExisting, hasSingleGenesisVersion, out failReason))
                                             {
                                                 atLeastOneInstalled = true;
+                                                newContentInstalled = true;
                                             }
                                             else {
                                                 Library.Skipped.Add(path, failReason);
@@ -162,6 +176,10 @@ namespace DazUnpacker
                                                 if (failReason == FindFailReason.AlreadyInstalled)
                                                 {
                                                     atLeastOneInstalled = true;
+                                                }
+                                                else if (failReason == FindFailReason.AccessDenied)
+                                                {
+                                                    accessDenied = true;
                                                 }
                                             }
 
@@ -179,22 +197,54 @@ namespace DazUnpacker
                                     if (!InstallRoot(unpackInfo.contentLibDir, rootDirList, topDirs, unpackInfo.overwriteExisting, out failReason))
                                     {
                                         Library.Skipped.Add(path, failReason);
+                                        accessDenied = true;
                                     }
+                                }
+
+                                if (archiverFailed)
+                                {
+                                    status = Library.Content.StatusFail;
+                                }
+                                else if (accessDenied)
+                                {
+                                    status = Library.Content.GetStatusText(FindFailReason.AccessDenied);
+                                }
+                                else if (newContentInstalled)
+                                {
+                                    status = Library.Content.StatusSuccess;
+                                }
+                                else if (atLeastOneInstalled)
+                                {
+                                    status = Library.Content.GetStatusText(FindFailReason.AlreadyInstalled);
+                                }
+                                else
+                                {
+                                    status = Library.Content.GetStatusText(FindFailReason.CriteriaNotMatch); // nothing passed the generation filter
                                 }
                             }
                             else
                             {
-                                Library.Skipped.Add(path, failReason);
+                                if (!archiverFailed)
+                                {
+                                    Library.Skipped.Add(path, failReason);
+                                }
+                                status = GetFinalStatus(archiverFailed, failReason);
                             }
                             FileSys.DirectoryDelete(tempDir);
+                        }
+                        else
+                        {
+                            Log.Error("Archive not found: " + path);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Globals.ReportError(ex, false);
+                        status = Library.Content.StatusFail;
+                        Globals.ReportError(ex, false, "Install: " + path);
                     }
                     finally
                     {
+                        Library.Content.SetStatus(path, status);
                         Statistics.DoneIncrement();
                     }
                 });
@@ -212,6 +262,16 @@ namespace DazUnpacker
             {
                 Globals.ReportError(ex, false, "Catalog update");
             }
+        }
+
+        // Status of an archive which was not installed: an archiver error wins over the other reasons
+        private static string GetFinalStatus(bool archiverFailed, FindFailReason reason)
+        {
+            if (archiverFailed)
+            {
+                return Library.Content.StatusFail;
+            }
+            return Library.Content.GetStatusText(reason);
         }
 
         private static bool IsNodeOfTopDir(string dir, List<string> topDirs)

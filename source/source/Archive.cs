@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,9 @@ namespace DazUnpacker
         EmptyArchive,
         AlreadyInstalled,
         CriteriaNotMatch,
-        ContentTypeUndefined
+        ContentTypeUndefined,
+        ArchiverError,
+        NoDufFiles
     }
 
     internal static class Archive
@@ -146,68 +149,76 @@ namespace DazUnpacker
 
 
 
+        // 7z.exe: only messages and errors are printed (-bso0 -bsp0), the exit code is checked
         internal static bool ExtractSingleZip(string zipPath, string destinationDir, List<string> skipObjects)
+        {
+            string skipList = "";
+            foreach (string name in skipObjects)
+            {
+                skipList += " -xr!\"" + name + "\"";
+            }
+            string args = String.Format("x -y -bso0 -bsp0 -sccUTF-8 -o\"{0}\"{1} \"{2}\"", destinationDir, skipList, zipPath);
+            return RunExtractor("7z", Config.Data.UnpackerTool7z, Encoding.UTF8, args, zipPath, NoExitCode);
+        }
+
+        // UnRAR.exe: only errors are printed (-idq), the exit code is checked
+        internal static bool ExtractSingleRar(string zipPath, string destinationDir, List<string> skipObjects)
+        {
+            string skipList = "";
+            foreach (string name in skipObjects)
+            {
+                skipList += " -x\"" + name + "\"";
+            }
+            string args = String.Format("x -y -idq -o- -op\"{0}\"{1} \"{2}\"", destinationDir, skipList, zipPath);
+            Encoding oemEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
+            return RunExtractor("UnRAR", Config.Data.UnpackerToolRar, oemEncoding, args, zipPath, UnrarNothingToExtract);
+        }
+
+        // Exit codes of 7-Zip and UnRAR: 0 - success, 1 - warning (not fatal), >= 2 - error.
+        // UnRAR also returns 10 when there was nothing to extract (e.g. everything was excluded by the skip list).
+        private const int NoExitCode = -1;
+        private const int UnrarNothingToExtract = 10;
+        private const int ErrorOutputLines = 10;
+
+        // Returns true if the archive was unpacked (a warning is not an error); errors are written to the log
+        private static bool RunExtractor(string toolName, string exePath, Encoding outputEncoding, string arguments, string archivePath, int nothingToExtractCode)
         {
             try
             {
-                string skipList = "";
-                foreach (string name in skipObjects)
+                List<string> output = new List<string>();
+                int exitCode = ArchiveLister.RunTool(exePath, arguments, outputEncoding, output, output);
+                if (exitCode == 0)
                 {
-                    skipList += " -xr!\"" + name + "\"";
-                }
-                Process p = new Process();
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = Config.Data.UnpackerTool7z,
-                    Arguments = String.Format("x -y -o\"{0}\"{1} \"{2}\"", destinationDir, skipList, zipPath),
-                    UseShellExecute = false,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true
-                };
-                p.StartInfo = psi;
-                if (p.Start())
-                {
-                    p.WaitForExit();
                     return true;
                 }
+                if (exitCode == 1)
+                {
+                    Log.Warning(String.Format("{0} finished with a warning (exit code 1): {1}{2}", toolName, archivePath, FormatOutputTail(output)));
+                    return true;
+                }
+                if (exitCode == nothingToExtractCode)
+                {
+                    Log.Info(String.Format("{0}: nothing to extract (exit code {1}): {2}", toolName, exitCode, archivePath));
+                    return true;
+                }
+                Log.Error(String.Format("Extraction failed ({0} exit code {1}): {2}{3}", toolName, exitCode, archivePath, FormatOutputTail(output)));
             }
             catch (Exception ex)
             {
-                Globals.ReportError(ex, false);
+                Globals.ReportError(ex, false, "Extraction failed (" + toolName + "): " + archivePath);
             }
             return false;
         }
 
-        internal static bool ExtractSingleRar(string zipPath, string destinationDir, List<string> skipObjects)
+        // Last lines of the tool output, for the log message
+        private static string FormatOutputTail(List<string> output)
         {
-            try
+            List<string> lines = output.Select(line => line.Trim()).Where(line => line.Length != 0).ToList();
+            if (lines.Count == 0)
             {
-                string skipList = "";
-                foreach (string name in skipObjects)
-                {
-                    skipList += " -x\"" + name + "\"";
-                }
-                Process p = new Process();
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = Config.Data.UnpackerToolRar,
-                    Arguments = String.Format("x -y -o- -op\"{0}\"{1} \"{2}\"", destinationDir, skipList, zipPath),
-                    UseShellExecute = false,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true
-                };
-                p.StartInfo = psi;
-                if (p.Start())
-                {
-                    p.WaitForExit();
-                    return true;
-                }
+                return "";
             }
-            catch (Exception ex)
-            {
-                Globals.ReportError(ex, false);
-            }
-            return false;
+            return " | " + String.Join(" | ", lines.Skip(Math.Max(0, lines.Count - ErrorOutputLines)));
         }
 
         internal static bool ExtractSingle(string zipPath, string destinationDir, List<string> skipObjects)
@@ -358,14 +369,18 @@ namespace DazUnpacker
             }
         }
 
+        // archiverFailed is set when the archiver returned an error for the archive or for any nested archive
+        // (the nested archive is skipped then, the rest is processed).
         // catalog (optional) receives the file lists of the archive and of all nested archives before they are unpacked
         internal static bool ExtractSmart(string zipPath, string destinationDir, bool recursively, bool skipDataDir,
             out List<DufRootInfo> dufRootInfo,
             out List<string> rootDirs,
             out FindFailReason failReason,
+            out bool archiverFailed,
             CatalogCollector catalog = null)
         {
             failReason = FindFailReason.Unknown;
+            archiverFailed = false;
             dufRootInfo = new List<DufRootInfo>();
             rootDirs = new List<string>();
 
@@ -404,7 +419,12 @@ namespace DazUnpacker
             {
                 catalog.Add(zipPath);
             }
-            ExtractSingle(zipPath, destinationDir, skipObjects);
+            if (!ExtractSingle(zipPath, destinationDir, skipObjects))
+            {
+                failReason = FindFailReason.ArchiverError;
+                archiverFailed = true;
+                return false;
+            }
 
             List<string> DirsUnpacked = new List<string>();
             DirsUnpacked.Add(destinationDir);
@@ -499,8 +519,15 @@ namespace DazUnpacker
                             {
                                 catalog.Add(file); // the nested archive is deleted right after unpacking
                             }
-                            ExtractSingle(file, tempDir, skipObjects);
+                            bool isNestedExtracted = ExtractSingle(file, tempDir, skipObjects);
                             FileSys.FileDelete(file);
+                            if (!isNestedExtracted)
+                            {
+                                // the error is already logged: skip the broken archive, keep the rest
+                                archiverFailed = true;
+                                FileSys.DirectoryDelete(tempDir);
+                                continue;
+                            }
                             nestedDirs.Add(tempDir);
 
                             if (!Directory.Exists(tempDir))
@@ -580,6 +607,10 @@ namespace DazUnpacker
 
             rootDirs = rootDirs.Distinct().ToList();
 
+            if (dufRootInfo.Count == 0 && failReason == FindFailReason.Unknown)
+            {
+                failReason = FindFailReason.NoDufFiles;
+            }
             return dufRootInfo.Count > 0;
         }
 

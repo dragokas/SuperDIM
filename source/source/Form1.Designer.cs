@@ -70,7 +70,7 @@
             this.listViewContent = new System.Windows.Forms.ListView();
             this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnSubfolder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.buttonAddContentFolder = new System.Windows.Forms.Button();
@@ -636,7 +636,7 @@
             this.listViewContent.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnName,
             this.columnPath,
-            this.columnProgress,
+            this.columnStatus,
             this.columnSubfolder});
             this.listViewContent.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listViewContent.FullRowSelect = true;
@@ -664,10 +664,10 @@
             this.columnPath.Text = "Path";
             this.columnPath.Width = 200;
             // 
-            // columnProgress
-            // 
-            this.columnProgress.Text = "Progress";
-            this.columnProgress.Width = 70;
+            // columnStatus
+            //
+            this.columnStatus.Text = "Status";
+            this.columnStatus.Width = 130;
             // 
             // columnSubfolder
             // 
@@ -1338,7 +1338,7 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.ColumnHeader columnName;
         private System.Windows.Forms.ColumnHeader columnPath;
-        private System.Windows.Forms.ColumnHeader columnProgress;
+        private System.Windows.Forms.ColumnHeader columnStatus;
         private System.Windows.Forms.ColumnHeader columnSubfolder;
         public System.Windows.Forms.ListView listViewContent;
         public System.Windows.Forms.CheckBox checkBoxGenesis9;

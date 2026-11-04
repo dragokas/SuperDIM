@@ -63,7 +63,7 @@ namespace DazUnpacker
             FileInfo fi = new FileInfo(file);
             if (Config.Storage.TabInstaller.Filters.IsPassed(fi.CreationTime))
             {
-                Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), 0, "", true);
+                Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), "", true);
             }
         }
 

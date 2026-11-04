@@ -35,10 +35,17 @@ namespace DazUnpacker
                 form.listViewContent.Items.Clear();
             }
 
-            public static int Add(string filename, string folder, int progress, string note, bool isChecked)
+            public const string StatusSuccess = "Success";
+            public const string StatusFail = "FAIL";
+            private const int StatusColumnIndex = 2;
+
+            // Items of listViewContent by archive path; built (and used) in the UI thread only
+            private static Dictionary<string, List<ListViewItem>> itemsByPath = new Dictionary<string, List<ListViewItem>>();
+
+            public static int Add(string filename, string folder, string note, bool isChecked)
             {
                 var item = form.listViewContent.Items.Add(new ListViewItem(new string[] {
-                filename, folder, progress.ToString() + " %", note }));
+                filename, folder, "", note }));
                 if (isChecked)
                 {
                     item.Checked = true;
@@ -46,9 +53,50 @@ namespace DazUnpacker
                 return item.Index;
             }
 
-            public static void UpdateProgress(int index, int progress)
+            // Text of the Status column for an archive which is not installed
+            public static string GetStatusText(FindFailReason reason)
             {
-                form.listViewContent.Items[index].SubItems[2].Text = progress.ToString() + " %";
+                if (reason == FindFailReason.ArchiverError || reason == FindFailReason.Unknown)
+                {
+                    return StatusFail;
+                }
+                return reason.ToString();
+            }
+
+            // Call in the UI thread before the installation: clears the Status column and indexes the items by path
+            public static void PrepareStatuses()
+            {
+                itemsByPath = new Dictionary<string, List<ListViewItem>>(StringComparer.OrdinalIgnoreCase);
+                foreach (ListViewItem item in form.listViewContent.Items)
+                {
+                    item.SubItems[StatusColumnIndex].Text = "";
+                    string path = Path.Combine(item.SubItems[1].Text, item.Text);
+                    List<ListViewItem> items;
+                    if (!itemsByPath.TryGetValue(path, out items))
+                    {
+                        items = new List<ListViewItem>();
+                        itemsByPath.Add(path, items);
+                    }
+                    items.Add(item);
+                }
+            }
+
+            // May be called from any thread
+            public static void SetStatus(string path, string status)
+            {
+                if (form.listViewContent.InvokeRequired)
+                {
+                    form.listViewContent.BeginInvoke(new Action(() => SetStatus(path, status)));
+                    return;
+                }
+                List<ListViewItem> items;
+                if (itemsByPath.TryGetValue(path, out items))
+                {
+                    foreach (ListViewItem item in items)
+                    {
+                        item.SubItems[StatusColumnIndex].Text = status;
+                    }
+                }
             }
 
             public static void UpdateNote(int index, string note)

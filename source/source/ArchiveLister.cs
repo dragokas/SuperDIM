@@ -94,12 +94,17 @@ namespace DazUnpacker
             return false;
         }
 
-        // Runs 7z.exe hidden; collects stdout lines (if requested); returns the exit code
         private static int RunTool(string arguments, List<string> outputLines)
+        {
+            return RunTool(Config.Data.UnpackerTool7z, arguments, Encoding.UTF8, outputLines, null);
+        }
+
+        // Runs an archiver hidden; collects stdout / stderr lines (if requested, may be the same list); returns the exit code
+        internal static int RunTool(string exePath, string arguments, Encoding outputEncoding, List<string> outputLines, List<string> errorLines)
         {
             ProcessStartInfo psi = new ProcessStartInfo
             {
-                FileName = Config.Data.UnpackerTool7z,
+                FileName = exePath,
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
@@ -107,13 +112,24 @@ namespace DazUnpacker
                 RedirectStandardInput = true, // closed at once, so a password prompt fails instead of hanging
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                StandardOutputEncoding = Encoding.UTF8
+                StandardOutputEncoding = outputEncoding,
+                StandardErrorEncoding = outputEncoding
             };
 
             using (Process p = new Process())
             {
                 p.StartInfo = psi;
-                p.ErrorDataReceived += (sender, e) => { }; // drain stderr to prevent a deadlock
+                p.ErrorDataReceived += (sender, e) =>
+                {
+                    // stderr is always drained to prevent a deadlock
+                    if (errorLines != null && e.Data != null)
+                    {
+                        lock (errorLines)
+                        {
+                            errorLines.Add(e.Data);
+                        }
+                    }
+                };
                 p.Start();
                 p.StandardInput.Close();
                 p.BeginErrorReadLine();
@@ -123,7 +139,10 @@ namespace DazUnpacker
                 {
                     if (outputLines != null)
                     {
-                        outputLines.Add(line);
+                        lock (outputLines)
+                        {
+                            outputLines.Add(line);
+                        }
                     }
                 }
                 p.WaitForExit();

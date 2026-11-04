@@ -267,6 +267,7 @@ namespace DazUnpacker
             {
                 Statistics.Done = 0;
                 Library.Skipped.RemoveAll();
+                Library.Content.PrepareStatuses();
 
                 UpdateGenesisTypeFilter();
                 Config.SaveFiltersFromForm();
@@ -328,6 +329,7 @@ namespace DazUnpacker
                 else
                 {
                     Library.Skipped.Add(file, FindFailReason.CriteriaNotMatch);
+                    Library.Content.SetStatus(file, Library.Content.GetStatusText(FindFailReason.CriteriaNotMatch));
                     Statistics.DoneIncrement();
                 }
             }

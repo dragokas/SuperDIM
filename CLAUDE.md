@@ -76,7 +76,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())` |
 | `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`), контекстное меню копирования, «Re-install access denied» |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
-| `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` через `Process`, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
+| `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` с проверкой кода возврата, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`), `GetParentFolders` для combobox «Root folder» |
 | `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов), `Basic` (DAZ-библиотеки), `Search`, `Exclude`, `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
 | `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabInstaller/_TabCatalog/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к утилитам; `Init` заполняет комбобоксы, `ApplyStorage` форма←конфиг, `SaveConfig` форма→конфиг (вызывается в `FormClosing`) |
@@ -143,7 +143,15 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray`, `\data\`, `Characters`).
   Любая правка должна учитывать порядок проверок и регрессии на реальных архивах — автотестов нет.
 - **Вложенные архивы:** `ExtractSmart` в цикле распаковывает найденные внутри архивы в `destDir\Daz<N>`, удаляя исходный вложенный архив,
-  и собирает общий список `dufRootInfo`/`rootDirs`. Код ошибки/exit code внешних утилит не проверяется (`ExtractSingle*` возвращает true, если процесс стартовал).
+  и собирает общий список `dufRootInfo`/`rootDirs`.
+- **Коды возврата распаковщиков проверяются** (`Archive.RunExtractor`, запуск через общий `ArchiveLister.RunTool`, stdin закрыт — запрос пароля не вешает поток):
+  0 — успех, 1 — предупреждение (`Log.Warning`, установка идёт дальше), 10 у UnRAR — «нечего распаковывать» (при Partial всё могло быть исключено), остальное — ошибка
+  (`Log.Error` с кодом и хвостом вывода). Ошибка внешнего архива → `ExtractSmart` возвращает `FindFailReason.ArchiverError`; ошибка вложенного → он пропускается,
+  остальное ставится, `archiverFailed = true`. Вывод архиваторов урезан ключами `-bso0 -bsp0` (7z) и `-idq` (UnRAR).
+- **Колонка Status** списка архивов (`listViewContent`, 3-я колонка): итог по бандлу пишет `Unpacker.UnpackAll` через `Library.Content.SetStatus` (потокобезопасно; перед стартом
+  `PrepareStatuses` очищает колонку и индексирует элементы по пути). Значения: `Success`; `FAIL` (`ArchiverError`, `Unknown`, исключение); иначе имя `FindFailReason`
+  (`AccessDenied`, `AlreadyInstalled`, `BlackName`, `NoDufFiles`, `CriteriaNotMatch`, `Genesis9` …). Приоритет: FAIL > AccessDenied > Success > AlreadyInstalled.
+  Распакованные файлы нередко имеют атрибут ReadOnly — удалять их через `FileSys.FileDelete`, а не `File.Delete`.
 - **Ошибки в рабочих потоках** гасятся: `Globals.ReportError(ex, false)` только пишет в лог. `AccessDenied` помечается в `Library.Skipped`
   и позволяет кнопку «Re-install access denied» (повторно добавляет такие архивы и жмёт Install).
 - **Размер окна:** `Form1` изменяемого размера (`MinimumSize` = размер дизайна), контролы вкладок Installer/Logs расставлены якорями (Anchor) в дизайнере,
