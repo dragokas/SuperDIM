@@ -248,6 +248,7 @@ namespace DazUnpacker
             string file = Library.Content.GetFirstFile();
             string grandParentDir = FileSys.GetParentDir(FileSys.GetParentDir(file));
             comboBoxContentRootFolder.SelectedIndex = comboBoxContentRootFolder.FindStringExact(grandParentDir);
+            UpdatePrefixColumn();
 
             ContentTypes contentType = Unpacker.DetectContentType(file);
             comboBoxContentType.SelectedIndex = comboBoxContentType.FindStringExact(contentType.ToString());
@@ -676,6 +677,18 @@ namespace DazUnpacker
         private void checkBoxHierarhyByRootFolder_CheckedChanged(object sender, EventArgs e)
         {
             comboBoxContentRootFolder.Enabled = checkBoxHierarhyByRootFolder.Checked;
+            UpdatePrefixColumn();
+        }
+
+        private void comboBoxContentRootFolder_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdatePrefixColumn();
+        }
+
+        // The Prefix column of the install list depends on the "Hierarhy by Root folder" settings
+        private void UpdatePrefixColumn()
+        {
+            Library.Content.UpdatePrefixes(checkBoxHierarhyByRootFolder.Checked, comboBoxContentRootFolder.Text);
         }
 
         private void tabControl_Selecting(object sender, TabControlCancelEventArgs e)

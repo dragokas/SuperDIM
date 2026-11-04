@@ -67,7 +67,7 @@ namespace DazUnpacker
             }
             if (Config.Storage.TabInstaller.Filters.IsArchivePassed(file))
             {
-                Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), "", true);
+                Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), true);
             }
         }
 

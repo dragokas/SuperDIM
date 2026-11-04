@@ -37,15 +37,16 @@ namespace DazUnpacker
 
             public const string StatusSuccess = "Success";
             public const string StatusFail = "FAIL";
-            private const int StatusColumnIndex = 2;
+            private const int PrefixColumnIndex = 2;
+            private const int StatusColumnIndex = 3;
 
             // Items of listViewContent by archive path; built (and used) in the UI thread only
             private static Dictionary<string, List<ListViewItem>> itemsByPath = new Dictionary<string, List<ListViewItem>>();
 
-            public static int Add(string filename, string folder, string note, bool isChecked)
+            public static int Add(string filename, string folder, bool isChecked)
             {
                 var item = form.listViewContent.Items.Add(new ListViewItem(new string[] {
-                filename, folder, "", note }));
+                filename, folder, "", "" }));
                 if (isChecked)
                 {
                     item.Checked = true;
@@ -99,9 +100,27 @@ namespace DazUnpacker
                 }
             }
 
-            public static void UpdateNote(int index, string note)
+            // Fills the Prefix column: the folder of every archive relative to rootDir (the mirrored hierarchy);
+            // empty if the hierarchy is off or the archive is not inside rootDir
+            public static void UpdatePrefixes(bool hierarchyByRootFolder, string rootDir)
             {
-                form.listViewContent.Items[index].SubItems[3].Text = note;
+                form.listViewContent.BeginUpdate();
+                try
+                {
+                    foreach (ListViewItem item in form.listViewContent.Items)
+                    {
+                        string prefix = null;
+                        if (hierarchyByRootFolder)
+                        {
+                            prefix = FileSys.GetRelativeDir(rootDir, Path.Combine(item.SubItems[1].Text, item.Text));
+                        }
+                        item.SubItems[PrefixColumnIndex].Text = prefix ?? "";
+                    }
+                }
+                finally
+                {
+                    form.listViewContent.EndUpdate();
+                }
             }
 
             public static IEnumerable<string> GetFiles()

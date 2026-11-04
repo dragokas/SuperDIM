@@ -71,7 +71,7 @@
             this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnSubfolder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnPrefix = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.buttonAddContentFolder = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -636,8 +636,8 @@
             this.listViewContent.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnName,
             this.columnPath,
-            this.columnStatus,
-            this.columnSubfolder});
+            this.columnPrefix,
+            this.columnStatus});
             this.listViewContent.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listViewContent.FullRowSelect = true;
             this.listViewContent.GridLines = true;
@@ -664,16 +664,16 @@
             this.columnPath.Text = "Path";
             this.columnPath.Width = 200;
             // 
+            // columnPrefix
+            //
+            this.columnPrefix.Text = "Prefix";
+            this.columnPrefix.Width = 220;
+            //
             // columnStatus
             //
             this.columnStatus.Text = "Status";
             this.columnStatus.Width = 130;
-            // 
-            // columnSubfolder
-            // 
-            this.columnSubfolder.Text = "Subfolder";
-            this.columnSubfolder.Width = 220;
-            // 
+            //
             // progressBar1
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1057,6 +1057,7 @@
             this.comboBoxContentRootFolder.Name = "comboBoxContentRootFolder";
             this.comboBoxContentRootFolder.Size = new System.Drawing.Size(850, 32);
             this.comboBoxContentRootFolder.TabIndex = 28;
+            this.comboBoxContentRootFolder.SelectedIndexChanged += new System.EventHandler(this.comboBoxContentRootFolder_SelectedIndexChanged);
             // 
             // buttonStart
             // 
@@ -1339,7 +1340,7 @@
         private System.Windows.Forms.ColumnHeader columnName;
         private System.Windows.Forms.ColumnHeader columnPath;
         private System.Windows.Forms.ColumnHeader columnStatus;
-        private System.Windows.Forms.ColumnHeader columnSubfolder;
+        private System.Windows.Forms.ColumnHeader columnPrefix;
         public System.Windows.Forms.ListView listViewContent;
         public System.Windows.Forms.CheckBox checkBoxGenesis9;
         public System.Windows.Forms.CheckBox checkBoxGenesis8;
