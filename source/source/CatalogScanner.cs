@@ -211,7 +211,7 @@ namespace DazUnpacker
                         // keep the unreadable archive itself as a file
                         rows.Add(CatalogRow.Create(nestedFile.Substring(dir.Length), bundlePath));
                     }
-                    File.Delete(nestedFile); // free the disk space as early as possible
+                    FileSys.FileDelete(nestedFile); // free the disk space as early as possible
                 }
                 return true;
             }

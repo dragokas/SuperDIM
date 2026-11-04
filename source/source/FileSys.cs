@@ -97,6 +97,16 @@ namespace DazUnpacker
             return path;
         }
 
+        // Deletes a file even if it has the read-only attribute (files unpacked from archives often have it)
+        public static void FileDelete(string path)
+        {
+            if (File.Exists(path))
+            {
+                File.SetAttributes(path, FileAttributes.Normal);
+                File.Delete(path);
+            }
+        }
+
         public static bool DirectoryDelete(string dir)
         {
             try
@@ -110,7 +120,7 @@ namespace DazUnpacker
             catch (Exception) // shitty C# IO Access denied Exception on delete dir
             {
                 return false;
-            } 
+            }
             return false;
         }
 
