@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
@@ -106,6 +107,19 @@ namespace DazUnpacker
             }
             tempDir = String.Empty;
             return false;
+        }
+
+        // Volumes 2, 3, ... of a multi-volume RAR (name.part2.rar): unpacking the first volume unpacks the whole set,
+        // so each following volume would only unpack the same content again
+        internal static bool IsFollowingVolume(string path)
+        {
+            Match match = Regex.Match(Path.GetFileName(path), @"\.part0*(\d+)\.rar$", RegexOptions.IgnoreCase);
+            if (!match.Success)
+            {
+                return false;
+            }
+            string number = match.Groups[1].Value.TrimStart('0');
+            return number.Length != 0 && number != "1";
         }
 
         public static bool IsArchiveExtension(string path)

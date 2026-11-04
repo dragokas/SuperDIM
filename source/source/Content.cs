@@ -60,6 +60,11 @@ namespace DazUnpacker
             {
                 return;
             }
+            if (Archive.IsFollowingVolume(file))
+            {
+                Log.Info("Skipped (the first volume unpacks the whole set): " + file);
+                return;
+            }
             if (Config.Storage.TabInstaller.Filters.IsArchivePassed(file))
             {
                 Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), "", true);
