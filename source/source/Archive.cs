@@ -181,7 +181,8 @@ namespace DazUnpacker
             string skipList = "";
             foreach (string name in skipObjects)
             {
-                skipList += " -x\"" + name + "\"";
+                // -x"name" skips only the folder at the root of the archive; "*\name\*" skips it at any depth, as -xr! of 7z does
+                skipList += " -x\"" + name + "\" -x\"*\\" + name + "\\*\"";
             }
             string args = String.Format("x -y -idq -o- -op\"{0}\"{1} \"{2}\"", destinationDir, skipList, zipPath);
             Encoding oemEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);

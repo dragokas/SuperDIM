@@ -135,7 +135,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - Пути к `7z.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7z.exe`, `tools\WinRAR\UnRAR.exe`
   (в git каталог называется `WinRar` — регистр не важен на Windows).
 - Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation`, `Documents`, `Readme`, `ReadMe's`,
-  `Templates`, `Dokumentation`, список в `ExtractSmart`) и **Full** (копируются и остальные корневые папки из `DazRootDirs`).
+  `Templates`, `Dokumentation`, список в `ExtractSmart`; исключаются на любой глубине: 7z `-xr!"name"`, UnRAR `-x"name" -x"*\name\*"` — без второго шаблона UnRAR пропускал только корневую папку, и rar с папкой-обёрткой распаковывались целиком; в выборке из 1892 реальных архивов `*.duf` внутри исключаемых папок не было) и **Full** (копируются и остальные корневые папки из `DazRootDirs`).
 
 ## Подводные камни и особенности (важно при доработке)
 
