@@ -126,6 +126,19 @@ namespace DazUnpacker
 
                                 bool bVersionIndependentType = Content.IsVersionIndependentType(contentType);
 
+                                // the folder of the archive below the Root folder: the same for all top folders of the archive
+                                string dirGroup = "";
+                                if (!unpackInfo.ignoreRootDir)
+                                {
+                                    dirGroup = FileSys.GetRelativeDir(unpackInfo.userSelectedRootDir, path);
+                                    if (dirGroup == null)
+                                    {
+                                        Log.Warning("The archive is not inside the Root folder, its folder hierarchy is not mirrored: " + path);
+                                        dirGroup = "";
+                                    }
+                                }
+                                dirGroup = FileSys.PathInsertPrefixToAllComponents(dirGroup, unpackInfo.subfolderPrefix);
+
                                 foreach (Archive.DufRootInfo dufInfo in dufRootInfo)
                                 {
                                     dufInfo.contentType = contentType;
@@ -142,18 +155,6 @@ namespace DazUnpacker
                                     {
                                         dufInfo.gender = unpackInfo.suggestedGender;
                                     }
-                                    string dirGroup;
-                                    if (unpackInfo.ignoreRootDir)
-                                    {
-                                        dirGroup = "";
-                                    }
-                                    else
-                                    {
-                                        dirGroup = FileSys.StripFilename(path.Substring(unpackInfo.userSelectedRootDir.Length + 1));
-                                    }
-
-                                    dirGroup = FileSys.PathInsertPrefixToAllComponents(dirGroup, unpackInfo.subfolderPrefix);
-
                                     GenesisVersion genVersionsFiltered = dufInfo.genesisVersion & Config.Storage.TabSettings.genesisVersionFilter;
                                     bool hasSingleGenesisVersion = IsSingleGenesisVersion(dufInfo.genesisVersion);
 

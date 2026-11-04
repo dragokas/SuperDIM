@@ -33,6 +33,17 @@ namespace DazUnpacker
                 && child[parent.Length] == '\\';
         }
 
+        // The folder of the file relative to rootDir ("" if the file is right in rootDir; the root of a drive like "D:\" is fine);
+        // null if the file is not inside rootDir
+        public static string GetRelativeDir(string rootDir, string filePath)
+        {
+            if (!IsSubPath(rootDir, filePath))
+            {
+                return null;
+            }
+            return StripFilename(filePath.Substring(rootDir.TrimEnd('\\').Length + 1));
+        }
+
         public static string Unquote(string path)
         {
             if (path.Length >= 2)
