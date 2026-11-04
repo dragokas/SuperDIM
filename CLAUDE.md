@@ -111,7 +111,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - **Ignore case** (чекбокс, по умолчанию выкл): выкл — всё регистрозависимо; вкл — полностью регистронезависимо, включая кириллицу.
   Для этого в таблице есть технические колонки `PathKey`/`NameKey` (нижний регистр, `ToLowerInvariant`) — в UI и CSV не показываются, при импорте CSV пересчитываются.
 - Листинг бандла не распаковывает его целиком: `7z l -slt -ba`; на диск (в `<temp>\Catalog\<guid>`) попадают только вложенные архивы и только если они есть;
-  папка удаляется сразу после листинга. Temp — «Specific folder» из groupBox6, иначе `Config.Data.TempFolder`.
+  папка удаляется сразу после листинга. Temp — «Specific folder» из groupBox6 (если режим включён и папка существует), иначе `Config.Data.TempFolder`.
   `7z.exe` читает rar только в полной версии 7-Zip (`7za.exe` формата RAR не содержит).
 - **Повторный Scan пропускает неизменённые бандлы:** таблица `Bundles` (`ArchivePath`, `Size`, `ModifiedTicks` = `LastWriteTimeUtc`) пишется в той же транзакции, что и строки
   (`ReplaceBundle(path, rows, BundleStamp)`; штамп снимается **до** чтения архива). Совпали размер и время — бандл не открывается, статус показывает число пропущенных.
@@ -140,9 +140,11 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   значения для установки перед стартом синхронизируются из формы (`UpdateGenesisTypeFilter`, `SaveFiltersFromForm` в `buttonStart_Click`).
 - **Завершение установки определяется косвенно:** `labelProgress_TextChanged` сравнивает `Statistics.Done == Total`,
   останавливает секундомер и включает кнопку Install. Пропущенные на этапе `FilterFilesList` архивы тоже считаются через `DoneIncrement`.
-- **Временные папки:** `Archive.PrepareTempDir` всегда использует `<корень диска целевой библиотеки>\Temp\Daz` (чтобы `Directory.Move`
-  был переименованием, а не копированием). Настройка «Specific temp folder» (`TabSettings.TempFolder/UseSpecificTempFolder`),
-  `Config.Data.TempFolder`, `Globals.ClearTempFolder` и `Archive.ClearTemp` — **не используются при распаковке / нигде не вызываются** (заготовки или недоделки).
+- **Временные папки:** установщик (`Unpacker.UnpackAll` → `Archive.PrepareTempDir`) всегда распаковывает в `<корень диска целевой библиотеки>\Temp\Daz`
+  (чтобы `Directory.Move` был переименованием, а не копированием) и настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
+  (`groupBox6`, `TabSettings.UseSpecificTempFolder/TempFolder`) на установку не влияет, хотя форма проверяет путь при уходе с вкладки (`CheckTempFolderForValidInput`).
+  Эта настройка действует только в сканировании каталога (`CatalogScanner`, ~строка 84): указанная папка, если режим включён и она существует,
+  иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Не вызываются нигде (заготовки очистки): `Globals.ClearTempFolder`, `Archive.ClearTemp`. По решению пользователя код и интерфейс не менялись.
 - **Вкладка Sort удалена** (вместе с `_TabSort`, `Exclusion`, `Library.Search/Exclude`). Её настройки установка не использовала. Живые поля «Prefix to append to subfolders»
   и «Create root subfolder» стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller` (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`).
   Старый ключ `TabSort` в `config.txt` Json.NET игнорирует. Остальные наследия: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries`.
