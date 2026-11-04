@@ -98,7 +98,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `CatalogScanner.cs` | `CatalogScanner` — Scan папки (потоки `Parallel.ForEach`, вложенные архивы рекурсивно); `CatalogCollector` — сбор листинга во время установки (хук в `Archive.ExtractSmart`) |
 | `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
 | `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180); при импорте обязательны `FilePath` и `ArchivePath`, `Modified` и `ArchiveCreated` берутся, если есть (у старых файлов без них даты пустые) |
-| `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата) |
+| `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата; галочка «Unique archive» оставляет в первых двух только первую строку каждого архива, без учёта регистра пути, в конфиг не сохраняется) |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
 | `Geometry.cs` | Поиск контрола под курсором (для контекстного меню Copy) |
 | `ListViewColumnSorter.cs` | `IComparer` для сортировки `listViewSkippedContent` (глобальный класс без namespace) |
@@ -174,6 +174,11 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   (какие корневые папки не копировать в режиме Full). Раньше было `StartsWith` по строке: «Hair\Short Curly» считалась вложенной в «Hair\Short» и терялась, а корневая `Props`
   принималась за папку с `*.duf` из-за `Props Pack\…`. Теперь такие соседние top-папки доходят до `ConcatenateSibilFolders` и, имея общего родителя, заменяются им
   (ставится вся папка родителя, как и для любых двух соседних top-папок). На 126 архивах `N:\DAZ_Unsorted\_Dress` результат не изменился (там такие пары убирались как подпапки папки продукта).
+  Слияние соседних папок (`ConcatenateSibilFolders`) может само выдать родителя и его подпапку одновременно (`Timeless Ballet` + `Timeless Ballet\Expressions`). Поэтому `Archive.RemoveNestedFolders`
+  (в любом порядке) вызывается и до слияния, и после него: иначе `Directory.Move` родителя уносит подпапку, и её установка падает с `DirectoryNotFoundException`.
+- **AccessDenied — общий ярлык для любого исключения в `Unpacker.InstallDuf`** (и для `CopyFailed`), поэтому настоящая причина только в логе: `Install: top folder '…' (exists: …), target '…' (exists: …),
+  target parent '…' (exists: …), single version, версия, пол, поток` + стек; `AccessDenied: <архив>, top folder: …` пишет `UnpackAll`; ошибка копирования папки — `Copy: <источник> -> <цель>`.
+  Известная причина (воспроизведена на синтетическом дереве): вложенная пара top-папок, см. выше; при повторной установке ошибки нет, потому что целевая папка уже существует и ветка `Directory.Move` не выполняется (идёт копирование).
 - **Вложенные архивы:** `ExtractSmart` в цикле распаковывает найденные внутри архивы в `destDir\Daz<N>`, удаляя исходный вложенный архив,
   и собирает общий список `dufRootInfo`/`rootDirs`. Корень вложенного архива `archiveRoot` (`FindRootDir(tempDir)`) не меняется, пока обрабатываются его top-папки:
   от него отсчитывается относительный путь top-папки, по которому определяются версия Genesis и пол (`FileSys.IsSubPath`; top-папка вне корня или пустой корень — берётся полный путь).
@@ -187,6 +192,8 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   `Unpacker` берёт как `dirGroup` (без `subfolderPrefix`, он добавляется только при установке). Пусто, если галочка «Hierarhy by Root folder» снята или архив лежит вне Root folder
   или прямо в нём. Пересчитывается `Library.Content.UpdatePrefixes` (через `Form1.UpdatePrefixColumn`) при смене галочки, смене Root folder и после добавления архивов
   (`DetectAndShowContentType`). Пример: Root folder `n:\Daz\Content\Outfit`, архив `N:\Daz\Content\Outfit\Cosplay\CatWoman\Catsuit V8 for G8F.rar` → `Cosplay\CatWoman`.
+- **Контекстное меню списка архивов** (`contextMenuContent`, пункт «Copy full path»): копирует полный путь архива под курсором (иначе выбранного); без архива меню не открывается.
+  Путь строки списка собирает `Library.Content.GetFullPath(item)`. Скорость в `labelSpeed` форматируется `0.#` (ведущий ноль: `0,4 arc/s`).
 - **Колонка Status** списка архивов (`listViewContent`, 4-я колонка): итог по бандлу пишет `Unpacker.UnpackAll` через `Library.Content.SetStatus` (потокобезопасно; перед стартом
   `PrepareStatuses` очищает колонку и индексирует элементы по пути). Значения: `Success`; `FAIL` (`ArchiverError`, `Unknown`, исключение); иначе имя `FindFailReason`
   (`AccessDenied`, `AlreadyInstalled`, `BlackName`, `NoDufFiles`, `CriteriaNotMatch`, `Genesis9` …). Приоритет: FAIL > AccessDenied > Success > AlreadyInstalled.

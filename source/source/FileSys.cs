@@ -213,7 +213,7 @@ namespace DazUnpacker
             }
             catch (Exception ex)
             {
-                Globals.ReportError(ex, false);
+                Globals.ReportError(ex, false, "Copy: " + sourceDir + " -> " + targetDir);
                 return FsCopyStatus.CopyFailed;
             }
             if (hasFailures)

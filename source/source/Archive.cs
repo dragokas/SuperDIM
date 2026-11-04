@@ -298,6 +298,22 @@ namespace DazUnpacker
             return fixedTopFolders.Distinct().ToList();
         }
 
+        // Removes the folders which lie inside another folder of the list, whatever the order is
+        private static void RemoveNestedFolders(List<string> dirs)
+        {
+            for (int i = dirs.Count - 1; i >= 0; i--)
+            {
+                foreach (string other in dirs)
+                {
+                    if (FileSys.IsSubPath(other, dirs[i]))
+                    {
+                        dirs.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
         private static bool GetDufTopFolders(string dir, out List<string> topDirs)
         {
             topDirs = new List<string>();
@@ -335,24 +351,15 @@ namespace DazUnpacker
             // G8/Dress/Name/ <== leave only this one
             // G8/Dress/Name/Materials
             // G8/Dress/Name/Wetness
-            if (topDirs.Count != 0)
-            {
-                for (int i = topDirs.Count - 1; i >= 0; i--)
-                {
-                    for (int k = 0; k < i; k++)
-                    {
-                        if (FileSys.IsSubPath(topDirs[k], topDirs[i]))
-                        {
-                            topDirs.RemoveAt(i);
-                            break;
-                        }
-                    }
-                }
-            }
+            RemoveNestedFolders(topDirs);
             if (topDirs.Count != 0)
             {
                 topDirs = ConcatenateSibilFolders(topDirs);
                 topDirs = ConcatenateSibilFolders(topDirs);
+
+                // merging of siblings can produce a parent and its own subfolder both at once:
+                // the parent is installed (moved) together with the subfolder, so the subfolder would not be found afterwards
+                RemoveNestedFolders(topDirs);
             }
             foreach (string topDir in topDirs)
             {

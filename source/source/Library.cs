@@ -54,6 +54,11 @@ namespace DazUnpacker
                 return item.Index;
             }
 
+            public static string GetFullPath(ListViewItem item)
+            {
+                return Path.Combine(item.SubItems[1].Text, item.Text);
+            }
+
             // Text of the Status column for an archive which is not installed
             public static string GetStatusText(FindFailReason reason)
             {
@@ -71,7 +76,7 @@ namespace DazUnpacker
                 foreach (ListViewItem item in form.listViewContent.Items)
                 {
                     item.SubItems[StatusColumnIndex].Text = "";
-                    string path = Path.Combine(item.SubItems[1].Text, item.Text);
+                    string path = GetFullPath(item);
                     List<ListViewItem> items;
                     if (!itemsByPath.TryGetValue(path, out items))
                     {
@@ -112,7 +117,7 @@ namespace DazUnpacker
                         string prefix = null;
                         if (hierarchyByRootFolder)
                         {
-                            prefix = FileSys.GetRelativeDir(rootDir, Path.Combine(item.SubItems[1].Text, item.Text));
+                            prefix = FileSys.GetRelativeDir(rootDir, GetFullPath(item));
                         }
                         item.SubItems[PrefixColumnIndex].Text = prefix ?? "";
                     }
@@ -127,7 +132,7 @@ namespace DazUnpacker
             {
                 foreach (ListViewItem item in form.listViewContent.Items)
                 {
-                    yield return Path.Combine(item.SubItems[1].Text, item.Text);
+                    yield return GetFullPath(item);
                 }
             }
 
@@ -136,7 +141,7 @@ namespace DazUnpacker
                 List<string> list = new List<string>();
                 foreach (ListViewItem item in form.listViewContent.Items)
                 {
-                    list.Add(Path.Combine(item.SubItems[1].Text, item.Text));
+                    list.Add(GetFullPath(item));
                 }
                 return list;
             }
@@ -145,8 +150,7 @@ namespace DazUnpacker
             {
                 if (form.listViewContent.Items.Count > 0)
                 {
-                    var item = form.listViewContent.Items[0];
-                    return Path.Combine(item.SubItems[1].Text, item.Text);
+                    return GetFullPath(form.listViewContent.Items[0]);
                 }
                 return String.Empty;
             }

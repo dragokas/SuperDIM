@@ -121,6 +121,8 @@
             this.contextMenuCommon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuContent = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyFullPathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl.SuspendLayout();
             this.tabPageSettings.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -142,6 +144,7 @@
             this.tabPageCatalog.SuspendLayout();
             this.tabPageLogs.SuspendLayout();
             this.contextMenuCommon.SuspendLayout();
+            this.contextMenuContent.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonAddLibraryPath
@@ -633,6 +636,7 @@
             // 
             this.listViewContent.AllowDrop = true;
             this.listViewContent.CheckBoxes = true;
+            this.listViewContent.ContextMenuStrip = this.contextMenuContent;
             this.listViewContent.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnName,
             this.columnPath,
@@ -1273,7 +1277,23 @@
             this.copyAllToolStripMenuItem.Size = new System.Drawing.Size(163, 36);
             this.copyAllToolStripMenuItem.Text = "Copy All";
             this.copyAllToolStripMenuItem.Click += new System.EventHandler(this.copyAllToolStripMenuItem_Click);
-            // 
+            //
+            // contextMenuContent
+            //
+            this.contextMenuContent.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.contextMenuContent.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyFullPathToolStripMenuItem});
+            this.contextMenuContent.Name = "contextMenuContent";
+            this.contextMenuContent.Size = new System.Drawing.Size(250, 40);
+            this.contextMenuContent.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuContent_Opening);
+            //
+            // copyFullPathToolStripMenuItem
+            //
+            this.copyFullPathToolStripMenuItem.Name = "copyFullPathToolStripMenuItem";
+            this.copyFullPathToolStripMenuItem.Size = new System.Drawing.Size(249, 36);
+            this.copyFullPathToolStripMenuItem.Text = "Copy full path";
+            this.copyFullPathToolStripMenuItem.Click += new System.EventHandler(this.copyFullPathToolStripMenuItem_Click);
+            //
             // Form1
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
@@ -1323,6 +1343,7 @@
             this.tabPageLogs.ResumeLayout(false);
             this.tabPageLogs.PerformLayout();
             this.contextMenuCommon.ResumeLayout(false);
+            this.contextMenuContent.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1384,6 +1405,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ToolStripMenuItem copyAllToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip contextMenuContent;
+        private System.Windows.Forms.ToolStripMenuItem copyFullPathToolStripMenuItem;
         private System.Windows.Forms.Button buttonClear;
         private System.Windows.Forms.Button buttonReInstallAccessDenied;
         private System.Windows.Forms.Panel panel6;

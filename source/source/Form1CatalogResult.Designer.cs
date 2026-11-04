@@ -20,6 +20,7 @@
             this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.labelSummary = new System.Windows.Forms.Label();
+            this.checkBoxUniqueArchive = new System.Windows.Forms.CheckBox();
             this.labelOnDisk = new System.Windows.Forms.Label();
             this.gridOnDisk = new DazUnpacker.Form1CatalogGrid();
             this.labelMissing = new System.Windows.Forms.Label();
@@ -38,18 +39,20 @@
             this.tableLayoutPanel.ColumnCount = 1;
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel.Controls.Add(this.labelSummary, 0, 0);
-            this.tableLayoutPanel.Controls.Add(this.labelOnDisk, 0, 1);
-            this.tableLayoutPanel.Controls.Add(this.gridOnDisk, 0, 2);
-            this.tableLayoutPanel.Controls.Add(this.labelMissing, 0, 3);
-            this.tableLayoutPanel.Controls.Add(this.gridMissing, 0, 4);
-            this.tableLayoutPanel.Controls.Add(this.labelNotFound, 0, 5);
-            this.tableLayoutPanel.Controls.Add(this.listBoxNotFound, 0, 6);
-            this.tableLayoutPanel.Controls.Add(this.buttonClose, 0, 7);
+            this.tableLayoutPanel.Controls.Add(this.checkBoxUniqueArchive, 0, 1);
+            this.tableLayoutPanel.Controls.Add(this.labelOnDisk, 0, 2);
+            this.tableLayoutPanel.Controls.Add(this.gridOnDisk, 0, 3);
+            this.tableLayoutPanel.Controls.Add(this.labelMissing, 0, 4);
+            this.tableLayoutPanel.Controls.Add(this.gridMissing, 0, 5);
+            this.tableLayoutPanel.Controls.Add(this.labelNotFound, 0, 6);
+            this.tableLayoutPanel.Controls.Add(this.listBoxNotFound, 0, 7);
+            this.tableLayoutPanel.Controls.Add(this.buttonClose, 0, 8);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
             this.tableLayoutPanel.Padding = new System.Windows.Forms.Padding(8);
-            this.tableLayoutPanel.RowCount = 8;
+            this.tableLayoutPanel.RowCount = 9;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 38F));
@@ -71,14 +74,25 @@
             this.labelSummary.Size = new System.Drawing.Size(60, 22);
             this.labelSummary.TabIndex = 0;
             //
+            // checkBoxUniqueArchive
+            //
+            this.checkBoxUniqueArchive.AutoSize = true;
+            this.checkBoxUniqueArchive.Location = new System.Drawing.Point(11, 33);
+            this.checkBoxUniqueArchive.Name = "checkBoxUniqueArchive";
+            this.checkBoxUniqueArchive.Size = new System.Drawing.Size(95, 17);
+            this.checkBoxUniqueArchive.TabIndex = 1;
+            this.checkBoxUniqueArchive.Text = "Unique archive";
+            this.checkBoxUniqueArchive.UseVisualStyleBackColor = true;
+            this.checkBoxUniqueArchive.CheckedChanged += new System.EventHandler(this.checkBoxUniqueArchive_CheckedChanged);
+            //
             // labelOnDisk
             //
             this.labelOnDisk.AutoSize = true;
-            this.labelOnDisk.Location = new System.Drawing.Point(11, 30);
+            this.labelOnDisk.Location = new System.Drawing.Point(11, 53);
             this.labelOnDisk.Name = "labelOnDisk";
             this.labelOnDisk.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.labelOnDisk.Size = new System.Drawing.Size(60, 21);
-            this.labelOnDisk.TabIndex = 1;
+            this.labelOnDisk.TabIndex = 2;
             //
             // gridOnDisk
             //
@@ -86,7 +100,7 @@
             this.gridOnDisk.Location = new System.Drawing.Point(11, 54);
             this.gridOnDisk.Name = "gridOnDisk";
             this.gridOnDisk.Size = new System.Drawing.Size(978, 200);
-            this.gridOnDisk.TabIndex = 2;
+            this.gridOnDisk.TabIndex = 3;
             //
             // labelMissing
             //
@@ -95,7 +109,7 @@
             this.labelMissing.Name = "labelMissing";
             this.labelMissing.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.labelMissing.Size = new System.Drawing.Size(60, 21);
-            this.labelMissing.TabIndex = 3;
+            this.labelMissing.TabIndex = 4;
             //
             // gridMissing
             //
@@ -103,7 +117,7 @@
             this.gridMissing.Location = new System.Drawing.Point(11, 281);
             this.gridMissing.Name = "gridMissing";
             this.gridMissing.Size = new System.Drawing.Size(978, 200);
-            this.gridMissing.TabIndex = 4;
+            this.gridMissing.TabIndex = 5;
             //
             // labelNotFound
             //
@@ -112,7 +126,7 @@
             this.labelNotFound.Name = "labelNotFound";
             this.labelNotFound.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.labelNotFound.Size = new System.Drawing.Size(60, 21);
-            this.labelNotFound.TabIndex = 5;
+            this.labelNotFound.TabIndex = 6;
             //
             // listBoxNotFound
             //
@@ -124,7 +138,7 @@
             this.listBoxNotFound.Name = "listBoxNotFound";
             this.listBoxNotFound.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.listBoxNotFound.Size = new System.Drawing.Size(978, 130);
-            this.listBoxNotFound.TabIndex = 6;
+            this.listBoxNotFound.TabIndex = 7;
             this.listBoxNotFound.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBoxNotFound_MouseDown);
             //
             // contextMenuNotFound
@@ -151,7 +165,7 @@
             this.buttonClose.MinimumSize = new System.Drawing.Size(75, 28);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(75, 28);
-            this.buttonClose.TabIndex = 7;
+            this.buttonClose.TabIndex = 8;
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
             //
@@ -181,6 +195,7 @@
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
         private System.Windows.Forms.Label labelSummary;
+        private System.Windows.Forms.CheckBox checkBoxUniqueArchive;
         private System.Windows.Forms.Label labelOnDisk;
         private Form1CatalogGrid gridOnDisk;
         private System.Windows.Forms.Label labelMissing;

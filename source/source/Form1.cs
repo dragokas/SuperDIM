@@ -463,6 +463,27 @@ namespace DazUnpacker
             }
         }
 
+        // The archive of the context menu: the one under the cursor, else the selected one
+        private ListViewItem m_contentMenuItem;
+
+        private void contextMenuContent_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            m_contentMenuItem = listViewContent.HitTest(listViewContent.PointToClient(Cursor.Position)).Item;
+            if (m_contentMenuItem == null && listViewContent.SelectedItems.Count != 0)
+            {
+                m_contentMenuItem = listViewContent.SelectedItems[0];
+            }
+            e.Cancel = m_contentMenuItem == null;
+        }
+
+        private void copyFullPathToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (m_contentMenuItem != null)
+            {
+                Clipboard.SetText(Library.Content.GetFullPath(m_contentMenuItem));
+            }
+        }
+
         private void listBoxLog_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -511,7 +532,7 @@ namespace DazUnpacker
                 {
                     int countDone = Statistics.Done;
                     double speed = countDone / elapsed.TotalSeconds;
-                    labelSpeed.Text = String.Format("{0:#.#} arc/s", speed); ;
+                    labelSpeed.Text = String.Format("{0:0.#} arc/s", speed);
                     if (Statistics.Total != 0)
                     {
                         int percent = countDone * 100 / Statistics.Total;

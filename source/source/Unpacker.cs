@@ -182,6 +182,7 @@ namespace DazUnpacker
                                                 else if (failReason == FindFailReason.AccessDenied)
                                                 {
                                                     accessDenied = true;
+                                                    Log.Warning("AccessDenied: " + path + ", top folder: " + dufInfo.topDirectory + ", " + genVersion);
                                                 }
                                             }
 
@@ -331,6 +332,7 @@ namespace DazUnpacker
             out FindFailReason failReason)
         {
             failReason = FindFailReason.Unknown;
+            string fullInstDir = "";
             try
             {
                 string targetInstDir = GetInstallDirByContentType(contentLibDir, dufInfo.contentType, dufInfo.genesisVersion, dufInfo.gender);
@@ -350,7 +352,7 @@ namespace DazUnpacker
                     dufParentName = "";
                 }
 
-                string fullInstDir = Path.Combine(targetInstDir, dufParentName);
+                fullInstDir = Path.Combine(targetInstDir, dufParentName);
                 string parentInstDir = FileSys.GetParentDir(fullInstDir);
 
                 if (!Directory.Exists(parentInstDir))
@@ -384,9 +386,20 @@ namespace DazUnpacker
             catch (Exception ex)
             {
                 failReason = FindFailReason.AccessDenied;
-                Globals.ReportError(ex, false);
+                Globals.ReportError(ex, false, DescribeInstallState(dufInfo, fullInstDir, hasSingleGenesisVersion));
             }
             return false;
+        }
+
+        // Details of a failed install of a top folder: any exception is reported as AccessDenied, so the real state goes to the log
+        private static string DescribeInstallState(Archive.DufRootInfo dufInfo, string fullInstDir, bool hasSingleGenesisVersion)
+        {
+            string parentInstDir = string.IsNullOrEmpty(fullInstDir) ? "" : FileSys.GetParentDir(fullInstDir);
+            return String.Format("Install: top folder '{0}' (exists: {1}), target '{2}' (exists: {3}), target parent '{4}' (exists: {5}), single version: {6}, {7}, {8}, thread {9}",
+                dufInfo.topDirectory, Directory.Exists(dufInfo.topDirectory),
+                fullInstDir, Directory.Exists(fullInstDir),
+                parentInstDir, Directory.Exists(parentInstDir),
+                hasSingleGenesisVersion, dufInfo.genesisVersion, dufInfo.gender, Thread.CurrentThread.ManagedThreadId);
         }
 
         private static string GetInstallDirByContentType(string contentLibDir, ContentTypes contentType, GenesisVersion genesisVersion, GenesisGenders gender)

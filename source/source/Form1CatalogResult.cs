@@ -7,21 +7,58 @@ namespace DazUnpacker
     // Result of "Search & Install": found files whose archives exist / are missing on disk, and paths not found at all
     internal partial class Form1CatalogResult : Form
     {
+        private readonly IList<CatalogRow> onDisk;
+        private readonly IList<CatalogRow> missing;
+
         public Form1CatalogResult(string summary, IList<CatalogRow> onDisk, IList<CatalogRow> missing, IList<string> notFound)
         {
             InitializeComponent();
 
+            this.onDisk = onDisk;
+            this.missing = missing;
             labelSummary.Text = summary;
-            labelOnDisk.Text = "Found, archive is on disk (" + onDisk.Count + "):";
-            labelMissing.Text = "Found, archive is missing on disk (" + missing.Count + "):";
             labelNotFound.Text = "Not found (" + notFound.Count + "):";
 
-            gridOnDisk.SetSource(new ListRowSource(onDisk));
-            gridMissing.SetSource(new ListRowSource(missing));
+            ShowRows();
             foreach (string path in notFound)
             {
                 listBoxNotFound.Items.Add(path);
             }
+        }
+
+        // Fills both grids: all found rows or, with "Unique archive", only the first row of every archive
+        private void ShowRows()
+        {
+            IList<CatalogRow> shownOnDisk = GetShownRows(onDisk);
+            IList<CatalogRow> shownMissing = GetShownRows(missing);
+
+            labelOnDisk.Text = "Found, archive is on disk (" + shownOnDisk.Count + "):";
+            labelMissing.Text = "Found, archive is missing on disk (" + shownMissing.Count + "):";
+            gridOnDisk.SetSource(new ListRowSource(shownOnDisk));
+            gridMissing.SetSource(new ListRowSource(shownMissing));
+        }
+
+        private IList<CatalogRow> GetShownRows(IList<CatalogRow> rows)
+        {
+            if (!checkBoxUniqueArchive.Checked)
+            {
+                return rows;
+            }
+            HashSet<string> archives = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            List<CatalogRow> unique = new List<CatalogRow>();
+            foreach (CatalogRow row in rows)
+            {
+                if (archives.Add(row.ArchivePath))
+                {
+                    unique.Add(row);
+                }
+            }
+            return unique;
+        }
+
+        private void checkBoxUniqueArchive_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowRows();
         }
 
         // The right click selects the line under the cursor, unless it is a part of the selection already
