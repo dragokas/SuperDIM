@@ -31,7 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.buttonAddLibraryPath = new System.Windows.Forms.Button();
-            this.buttonFullScreen = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPageSettings = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -922,7 +921,7 @@
             this.tabPageInstaller.Location = new System.Drawing.Point(4, 33);
             this.tabPageInstaller.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabPageInstaller.Name = "tabPageInstaller";
-            this.tabPageInstaller.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tabPageInstaller.Padding = new System.Windows.Forms.Padding(0);
             this.tabPageInstaller.Size = new System.Drawing.Size(1158, 1080);
             this.tabPageInstaller.TabIndex = 1;
             this.tabPageInstaller.Text = "Installer";
@@ -1639,35 +1638,20 @@
             this.copyAllToolStripMenuItem.Text = "Copy All";
             this.copyAllToolStripMenuItem.Click += new System.EventHandler(this.copyAllToolStripMenuItem_Click);
             // 
-            // buttonFullScreen
-            //
-            this.buttonFullScreen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonFullScreen.Location = new System.Drawing.Point(1022, 16);
-            this.buttonFullScreen.Margin = new System.Windows.Forms.Padding(4);
-            this.buttonFullScreen.Name = "buttonFullScreen";
-            this.buttonFullScreen.Size = new System.Drawing.Size(158, 34);
-            this.buttonFullScreen.TabIndex = 4;
-            this.buttonFullScreen.Text = "Full screen";
-            this.buttonFullScreen.UseVisualStyleBackColor = true;
-            this.buttonFullScreen.Click += new System.EventHandler(this.buttonFullScreen_Click);
-            //
             // Form1
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1192, 1151);
-            this.Controls.Add(this.buttonFullScreen);
             this.Controls.Add(this.tabControl);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Super DAZ Content Install Manager";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl.ResumeLayout(false);
             this.tabPageSettings.ResumeLayout(false);
@@ -1719,7 +1703,6 @@
 
         #endregion
         private System.Windows.Forms.Button buttonAddLibraryPath;
-        private System.Windows.Forms.Button buttonFullScreen;
         private System.Windows.Forms.TabPage tabPageSettings;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabPage tabPageInstaller;

@@ -32,11 +32,6 @@ namespace DazUnpacker
             get { return tabControl.TabPages.Contains(tabPageInstaller); }
         }
 
-        // State of the window before the full screen mode
-        private bool _isFullScreen = false;
-        private Rectangle _windowedBounds;
-        private FormWindowState _windowedState;
-
         public Form1()
         {
             InitializeComponent();
@@ -407,55 +402,6 @@ namespace DazUnpacker
         #region Form
 
         
-
-        private void buttonFullScreen_Click(object sender, EventArgs e)
-        {
-            SetFullScreen(!_isFullScreen);
-        }
-
-        // F11 toggles the full screen mode, Esc leaves it
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.F11)
-            {
-                SetFullScreen(!_isFullScreen);
-                e.Handled = true;
-            }
-            else if (e.KeyCode == Keys.Escape && _isFullScreen)
-            {
-                SetFullScreen(false);
-                e.Handled = true;
-            }
-        }
-
-        // The full screen mode: no window border, the window covers the whole screen (with the taskbar)
-        private void SetFullScreen(bool fullScreen)
-        {
-            if (fullScreen == _isFullScreen)
-            {
-                return;
-            }
-            if (fullScreen)
-            {
-                _windowedState = WindowState;
-                if (WindowState == FormWindowState.Maximized)
-                {
-                    WindowState = FormWindowState.Normal;
-                }
-                _windowedBounds = Bounds;
-                FormBorderStyle = FormBorderStyle.None;
-                Bounds = Screen.FromControl(this).Bounds;
-                buttonFullScreen.Text = "Exit full screen";
-            }
-            else
-            {
-                FormBorderStyle = FormBorderStyle.Sizable;
-                Bounds = _windowedBounds;
-                WindowState = _windowedState;
-                buttonFullScreen.Text = "Full screen";
-            }
-            _isFullScreen = fullScreen;
-        }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {

@@ -145,7 +145,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - **Ошибки в рабочих потоках** гасятся: `Globals.ReportError(ex, false)` только пишет в лог. `AccessDenied` помечается в `Library.Skipped`
   и позволяет кнопку «Re-install access denied» (повторно добавляет такие архивы и жмёт Install).
 - **Размер окна:** `Form1` изменяемого размера (`MinimumSize` = размер дизайна), контролы вкладок Installer/Logs расставлены якорями (Anchor) в дизайнере,
-  Catalog растягивается через Dock/TableLayoutPanel. Кнопка `buttonFullScreen` / F11 — режим без рамки на весь экран, Esc — выход (`Form1.SetFullScreen`).
+  Catalog растягивается через Dock/TableLayoutPanel. Разворачивание на весь экран — только системной кнопкой окна (собственного full screen нет, по просьбе пользователя).
 - **Вкладки:** порядок Settings, Installer, Catalog, Logs. Installer и Logs добавляются/убираются в `UpdateTabs` (когда есть хотя бы одна библиотека),
   Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс,
   поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
