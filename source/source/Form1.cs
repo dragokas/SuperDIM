@@ -83,6 +83,10 @@ namespace DazUnpacker
             Log.SetLogLocation(Log.LOG_LOCATION.LOG_LOCATION_FORM | Log.LOG_LOCATION.LOG_LOCATION_FILE);
             Log.DisableCache(true);
             Log.Info("Daz unpacker is started.");
+            if (Config.LoadWarning != null)
+            {
+                Log.Warning(Config.LoadWarning);
+            }
         }
 
         #region Settings

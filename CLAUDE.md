@@ -129,7 +129,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 
 ### Конфигурация
 
-- `config.txt` рядом с exe, Json.NET, `Formatting.Indented`. Читается в `Config.Init` (конструктор формы), пишется в `Form1_FormClosing`.
+- `config.txt` рядом с exe, Json.NET, `Formatting.Indented`. Читается в `Config.Init` (конструктор формы), пишется в `Form1_FormClosing` через `config.txt.tmp` + `File.Replace`.
+  Пустой или повреждённый файл не мешает запуску: копия остаётся в `config.txt.bad`, берутся значения по умолчанию, причина в `Config.LoadWarning` (в лог попадает в `Form1_Load`).
+  Секции `null` заменяются пустыми (`FillMissingSections`), значения вне диапазона (потоки, номер вкладки, дата фильтра) приводятся к допустимым.
 - Пути к `7z.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7z.exe`, `tools\WinRAR\UnRAR.exe`
   (в git каталог называется `WinRar` — регистр не важен на Windows).
 - Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation`, `Documents`, `Readme`, `ReadMe's`,

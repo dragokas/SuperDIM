@@ -71,8 +71,11 @@ namespace DazUnpacker
         public static ConfigStorage Storage = new ConfigStorage();
         public static ConfigData Data = new ConfigData();
 
+        // Set when config.txt was damaged or could not be applied completely; written to the log when the log is ready
+        public static string LoadWarning { get; private set; }
+
         private static Form1 form;
-        private static string configPath = 
+        private static string configPath =
             Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) 
             + "\\config.txt";
         
@@ -85,7 +88,14 @@ namespace DazUnpacker
 
             if (LoadStorage())
             {
-                ApplyStorage();
+                try
+                {
+                    ApplyStorage();
+                }
+                catch (Exception ex)
+                {
+                    LoadWarning = "Some settings of config.txt cannot be applied: " + ex.Message;
+                }
             }
         }
 
@@ -112,13 +122,83 @@ namespace DazUnpacker
             {
                 return false;
             }
-            string str = File.ReadAllText(configPath);
-            var settings = new JsonSerializerSettings
+            try
             {
-                TypeNameHandling = TypeNameHandling.Auto // Interface support
-            };
-            Storage = JsonConvert.DeserializeObject<ConfigStorage>(str, settings);
-            return true;
+                string str = File.ReadAllText(configPath);
+                var settings = new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto // Interface support
+                };
+                ConfigStorage loaded = JsonConvert.DeserializeObject<ConfigStorage>(str, settings);
+                if (loaded == null)
+                {
+                    throw new InvalidDataException("the file is empty");
+                }
+                FillMissingSections(loaded);
+                Storage = loaded;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                BackupBrokenConfig(ex);
+                return false;
+            }
+        }
+
+        // A damaged or hand-edited config may have "null" instead of a section
+        private static void FillMissingSections(ConfigStorage storage)
+        {
+            if (storage.TabSettings == null)
+            {
+                storage.TabSettings = new _TabSettings();
+            }
+            if (storage.TabSettings.BasicLibraries == null)
+            {
+                storage.TabSettings.BasicLibraries = new List<string>();
+            }
+            if (storage.TabInstaller == null)
+            {
+                storage.TabInstaller = new _TabInstaller();
+            }
+            if (storage.TabInstaller.GarbageLibraries == null)
+            {
+                storage.TabInstaller.GarbageLibraries = new List<int>();
+            }
+            if (storage.TabInstaller.Filters == null)
+            {
+                storage.TabInstaller.Filters = new FilterManager();
+            }
+            if (storage.TabInstaller.Filters.FilterList == null)
+            {
+                storage.TabInstaller.Filters.FilterList = new List<IFilter>();
+            }
+            if (storage.TabCatalog == null)
+            {
+                storage.TabCatalog = new _TabCatalog();
+            }
+            if (storage.TabLog == null)
+            {
+                storage.TabLog = new _TabLog();
+            }
+        }
+
+        // The damaged file is copied to config.txt.bad (it is overwritten on exit); the application starts with the defaults
+        private static void BackupBrokenConfig(Exception reason)
+        {
+            LoadWarning = "config.txt cannot be read (" + reason.Message + "), the defaults are used";
+            try
+            {
+                File.Copy(configPath, configPath + ".bad", true);
+            }
+            catch (Exception ex)
+            {
+                LoadWarning += "; the copy config.txt.bad failed: " + ex.Message;
+            }
+        }
+
+        private static decimal ClampToRange(NumericUpDown control, int value)
+        {
+            return Math.Max(control.Minimum, Math.Min(control.Maximum, value));
         }
 
         private static void LoadDefaults()
@@ -165,7 +245,10 @@ namespace DazUnpacker
         private static void ApplyStorage()
         {
             // General
-            form.tabControl.SelectedIndex = Storage.TabNumber;
+            if (Storage.TabNumber >= 0 && Storage.TabNumber < form.tabControl.TabPages.Count)
+            {
+                form.tabControl.SelectedIndex = Storage.TabNumber;
+            }
 
             // Tab Settings
             foreach (string item in Storage.TabSettings.BasicLibraries)
@@ -190,7 +273,7 @@ namespace DazUnpacker
             form.checkBoxCreateRootSubfolder.Checked = Storage.TabInstaller.CreateRootSubfolder;
             form.checkBoxDetectContentTypePerFile.Checked = Storage.TabInstaller.DetectContentTypePerFile;
             form.checkBoxInstallDufOnly.Checked = Storage.TabInstaller.InstallDufOnly;
-            form.numericUpDownThreadsCount.Value = Storage.TabInstaller.ThreadsCount;
+            form.numericUpDownThreadsCount.Value = ClampToRange(form.numericUpDownThreadsCount, Storage.TabInstaller.ThreadsCount);
             LoadFiltersOnForm();
             form.checkBoxOverwrite.Checked = Storage.TabInstaller.OverwriteExisting;
             form.checkBoxHierarhyByRootFolder.Checked = !Storage.TabInstaller.IgnoreRootFolder;
@@ -243,7 +326,24 @@ namespace DazUnpacker
                 Formatting = Formatting.Indented
             };
             string str = JsonConvert.SerializeObject(Storage, settings);
-            File.WriteAllText(configPath, str);
+            try
+            {
+                // write to a temporary file first, so that an interrupted write cannot leave a half-written config.txt
+                string tempPath = configPath + ".tmp";
+                File.WriteAllText(tempPath, str);
+                if (File.Exists(configPath))
+                {
+                    File.Replace(tempPath, configPath, null);
+                }
+                else
+                {
+                    File.Move(tempPath, configPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Globals.ReportError(ex, false, "Save config");
+            }
         }
 
         internal static void LoadFiltersOnForm()
@@ -253,7 +353,12 @@ namespace DazUnpacker
                 if (filter is DateFilter dateFilter)
                 {
                     form.comboBoxDateFilterDirection.Text = dateFilter.Direction.ToString();
-                    form.dateTimePickerFilterCreated.Value = dateFilter.Date;
+                    DateTime date = dateFilter.Date;
+                    if (date < form.dateTimePickerFilterCreated.MinDate || date > form.dateTimePickerFilterCreated.MaxDate)
+                    {
+                        date = DateTime.Now; // a missing or invalid date in the config
+                    }
+                    form.dateTimePickerFilterCreated.Value = date;
                 }
                 else if (filter is ContentFilter contentFilter)
                 {
