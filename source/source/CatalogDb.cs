@@ -13,9 +13,11 @@ namespace DazUnpacker
         FilePath,
         FileName,
         FileType,
+        Modified,       // the date of the file inside the archive, as 7z lists it
         ArchivePath,
         ArchiveName,
-        ArchiveType
+        ArchiveType,
+        ArchiveCreated  // the creation date of the archive file (the bundle) on the disk
     }
 
     // One file inside a bundle (the bundle is an archive file on disk)
@@ -24,22 +26,39 @@ namespace DazUnpacker
         public string FilePath = "";
         public string FileName = "";
         public string FileType = "";
+        public string Modified = "";
         public string ArchivePath = "";
         public string ArchiveName = "";
         public string ArchiveType = "";
+        public string ArchiveCreated = "";
 
-        // Builds the row from a path inside the archive (any slashes) and the bundle path
-        public static CatalogRow Create(string pathInArchive, string bundlePath)
+        // Builds the row from a path inside the archive (any slashes), its date, the bundle path and the creation date of the bundle
+        public static CatalogRow Create(string pathInArchive, string modified, string bundlePath, string archiveCreated)
         {
             string filePath = NormalizePath(pathInArchive);
             CatalogRow row = new CatalogRow();
             row.FilePath = filePath;
             row.FileName = filePath.Substring(filePath.LastIndexOf('/') + 1);
             row.FileType = GetExtension(row.FileName);
+            row.Modified = modified;
             row.ArchivePath = bundlePath;
             row.ArchiveName = Path.GetFileName(bundlePath);
             row.ArchiveType = GetExtension(row.ArchiveName);
+            row.ArchiveCreated = archiveCreated;
             return row;
+        }
+
+        // The date format of the catalog (the same as the date which is taken from 7z), sorts correctly as a text
+        public static string FormatDate(DateTime date)
+        {
+            return date.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        // Creation date of the bundle file; empty if the file does not exist
+        public static string GetBundleCreated(string bundlePath)
+        {
+            FileInfo info = new FileInfo(bundlePath);
+            return info.Exists ? FormatDate(info.CreationTime) : "";
         }
 
         // Forward slashes and the leading slash, e.g. "/Poses/Name/file.duf"
@@ -71,9 +90,11 @@ namespace DazUnpacker
                 case CatalogColumn.FilePath: return FilePath;
                 case CatalogColumn.FileName: return FileName;
                 case CatalogColumn.FileType: return FileType;
+                case CatalogColumn.Modified: return Modified;
                 case CatalogColumn.ArchivePath: return ArchivePath;
                 case CatalogColumn.ArchiveName: return ArchiveName;
-                default: return ArchiveType;
+                case CatalogColumn.ArchiveType: return ArchiveType;
+                default: return ArchiveCreated;
             }
         }
     }
@@ -113,7 +134,8 @@ namespace DazUnpacker
 
     public static class CatalogDb
     {
-        private const string SelectColumns = "FilePath, FileName, FileType, ArchivePath, ArchiveName, ArchiveType";
+        // The order is the order of CatalogColumn (the grid shows the columns in this order) and of ReadRow
+        private const string SelectColumns = "FilePath, FileName, FileType, Modified, ArchivePath, ArchiveName, ArchiveType, ArchiveCreated";
 
         private static readonly object writeLock = new object();
         private static string connectionString = "";
@@ -143,11 +165,14 @@ namespace DazUnpacker
                         "FilePath TEXT NOT NULL, " +
                         "FileName TEXT NOT NULL, " +
                         "FileType TEXT NOT NULL, " +
+                        "Modified TEXT NOT NULL, " +
                         "ArchivePath TEXT NOT NULL, " +
                         "ArchiveName TEXT NOT NULL, " +
                         "ArchiveType TEXT NOT NULL, " +
+                        "ArchiveCreated TEXT NOT NULL, " +
                         "PathKey TEXT NOT NULL, " + // lower-cased FilePath, for "Ignore case" search
                         "NameKey TEXT NOT NULL)"); // lower-cased FileName, for the lookup by name
+                    CheckFilesTableFormat(con);
                     Execute(con, "CREATE INDEX IF NOT EXISTS ix_files_namekey ON Files(NameKey)");
                     Execute(con, "CREATE INDEX IF NOT EXISTS ix_files_archive ON Files(ArchivePath)");
                     // bundles whose file list is in the catalog; used to skip unchanged archives on the next scan
@@ -156,6 +181,18 @@ namespace DazUnpacker
                         "ArchivePath TEXT PRIMARY KEY, " +
                         "Size INTEGER NOT NULL, " +
                         "ModifiedTicks INTEGER NOT NULL)");
+                }
+            }
+        }
+
+        // A database of an older version has no Modified and ArchiveCreated columns: there is no migration, the user deletes the file
+        private static void CheckFilesTableFormat(SQLiteConnection con)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand("SELECT COUNT(*) FROM pragma_table_info('Files') WHERE name IN ('Modified', 'ArchiveCreated')", con))
+            {
+                if (Convert.ToInt32(cmd.ExecuteScalar()) != 2)
+                {
+                    throw new InvalidOperationException("The catalog database has an old format (no Modified and ArchiveCreated columns). Close the application and delete the file " + DbPath);
                 }
             }
         }
@@ -293,14 +330,16 @@ namespace DazUnpacker
         private static SQLiteCommand CreateInsertCommand(SQLiteConnection con)
         {
             SQLiteCommand cmd = new SQLiteCommand(
-                "INSERT INTO Files(FilePath, FileName, FileType, ArchivePath, ArchiveName, ArchiveType, PathKey, NameKey) " +
-                "VALUES(@fp, @fn, @ft, @ap, @an, @at, @pk, @nk)", con);
+                "INSERT INTO Files(FilePath, FileName, FileType, Modified, ArchivePath, ArchiveName, ArchiveType, ArchiveCreated, PathKey, NameKey) " +
+                "VALUES(@fp, @fn, @ft, @mo, @ap, @an, @at, @ac, @pk, @nk)", con);
             cmd.Parameters.Add(new SQLiteParameter("@fp"));
             cmd.Parameters.Add(new SQLiteParameter("@fn"));
             cmd.Parameters.Add(new SQLiteParameter("@ft"));
+            cmd.Parameters.Add(new SQLiteParameter("@mo"));
             cmd.Parameters.Add(new SQLiteParameter("@ap"));
             cmd.Parameters.Add(new SQLiteParameter("@an"));
             cmd.Parameters.Add(new SQLiteParameter("@at"));
+            cmd.Parameters.Add(new SQLiteParameter("@ac"));
             cmd.Parameters.Add(new SQLiteParameter("@pk"));
             cmd.Parameters.Add(new SQLiteParameter("@nk"));
             return cmd;
@@ -311,9 +350,11 @@ namespace DazUnpacker
             insert.Parameters["@fp"].Value = row.FilePath;
             insert.Parameters["@fn"].Value = row.FileName;
             insert.Parameters["@ft"].Value = row.FileType;
+            insert.Parameters["@mo"].Value = row.Modified;
             insert.Parameters["@ap"].Value = row.ArchivePath;
             insert.Parameters["@an"].Value = row.ArchiveName;
             insert.Parameters["@at"].Value = row.ArchiveType;
+            insert.Parameters["@ac"].Value = row.ArchiveCreated;
             insert.Parameters["@pk"].Value = row.FilePath.ToLowerInvariant();
             insert.Parameters["@nk"].Value = row.FileName.ToLowerInvariant();
             insert.ExecuteNonQuery();
@@ -436,9 +477,11 @@ namespace DazUnpacker
             row.FilePath = reader.GetString(offset);
             row.FileName = reader.GetString(offset + 1);
             row.FileType = reader.GetString(offset + 2);
-            row.ArchivePath = reader.GetString(offset + 3);
-            row.ArchiveName = reader.GetString(offset + 4);
-            row.ArchiveType = reader.GetString(offset + 5);
+            row.Modified = reader.GetString(offset + 3);
+            row.ArchivePath = reader.GetString(offset + 4);
+            row.ArchiveName = reader.GetString(offset + 5);
+            row.ArchiveType = reader.GetString(offset + 6);
+            row.ArchiveCreated = reader.GetString(offset + 7);
             return row;
         }
 

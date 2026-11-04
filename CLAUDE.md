@@ -93,11 +93,11 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `Statistics.cs` | Счётчики `Total/Done` (Interlocked) и вывод в `labelProgress` через `BeginInvoke` |
 | `Logger.cs` | Статический `Log` (Info/Warning/Error/Trace), вывод в `app.log` и `listBoxLog`; потокобезопасный, `DisableCache(true)` => запись сразу |
 | `Globals.cs` | `AppDir`, `AppName`, `ReportError(ex, interactive, context)` (лог; MessageBox только при `interactive = true`), `FormatException`, `StringContains` (ignore-case), `OpenTextFile`, `ClearTempFolder` (не вызывается) |
-| `ArchiveLister.cs` | Чтение содержимого архива через `7z.exe`: `ListFiles` (`7z l -slt -ba`, только оглавление, без распаковки), `ExtractNestedArchives` (`7z x -r -i!*.zip -i!*.rar -i!*.7z` — только вложенные архивы), `FindArchives` |
-| `CatalogDb.cs` | SQLite-слой каталога (`catalog.db`): таблица `Files`, `ReplaceBundle` (атомарная замена строк бандла), `QueryIds` (фильтр/сортировка), `GetRows`, `FindByTails`, `ImportRows`, `Clear`. Класс `CatalogRow` (6 полей), `CatalogColumn` |
+| `ArchiveLister.cs` | Чтение содержимого архива через `7z.exe`: `ListFiles` (`7z l -slt -ba`, только оглавление, без распаковки; возвращает `ArchiveEntry`: путь и `Modified` из строки `Modified = …` ответа 7z, обрезанный до секунды `yyyy-MM-dd HH:mm:ss`), `ExtractNestedArchives` (`7z x -r -i!*.zip -i!*.rar -i!*.7z` — только вложенные архивы), `FindArchives` |
+| `CatalogDb.cs` | SQLite-слой каталога (`catalog.db`): таблица `Files`, `ReplaceBundle` (атомарная замена строк бандла), `QueryIds` (фильтр/сортировка), `GetRows`, `FindByTails`, `ImportRows`, `Clear`. Класс `CatalogRow` (8 полей), `CatalogColumn` (порядок: `FilePath, FileName, FileType, Modified, ArchivePath, ArchiveName, ArchiveType, ArchiveCreated` — он же порядок колонок грида, `SelectColumns` и `ReadRow`). Миграции нет: БД без колонок `Modified`/`ArchiveCreated` (`CheckFilesTableFormat`) не открывается, нужно удалить `catalog.db` |
 | `CatalogScanner.cs` | `CatalogScanner` — Scan папки (потоки `Parallel.ForEach`, вложенные архивы рекурсивно); `CatalogCollector` — сбор листинга во время установки (хук в `Archive.ExtractSmart`) |
 | `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
-| `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180) |
+| `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180); при импорте обязательны `FilePath` и `ArchivePath`, `Modified` и `ArchiveCreated` берутся, если есть (у старых файлов без них даты пустые) |
 | `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата) |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
 | `Geometry.cs` | Поиск контрола под курсором (для контекстного меню Copy) |
@@ -116,6 +116,10 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - Листинг бандла не распаковывает его целиком: `7z l -slt -ba`; на диск (в `<temp>\Catalog\<guid>`) попадают только вложенные архивы и только если они есть;
   папка удаляется сразу после листинга. Temp — «Specific folder» из groupBox6 (если режим включён и папка существует), иначе `Config.Data.TempFolder`.
   `7z.exe` читает rar только в полной версии 7-Zip (`7za.exe` формата RAR не содержит).
+- **Даты в каталоге.** `Modified` — дата файла внутри архива, ровно как её печатает 7z (`Modified = …`), до секунды; у вложенных архивов — из листинга вложенного. Zip хранит локальное время,
+  а rar/7z — UTC, и 7z переводит его в локальное по **текущему** смещению часового пояса (Win32 `FileTimeToLocalFileTime`): при скане зимой летние даты rar/7z на час раньше «истинных», и наоборот.
+  Так оставлено сознательно (берём ответ 7z как есть). `ArchiveCreated` — `File.GetCreationTime` файла-бандла (локальное, тот же формат), одинаковая у всех строк бандла, включая вложенные уровни.
+  Она записывается при (пере)сканировании бандла; штамп бандла (размер + время записи) её не включает, поэтому у неизменённого бандла старое значение остаётся до пересканирования.
 - **Повторный Scan пропускает неизменённые бандлы:** таблица `Bundles` (`ArchivePath`, `Size`, `ModifiedTicks` = `LastWriteTimeUtc`) пишется в той же транзакции, что и строки
   (`ReplaceBundle(path, rows, BundleStamp)`; штамп снимается **до** чтения архива). Совпали размер и время — бандл не открывается, статус показывает число пропущенных.
   Штамп пишет и хук установщика. Импорт CSV штамп бандла удаляет (бандл пересканируется), Clear очищает обе таблицы. Принудительного «Rescan all» нет (по решению пользователя).

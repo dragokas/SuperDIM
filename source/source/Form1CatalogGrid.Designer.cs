@@ -22,9 +22,11 @@
             this.columnFilePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnFileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnFileType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.columnModified = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnArchivePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnArchiveName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.columnArchiveType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.columnArchiveCreated = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.contextMenuGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemCopy = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
@@ -43,9 +45,11 @@
             this.columnFilePath,
             this.columnFileName,
             this.columnFileType,
+            this.columnModified,
             this.columnArchivePath,
             this.columnArchiveName,
-            this.columnArchiveType});
+            this.columnArchiveType,
+            this.columnArchiveCreated});
             this.dataGridView.ContextMenuStrip = this.contextMenuGrid;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView.Location = new System.Drawing.Point(0, 0);
@@ -84,6 +88,14 @@
             this.columnFileType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             this.columnFileType.Width = 80;
             //
+            // columnModified
+            //
+            this.columnModified.HeaderText = "Modified";
+            this.columnModified.Name = "columnModified";
+            this.columnModified.ReadOnly = true;
+            this.columnModified.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            this.columnModified.Width = 130;
+            //
             // columnArchivePath
             //
             this.columnArchivePath.HeaderText = "ArchivePath";
@@ -107,6 +119,14 @@
             this.columnArchiveType.ReadOnly = true;
             this.columnArchiveType.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
             this.columnArchiveType.Width = 100;
+            //
+            // columnArchiveCreated
+            //
+            this.columnArchiveCreated.HeaderText = "ArchiveCreated";
+            this.columnArchiveCreated.Name = "columnArchiveCreated";
+            this.columnArchiveCreated.ReadOnly = true;
+            this.columnArchiveCreated.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic;
+            this.columnArchiveCreated.Width = 130;
             //
             // contextMenuGrid
             //
@@ -141,9 +161,11 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn columnFilePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnFileName;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnFileType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnModified;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnArchivePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnArchiveName;
         private System.Windows.Forms.DataGridViewTextBoxColumn columnArchiveType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn columnArchiveCreated;
         private System.Windows.Forms.ContextMenuStrip contextMenuGrid;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCopy;
     }

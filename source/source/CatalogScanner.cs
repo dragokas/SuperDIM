@@ -12,29 +12,31 @@ namespace DazUnpacker
         internal readonly string BundlePath;
         internal readonly List<CatalogRow> Rows = new List<CatalogRow>();
         private readonly BundleStamp stamp; // the state of the file before it is read
+        private readonly string bundleCreated; // the creation date of the bundle file, the same for all rows
 
         internal CatalogCollector(string bundlePath)
         {
             BundlePath = bundlePath;
             stamp = BundleStamp.FromFile(bundlePath);
+            bundleCreated = CatalogRow.GetBundleCreated(bundlePath);
         }
 
         // Lists the archive (outer or nested) right before it is unpacked.
         // Nested archives are skipped, because the installer unpacks and lists them separately.
         internal void Add(string archivePath)
         {
-            List<string> entries = new List<string>();
+            List<ArchiveEntry> entries = new List<ArchiveEntry>();
             if (!ArchiveLister.ListFiles(archivePath, entries))
             {
                 return;
             }
             lock (Rows)
             {
-                foreach (string entry in entries)
+                foreach (ArchiveEntry entry in entries)
                 {
-                    if (!Archive.IsArchiveExtension(entry))
+                    if (!Archive.IsArchiveExtension(entry.Path))
                     {
-                        Rows.Add(CatalogRow.Create(entry, BundlePath));
+                        Rows.Add(CatalogRow.Create(entry.Path, entry.Modified, BundlePath, bundleCreated));
                     }
                 }
             }
@@ -139,52 +141,54 @@ namespace DazUnpacker
         private List<CatalogRow> ScanBundle(string bundlePath, CancellationToken token)
         {
             List<CatalogRow> rows = new List<CatalogRow>();
-            if (!ScanArchive(bundlePath, bundlePath, rows, 0, token))
+            string bundleCreated = CatalogRow.GetBundleCreated(bundlePath);
+            if (!ScanArchive(bundlePath, bundlePath, bundleCreated, rows, 0, token))
             {
                 return null;
             }
             return rows;
         }
 
-        // Lists the archive without unpacking; only nested archives (if any) are unpacked and scanned recursively
-        private bool ScanArchive(string archivePath, string bundlePath, List<CatalogRow> rows, int depth, CancellationToken token)
+        // Lists the archive without unpacking; only nested archives (if any) are unpacked and scanned recursively.
+        // bundleCreated is the creation date of the bundle file: it is the same for the rows of all nested levels.
+        private bool ScanArchive(string archivePath, string bundlePath, string bundleCreated, List<CatalogRow> rows, int depth, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
 
-            List<string> entries = new List<string>();
+            List<ArchiveEntry> entries = new List<ArchiveEntry>();
             if (!ArchiveLister.ListFiles(archivePath, entries))
             {
                 return false;
             }
 
-            List<string> nestedEntries = new List<string>();
-            foreach (string entry in entries)
+            List<ArchiveEntry> nestedEntries = new List<ArchiveEntry>();
+            foreach (ArchiveEntry entry in entries)
             {
-                if (Archive.IsArchiveExtension(entry))
+                if (Archive.IsArchiveExtension(entry.Path))
                 {
                     nestedEntries.Add(entry);
                 }
                 else
                 {
-                    rows.Add(CatalogRow.Create(entry, bundlePath));
+                    rows.Add(CatalogRow.Create(entry.Path, entry.Modified, bundlePath, bundleCreated));
                 }
             }
             if (nestedEntries.Count == 0)
             {
                 return true; // a leaf archive
             }
-            if (depth >= MaxNestingDepth || !ScanNestedArchives(archivePath, bundlePath, rows, depth, token))
+            if (depth >= MaxNestingDepth || !ScanNestedArchives(archivePath, bundlePath, bundleCreated, rows, depth, token))
             {
                 // Nested archives cannot be opened: keep them as ordinary files
-                foreach (string entry in nestedEntries)
+                foreach (ArchiveEntry entry in nestedEntries)
                 {
-                    rows.Add(CatalogRow.Create(entry, bundlePath));
+                    rows.Add(CatalogRow.Create(entry.Path, entry.Modified, bundlePath, bundleCreated));
                 }
             }
             return true;
         }
 
-        private bool ScanNestedArchives(string archivePath, string bundlePath, List<CatalogRow> rows, int depth, CancellationToken token)
+        private bool ScanNestedArchives(string archivePath, string bundlePath, string bundleCreated, List<CatalogRow> rows, int depth, CancellationToken token)
         {
             string dir = Path.Combine(workRoot, Guid.NewGuid().ToString("N"));
             try
@@ -202,14 +206,14 @@ namespace DazUnpacker
                 foreach (string nestedFile in nestedFiles)
                 {
                     List<CatalogRow> nestedRows = new List<CatalogRow>();
-                    if (ScanArchive(nestedFile, bundlePath, nestedRows, depth + 1, token))
+                    if (ScanArchive(nestedFile, bundlePath, bundleCreated, nestedRows, depth + 1, token))
                     {
                         rows.AddRange(nestedRows);
                     }
                     else
                     {
-                        // keep the unreadable archive itself as a file
-                        rows.Add(CatalogRow.Create(nestedFile.Substring(dir.Length), bundlePath));
+                        // keep the unreadable archive itself as a file; 7z gave the extracted file the date of the entry
+                        rows.Add(CatalogRow.Create(nestedFile.Substring(dir.Length), CatalogRow.FormatDate(File.GetLastWriteTime(nestedFile)), bundlePath, bundleCreated));
                     }
                     FileSys.FileDelete(nestedFile); // free the disk space as early as possible
                 }

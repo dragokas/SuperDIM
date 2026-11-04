@@ -9,9 +9,10 @@ namespace DazUnpacker
     // Reads and writes the catalog as a CSV file (UTF-8 with BOM, RFC 4180 quoting)
     internal static class CsvHelper
     {
+        // The order of CatalogColumn
         private static readonly string[] Header =
         {
-            "FilePath", "FileName", "FileType", "ArchivePath", "ArchiveName", "ArchiveType"
+            "FilePath", "FileName", "FileType", "Modified", "ArchivePath", "ArchiveName", "ArchiveType", "ArchiveCreated"
         };
 
         internal static void Export(string path, IEnumerable<CatalogRow> rows, Action<long> rowsWritten, CancellationToken token)
@@ -26,7 +27,7 @@ namespace DazUnpacker
 
                     WriteRecord(writer, new string[]
                     {
-                        row.FilePath, row.FileName, row.FileType, row.ArchivePath, row.ArchiveName, row.ArchiveType
+                        row.FilePath, row.FileName, row.FileType, row.Modified, row.ArchivePath, row.ArchiveName, row.ArchiveType, row.ArchiveCreated
                     });
                     count++;
                     if ((count & 0x3FFF) == 0)
@@ -38,7 +39,8 @@ namespace DazUnpacker
             rowsWritten(count);
         }
 
-        // Rows of the file. Only FilePath and ArchivePath are taken, the other columns are derived from them.
+        // Rows of the file. FilePath and ArchivePath are required, the names and types are derived from them;
+        // Modified and ArchiveCreated are taken if the file has these columns (a file of an older version has not: the dates are empty).
         // percent(0..100) reports the progress by the position in the file.
         internal static IEnumerable<CatalogRow> Import(string path, Action<int> percent)
         {
@@ -56,6 +58,8 @@ namespace DazUnpacker
                 {
                     throw new InvalidDataException("The CSV file must have the columns FilePath and ArchivePath.");
                 }
+                int modifiedIndex = header.FindIndex(h => h.Trim().Equals("Modified", StringComparison.OrdinalIgnoreCase));
+                int createdIndex = header.FindIndex(h => h.Trim().Equals("ArchiveCreated", StringComparison.OrdinalIgnoreCase));
 
                 long lines = 0;
                 List<string> record;
@@ -76,7 +80,9 @@ namespace DazUnpacker
                     {
                         percent((int)(stream.Position * 100 / stream.Length));
                     }
-                    yield return CatalogRow.Create(filePath, archivePath);
+                    string modified = modifiedIndex >= 0 && modifiedIndex < record.Count ? record[modifiedIndex].Trim() : "";
+                    string created = createdIndex >= 0 && createdIndex < record.Count ? record[createdIndex].Trim() : "";
+                    yield return CatalogRow.Create(filePath, modified, archivePath, created);
                 }
                 percent(100);
             }
