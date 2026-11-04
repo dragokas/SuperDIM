@@ -344,7 +344,7 @@ namespace DazUnpacker
                 {
                     for (int k = 0; k < i; k++)
                     {
-                        if (topDirs[i].StartsWith(topDirs[k]))
+                        if (FileSys.IsSubPath(topDirs[k], topDirs[i]))
                         {
                             topDirs.RemoveAt(i);
                             break;

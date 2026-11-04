@@ -22,6 +22,17 @@ namespace DazUnpacker
             return string.Empty;
         }
 
+        // True if child is inside the folder parent (and is not the parent itself). A plain string prefix is not enough:
+        // "...\Short Curly" starts with "...\Short" but is not inside it, so the parent must be followed by a separator.
+        public static bool IsSubPath(string parent, string child)
+        {
+            parent = parent.TrimEnd('\\');
+            return parent.Length != 0
+                && child.Length > parent.Length
+                && child.StartsWith(parent, StringComparison.OrdinalIgnoreCase)
+                && child[parent.Length] == '\\';
+        }
+
         public static string Unquote(string path)
         {
             if (path.Length >= 2)

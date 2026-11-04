@@ -282,7 +282,7 @@ namespace DazUnpacker
         {
             foreach (string topDir in topDirs)
             {
-                if (topDir.StartsWith(dir, StringComparison.CurrentCultureIgnoreCase))
+                if (topDir.Equals(dir, StringComparison.OrdinalIgnoreCase) || FileSys.IsSubPath(dir, topDir))
                 {
                     return true;
                 }
