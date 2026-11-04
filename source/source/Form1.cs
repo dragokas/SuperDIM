@@ -361,7 +361,7 @@ namespace DazUnpacker
             List<string> filteredList = new List<string>();
             foreach (string file in list)
             {
-                if (Config.Storage.TabInstaller.Filters.IsPassed(new FileInfo(file).CreationTime))
+                if (Config.Storage.TabInstaller.Filters.IsArchivePassed(file))
                 {
                     filteredList.Add(file);
                 }

@@ -60,8 +60,7 @@ namespace DazUnpacker
             {
                 return;
             }
-            FileInfo fi = new FileInfo(file);
-            if (Config.Storage.TabInstaller.Filters.IsPassed(fi.CreationTime))
+            if (Config.Storage.TabInstaller.Filters.IsArchivePassed(file))
             {
                 Library.Content.Add(Path.GetFileName(file), Path.GetDirectoryName(file), "", true);
             }

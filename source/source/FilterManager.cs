@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -119,6 +120,16 @@ namespace DazUnpacker.source
         internal bool HasFilters()
         {
             return FilterList.Count > 0;
+        }
+
+        // The file is touched only when the date filter is enabled (the creation time is a request per file, slow on network drives)
+        internal bool IsArchivePassed(string archivePath)
+        {
+            if (!IsDateFilterEnabled)
+            {
+                return true;
+            }
+            return IsPassed(new FileInfo(archivePath).CreationTime);
         }
 
         internal bool IsPassed(DateTime dateCreated)
