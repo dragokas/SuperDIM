@@ -19,8 +19,11 @@ Windows-приложение (WinForms, .NET Framework 4.8, C#) для масс�
 ```
 
 - Результат: `source/bin/Debug/SuperDIM.exe`. Папка `tools/` копируется в выход автоматически (`<Content Include=".\tools\**">`).
-- NuGet: `EWSoftware.ListControls` (кастомный список-радиокнопки `radioButtonInstallLibs`), `Newtonsoft.Json` (конфиг). Пакеты лежат в `source/packages/`.
-- Тестов в проекте нет. `source/_publish.bat` собирает Release и пакует zip (без `config.txt` и `app.log`).
+- NuGet: `EWSoftware.ListControls` (кастомный список-радиокнопки `radioButtonInstallLibs`), `Newtonsoft.Json` (конфиг),
+  `System.Data.SQLite.Core` (БД каталога; нативные `x86\`/`x64\SQLite.Interop.dll` копирует `.targets` пакета `Stub.System.Data.SQLite.Core.NetFramework`).
+  Пакеты лежат в `source/packages/`. На чистом клоне (нет `source/packages/`) первую сборку делай с `-p:RestorePackagesConfig=true`
+  (иначе `-restore` не восстанавливает `packages.config`) и затем повтори сборку обычной командой.
+- Тестов в проекте нет. `source/_publish.bat` собирает Release и пакует zip (без `config.txt`, `catalog.db*` и `app.log`).
 - Релизная сборка блокируется запущенным Release-процессом пользователя — всегда собирай Debug (см. глобальные правила).
 
 ## Структура репозитория
@@ -35,11 +38,11 @@ source/
   dci.ico, _publish.bat, packages.config
 ```
 
-Артефакты рядом с exe при работе: `config.txt` (настройки, JSON), `app.log`.
+Артефакты рядом с exe при работе: `config.txt` (настройки, JSON), `app.log`, `catalog.db` (SQLite, + `-wal`/`-shm`).
 
 ## Архитектура
 
-Один главный `Form1` (partial: `Form1.cs` + `Form1.Designer.cs`, 4 вкладки) и набор **статических классов-фасадов**,
+Один главный `Form1` (partial: `Form1.cs` + `Form1.Designer.cs`, вкладки Settings, Installer, Catalog, Logs; Sort удалена) и набор **статических классов-фасадов**,
 каждый из которых получает ссылку на форму через `Init(Form1)` и работает с её контролами напрямую.
 Слоёв «модель / представление» нет: состояние живёт в контролах формы и в `Config.Storage`.
 
@@ -82,10 +85,34 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `Statistics.cs` | Счётчики `Total/Done` (Interlocked) и вывод в `labelProgress` через `BeginInvoke` |
 | `Logger.cs` | Статический `Log` (Info/Warning/Error/Trace), вывод в `app.log` и `listBoxLog`; потокобезопасный, `DisableCache(true)` => запись сразу |
 | `Globals.cs` | `AppDir`, `AppName`, `ReportError` (лог + MessageBox), `StringContains` (ignore-case), `OpenTextFile` |
+| `ArchiveLister.cs` | Чтение содержимого архива через `7z.exe`: `ListFiles` (`7z l -slt -ba`, только оглавление, без распаковки), `ExtractNestedArchives` (`7z x -r -i!*.zip -i!*.rar -i!*.7z` — только вложенные архивы), `FindArchives` |
+| `CatalogDb.cs` | SQLite-слой каталога (`catalog.db`): таблица `Files`, `ReplaceBundle` (атомарная замена строк бандла), `QueryIds` (фильтр/сортировка), `GetRows`, `FindByTails`, `ImportRows`, `Clear`. Класс `CatalogRow` (6 полей), `CatalogColumn` |
+| `CatalogScanner.cs` | `CatalogScanner` — Scan папки (потоки `Parallel.ForEach`, вложенные архивы рекурсивно); `CatalogCollector` — сбор листинга во время установки (хук в `Archive.ExtractSmart`) |
+| `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
+| `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180) |
+| `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата) |
 | `Exclusion.cs` | Фасад над `checkedListBoxSubfolderBlock` (блоклист подпапок — относится к удалённой вкладке Sort) |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
 | `Geometry.cs` | Поиск контрола под курсором (для контекстного меню Copy) |
 | `ListViewColumnSorter.cs` | `IComparer` для сортировки `listViewSkippedContent` (глобальный класс без namespace) |
+
+### Каталог файлов в архивах (вкладка Catalog)
+
+- **Бандл** — архив на диске (его путь `ArchivePath` хранится в БД и именно он добавляется в список установки). Внутри могут лежать другие архивы
+  (любой глубины, `MaxNestingDepth = 8`). В БД попадают файлы всех уровней; вложенные архивы-контейнеры как строки не пишутся.
+- `FilePath` — путь внутри (листового) архива **как есть**, с `/` и ведущим `/` (например, `/Content/data/Daz 3D/...`, `/Pinme-for-.../Studio/My Library/Presets/Poses/...`).
+  Корень библиотеки DAZ не вычисляется. Массовый поиск (Search & Install) — по **хвосту** пути; фильтр на вкладке — по **вхождению**.
+- **Ignore case** (чекбокс, по умолчанию выкл): выкл — всё регистрозависимо; вкл — полностью регистронезависимо, включая кириллицу.
+  Для этого в таблице есть технические колонки `PathKey`/`NameKey` (нижний регистр, `ToLowerInvariant`) — в UI и CSV не показываются, при импорте CSV пересчитываются.
+- Листинг бандла не распаковывает его целиком: `7z l -slt -ba`; на диск (в `<temp>\Catalog\<guid>`) попадают только вложенные архивы и только если они есть;
+  папка удаляется сразу после листинга. Temp — «Specific folder» из groupBox6, иначе `Config.Data.TempFolder`.
+  `7z.exe` читает rar только в полной версии 7-Zip (`7za.exe` формата RAR не содержит).
+- Хук установщика: `Archive.ExtractSmart(..., CatalogCollector)` листит внешний и каждый вложенный архив **перед** распаковкой (вложенный затем удаляется);
+  `Unpacker.UnpackAll` пишет результат в БД, ошибки каталога установку не ломают. Так список файлов полный и в режиме Partial (где `data`/`Runtime` не распаковываются).
+- БД: один писатель (общий `lock`), WAL; чтение — отдельными соединениями. Грид виртуальный: `DbRowSource` держит `long[] ids` (результат фильтра/сортировки)
+  и подгружает строки страницами по Id. Фильтр запускается через 1 с после ввода (`Timer`), устаревшие запросы отбрасываются по номеру.
+- Search & Install: `Form1.ReplaceInstallList` (очистка списка установки + `AddFile` только для существующих на диске бандлов + переход на вкладку Installer).
+  Если на диске нет ни одного бандла — список установки не трогается.
 
 ### Конфигурация
 
@@ -116,8 +143,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   и собирает общий список `dufRootInfo`/`rootDirs`. Код ошибки/exit code внешних утилит не проверяется (`ExtractSingle*` возвращает true, если процесс стартовал).
 - **Ошибки в рабочих потоках** гасятся: `Globals.ReportError(ex, false)` только пишет в лог. `AccessDenied` помечается в `Library.Skipped`
   и позволяет кнопку «Re-install access denied» (повторно добавляет такие архивы и жмёт Install).
-- **Номера вкладок:** `tabControl.SelectedIndex = 2` в `buttonReInstallAccessDenied_Click` и `Config.TabNumber` зависят от порядка/удаления вкладок
-  (Sort удаляется, Installer/Logs добавляются динамически в `UpdateTabs`, когда есть хотя бы одна библиотека).
+- **Вкладки:** порядок Settings, Installer, Catalog, Logs. Installer и Logs добавляются/убираются в `UpdateTabs` (когда есть хотя бы одна библиотека),
+  Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс,
+  поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
 - **Локализация:** UI на английском, русский вариант не реализован. Комментарии в коде — английские.
 - **Кодировка исходников:** файлы в UTF-8 с BOM, CRLF (перед правкой полагаться на хуки File Guard, см. глобальные правила).
 - Несоответствие в зависимостях: `packages.config` в `source/` ссылается только на `EWSoftware.ListControls`,
@@ -128,5 +156,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - Общие правила стиля/git/сборки берутся из глобального `~/.claude/CLAUDE.md` (фигурные скобки везде, комментарии на английском,
   один оператор на строку, коммит локально после каждой правки, push только по явной просьбе).
 - Новый `.cs` файл нужно вручную добавить в `<Compile Include=...>` в `source/DazUnpacker.csproj`.
+- Проверка UI без ручного запуска: копию `bin\Debug` запускать из scratchpad (чужие/пользовательские процессы SuperDIM не трогать — завершать только по своему PID),
+  управлять через UI Automation (элементы ищутся по `Name`, перед кликом окно нужно активировать, `Microsoft.VisualBasic.Interaction.AppActivate`).
 - Если логика новой функции > ~500 строк — выносить в отдельную форму/класс с именем, начинающимся на `Form1…` (правило из глобальных инструкций).
 - Прежде чем добавлять код, проверяй существующие хелперы: `FileSys`, `Globals`, `Library.*`, `FilterManager`.

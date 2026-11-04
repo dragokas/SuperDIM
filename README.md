@@ -18,6 +18,11 @@ It provides the advanced fetures to install content archives of any type in conv
  - Filter by date
    - options: before, after, exact - e.g. only newest content will be installed
  - Filter by Genesis version and gender
+ - Catalog of archive contents
+   - "Catalog" tab scans a folder with archives (multithreaded, nested archives included) and keeps the list of files inside them in a local SQLite database (without unpacking the archives fully)
+   - Archives installed on the "Installer" tab are added to the catalog automatically
+   - Search by part of the path (optionally ignoring case), sorting by any column, export/import to CSV
+   - "Search & Install by file paths": paste relative file paths, and the archives containing them are put to the install list
 
 ## Quick start
 

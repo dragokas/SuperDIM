@@ -27,7 +27,7 @@ del "app.log" 2>NUL
 
 :: Prepare release archive
 if exist "%exename%.zip" del "%exename%.zip"
-"%compressor%" a -tzip -mx=9 -r -x!config.txt "%exename%.zip" .\*
+"%compressor%" a -tzip -mx=9 -r -x!config.txt -x!catalog.db* "%exename%.zip" .\*
 move "%exename%.zip" "%~dp0"
 
 pause
