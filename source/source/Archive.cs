@@ -550,10 +550,11 @@ namespace DazUnpacker
                                 continue;
                             }
 
-                            rootDir = FindRootDir(tempDir);
-                            if (!String.IsNullOrEmpty(rootDir))
+                            // the root of this nested archive; it must not change while its top folders are processed
+                            string archiveRoot = FindRootDir(tempDir);
+                            if (!String.IsNullOrEmpty(archiveRoot))
                             {
-                                rootDirs.Add(rootDir);
+                                rootDirs.Add(archiveRoot);
                             }
 
                             List<string> topDirs;
@@ -564,7 +565,8 @@ namespace DazUnpacker
                                     GenesisVersion genesisVersion = GenesisVersion.Unknown;
                                     GenesisGenders gender = GenesisGenders.Unknown;
 
-                                    string relativeTopDir = topDir.Substring(rootDir.Length);
+                                    // the path below the root of the nested archive (the whole path if the folder is not inside the root)
+                                    string relativeTopDir = FileSys.IsSubPath(archiveRoot, topDir) ? topDir.Substring(archiveRoot.Length) : topDir;
 
                                     Unpacker.GetGenesisVersionsByName(relativeTopDir, out genesisVersion, out gender);
 
@@ -600,10 +602,10 @@ namespace DazUnpacker
                                         });
 
                                         //ensure we didn't miss root dir
-                                        rootDir = FindRootDirFromTopDir(topDir, tempDir);
-                                        if (!String.IsNullOrEmpty(rootDir))
+                                        string topRootDir = FindRootDirFromTopDir(topDir, tempDir);
+                                        if (!String.IsNullOrEmpty(topRootDir))
                                         {
-                                            rootDirs.Add(rootDir);
+                                            rootDirs.Add(topRootDir);
                                         }
                                     }
                                     else
