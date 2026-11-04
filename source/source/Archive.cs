@@ -137,24 +137,21 @@ namespace DazUnpacker
             {
                 return true;
             }
-            name = name.ToLower();
-            // Sometimes authors confuse names
-            /*
-            if (name.Contains("templ"))
+            if (PoserWord.IsMatch(name))
             {
                 return true;
             }
-            */
-            if (name.Contains("poser"))
-            {
-                return true;
-            }
-            if (name.Contains("uvm"))
+            // "uvm" is looked for anywhere on purpose: it also skips the nested "..._UVMaps_....zip" archives of the vendors
+            if (name.IndexOf("uvm", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return true;
             }
             return false;
         }
+
+        // "poser" must start a word ("Poser", "for_poser", "POSER", "ForPoser", but not "Composer"): after a non-letter,
+        // or written as "Poser" after a lower-case letter. Only the first alternative ignores the case.
+        private static readonly Regex PoserWord = new Regex(@"(?i:(?<![A-Za-z])poser)|(?<=[a-z])Poser");
 
         internal static bool ExtractSingle(string zipPath, string destinationDir)
         {

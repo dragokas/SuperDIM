@@ -528,6 +528,21 @@ namespace DazUnpacker
             return contentType;
         }
 
+        // True if the token is in the text and starts not inside a word: "and 3" is found in "genesis 8 and 3" but not in "hand 3d"
+        private static bool ContainsAtWordStart(string text, string token)
+        {
+            int index = text.IndexOf(token, StringComparison.Ordinal);
+            while (index >= 0)
+            {
+                if (index == 0 || !Char.IsLetter(text[index - 1]))
+                {
+                    return true;
+                }
+                index = text.IndexOf(token, index + 1, StringComparison.Ordinal);
+            }
+            return false;
+        }
+
         private static bool IsGenesisX(string name, string version, out GenesisGenders gender)
         {
             gender = GenesisGenders.Unknown;
@@ -574,7 +589,7 @@ namespace DazUnpacker
             {
                 return true;
             }
-            if (name.Contains("and " + version))
+            if (ContainsAtWordStart(name, "and " + version))
             {
                 return true;
             }
@@ -586,7 +601,7 @@ namespace DazUnpacker
             {
                 return true;
             }
-            if (name.Contains("and-" + version))
+            if (ContainsAtWordStart(name, "and-" + version))
             {
                 return true;
             }
@@ -598,7 +613,7 @@ namespace DazUnpacker
             {
                 return true;
             }
-            if (name.Contains("and" + version))
+            if (ContainsAtWordStart(name, "and" + version))
             {
                 return true;
             }
