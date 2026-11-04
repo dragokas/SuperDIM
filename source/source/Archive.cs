@@ -500,7 +500,7 @@ namespace DazUnpacker
                                 catalog.Add(file); // the nested archive is deleted right after unpacking
                             }
                             ExtractSingle(file, tempDir, skipObjects);
-                            File.Delete(file);
+                            FileSys.FileDelete(file);
                             nestedDirs.Add(tempDir);
 
                             if (!Directory.Exists(tempDir))

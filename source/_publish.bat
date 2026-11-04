@@ -7,7 +7,7 @@ set prj=DazUnpacker
 set exename=SuperDIM
 set release_dir=%~dp0bin\Release
 
-rd /s /q "%release_dir%"
+if exist "%release_dir%" move "%release_dir%" "%release_dir%.bak"
 
 :: Compile project if needed
 if not exist "%release_dir%\%exename%.exe" (
@@ -17,7 +17,7 @@ if not exist "%release_dir%\%exename%.exe" (
 
 if not exist "%release_dir%\%exename%.exe" (
   echo Failed to build the solution!
-  pause>NUL & exit /b
+  goto finale
 )
 
 cd /d "%release_dir%"
@@ -30,4 +30,7 @@ if exist "%exename%.zip" del "%exename%.zip"
 "%compressor%" a -tzip -mx=9 -r -x!config.txt -x!catalog.db* "%exename%.zip" .\*
 move "%exename%.zip" "%~dp0"
 
+:finale
+rd /s /q "%release_dir%"
+if exist "%release_dir%.bak" move "%release_dir%.bak" "%release_dir%"
 pause
