@@ -5,59 +5,40 @@ SuperDIM changelog
 ----------------------
 
 Added
- - Catalog tab: a database (catalog.db) of the files inside archives.
-   - virtual grid, filter by substring, "Ignore case", "Unique archive" (the first row of every archive)
-   - columns Modified (date of the file inside the archive) and ArchiveCreated (date of the archive file)
+ - Catalog tab - a database of the files inside archives:
+   - Catalog allows instant search missing DAZ files (in case you deleted content library)
+   - Scan the root of your entire DAZ Archives collection on PC to have access for the quick search of nested files in future!
+   - Files list is kept in a local SQLite database (without unpacking the archives)
+   - For every file the catalog shows its path, name, type, the modification date inside the archive (Modified), the archive path, name, type and the creation date of the archive file (ArchiveCreated)
+   - Archives installed on the "Installer" tab are added to the catalog automatically
+   - Search by part of the path (optionally ignoring case), sorting by any column, export/import to CSV
+   - "Search & Install by file paths" button allows you quickly find all archives having the missing files list you provided: paste relative file paths that you see in DAZ Studio "Missing Files" window, and the archives containing them are put to the install list
    - CSV export / import
-   - Scan of a folder, nested archives of any depth are included; a repeated Scan skips unchanged archives
-   - the catalog is filled while installing archives too
-   - Search & Install: find archives by the paths of files and put them to the install list
-   - the database of an old format must be deleted (catalog.db), there is no migration
- - Search & Install result window: "Unique archive" check box.
- - Install list: Status column (Success, FAIL or the reason why the archive was not installed).
- - Install list: Prefix column (folder of the archive relative to the Root folder, shown when
-   "Hierarhy by Root folder" is on); it replaces the unused Subfolder column.
- - Install list: context menu "Copy full path".
- - The main window can be resized.
- - Exit codes of 7z.exe / UnRAR.exe are checked; the details of a failed install are written to the log
-   (state of the source and target folders).
 
-Changed
- - The full 7-Zip (7z.exe + 7z.dll) is used instead of 7za: it reads rar too.
- - Speed is shown with a leading zero (0,4 arc/s).
- - Archives are added to the install list in a batch without redrawing the list (5000 archives: 3.5 s -> 1.9 s).
- - Dropping a folder skips the subfolders which cannot be read.
- - The date filter does not touch the archive file when the filter is disabled.
- - The filters of the form are applied to the archives which are added right now.
- - The hidden "Sort" tab and its unused settings are removed (the old TabSort key of config.txt is ignored).
- - The release zip does not contain catalog.db.
+Install list:
+ - Status column (Success, FAIL or the reason why the archive was not installed).
+ - Prefix column (folder of the archive relative to the Root folder, shown when "Hierarhy by Root folder" is on).
+ - Context menu "Copy full path".
 
-Fixed
- - AccessDenied for an archive whose content has a folder together with its own subfolder
-   (e.g. "Timeless Ballet" and "Timeless Ballet\Expressions"): the second folder was moved
-   together with the first one and was not found. It appeared only on the first install.
- - The Install button stayed disabled after an empty list or an error.
- - The unpacked temp folder of an archive is always deleted.
- - Damaged or empty config.txt: the program starts with defaults (a copy is kept as config.txt.bad),
-   config.txt is written atomically.
- - Copying: read-only files are overwritten, a failed file does not stop the others.
- - Closing the window during installation asks for a confirmation and stops the installation.
- - Unhandled exceptions are written to the log and shown.
- - Volumes 2..N of a multi-volume RAR (name.partN.rar) are not added to the install list.
+Improved reliability of content installation:
+ - Fixed access denied errors (uncheck Read-Only flag, check missing directories etc.)
+ - Checking 7z/Unrar exit codes.
+ - Fixed case when some content could be missing due to specific folder structure
  - UnRAR skips the Partial-mode folders (data, Runtime, Documentation ...) at any depth, like 7z.
- - Nesting of folders is compared as a path, not as a string prefix ("Hair\Short Curly" was lost
-   as "nested" in "Hair\Short").
+ - Nesting of folders is compared as a path, not as a string prefix ("Hair\Short Curly" was lost as "nested" in "Hair\Short").
  - Nested archive with a shorter path of a top folder made the whole archive FAIL (ArgumentOutOfRangeException).
- - Root folder: the relative folder of an archive is computed safely (root of a drive is allowed,
-   an archive outside the Root folder gives a warning in the log).
- - Name heuristics: "Composer" is not blocked as "poser", "Hand 3D" / "Band3" are not taken for a Genesis version.
- - Read-only nested archives are deleted after unpacking and after listing.
- - Position of the Speed labels.
+ - Root folder: the relative folder of an archive is computed safely (root of a drive is allowed, an archive outside the Root folder gives a warning in the log).
+ - Improved heuristic analysis in root folder detector
 
-Internal
- - SDK-style project (DazUnpacker.csproj) and the DazUnpacker.slnx solution; "dotnet build" works;
-   _publish.bat builds with dotnet.
- - CLAUDE.md with the architecture notes.
+Fixed some errors:
+ - The Install button stayed disabled after an empty list or an error.
+ - Volumes 2..N of a multi-volume RAR (name.partN.rar) are not added to the install list.
+ - Fixed builder script
+
+Other:
+ - Main window can be resized.
+ - Improved UI speed.
+ - Code is under control of AI (Claude).
 
 1.2 (2026-06-30)
 ----------------
