@@ -37,6 +37,7 @@ namespace DazUnpacker
         {
             InitializeComponent();
             MinimumSize = Size; // the layout is designed for this size
+            this.Text += $" v{AppVersion.Version}";
             Globals.Init();
             Archive.Init();
             Library.Init(this);
