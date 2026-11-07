@@ -26,8 +26,7 @@ dotnet build DazUnpacker.slnx --configuration Debug '-p:Platform=Any CPU' -nolog
   (`<Content Include="tools\**">`).
 - NuGet (`PackageReference` в csproj, `packages.config` нет): `EWSoftware.ListControls` (кастомный список-радиокнопки `radioButtonInstallLibs`), `Newtonsoft.Json` (конфиг),
   `System.Data.SQLite.Core` (БД каталога; нативные `x86\`/`x64\SQLite.Interop.dll` копирует `.targets` транзитивного пакета `Stub.System.Data.SQLite.Core.NetFramework`).
-  Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Старая папка `source/packages/` не используется (исключена из сборки
-  через `DefaultItemExcludes`, в git не лежит) — её можно удалить.
+  Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Папка `source/packages/` не используется (исключена из сборки через `DefaultItemExcludes`, в git не лежит).
 - Описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) задано в csproj; `AssemblyInfo.cs` нет. Версия, которую видит пользователь, — `AppVersion.Version`
   в `source/source/Version.cs` (добавляется к заголовку окна `Form1`: `… v1.3`); `<Version>` в csproj (1.0.0.0) с ней не синхронизирован и нигде не показывается.
 - Тестов в проекте нет. `source/_publish.bat` собирает Release (`dotnet build`) и пакует zip (без `config.txt`, `catalog.db*` и `app.log`);
@@ -83,7 +82,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | Файл | Роль |
 |---|---|
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())`; необработанные исключения (`Application.ThreadException`, `AppDomain.UnhandledException`) идут в лог и в MessageBox через `Globals.ReportError` |
-| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`; пачки архивов добавляются через `WithoutListRedraw` — `BeginUpdate`/`EndUpdate`, 5000 архивов: 3,5 с → 1,9 с), контекстное меню копирования (Copy / Copy All для `listBoxLog` и `listViewSkippedContent`; «Copy full path» для `listViewContent`), «Re-install access denied» (после добавления архивов переходит на вкладку Logs и сам жмёт Install) |
+| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`; пачки архивов добавляются через `WithoutListRedraw` — `BeginUpdate`/`EndUpdate`), контекстное меню копирования (Copy / Copy All для `listBoxLog` и `listViewSkippedContent`; «Copy full path» для `listViewContent`), «Re-install access denied» (после добавления архивов переходит на вкладку Logs и сам жмёт Install) |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
 | `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` с проверкой кода возврата, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `IsFollowingVolume` (тома 2…N многотомного RAR `name.partN.rar` не попадают в список установки: первый том распаковывает весь набор, остальные лишь распаковывали то же самое повторно), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`; `AddFolder` обходит папку через `ArchiveLister.FindArchives`, недоступные подпапки пропускаются), `GetParentFolders` для combobox «Root folder» |
@@ -98,7 +97,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `CatalogDb.cs` | SQLite-слой каталога (`catalog.db`): таблица `Files`, `ReplaceBundle` (атомарная замена строк бандла), `QueryIds` (фильтр/сортировка), `GetRows`, `FindByTails`, `ImportRows`, `Clear`. Класс `CatalogRow` (8 полей), `CatalogColumn` (порядок: `FilePath, FileName, FileType, Modified, ArchivePath, ArchiveName, ArchiveType, ArchiveCreated` — он же порядок колонок грида, `SelectColumns` и `ReadRow`). Миграции нет: БД без колонок `Modified`/`ArchiveCreated` (`CheckFilesTableFormat`) не открывается, нужно удалить `catalog.db` |
 | `CatalogScanner.cs` | `CatalogScanner` — Scan папки (потоки `Parallel.ForEach`, вложенные архивы рекурсивно); `CatalogCollector` — сбор листинга во время установки (хук в `Archive.ExtractSmart`) |
 | `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
-| `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180); при импорте обязательны `FilePath` и `ArchivePath`, `Modified` и `ArchiveCreated` берутся, если есть (у старых файлов без них даты пустые) |
+| `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180); при импорте обязательны `FilePath` и `ArchivePath`, `Modified` и `ArchiveCreated` берутся, если колонки есть (иначе даты пустые) |
 | `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата; галочка «Unique archive» оставляет в первых двух только первую строку каждого архива, без учёта регистра пути, в конфиг не сохраняется) |
 | `Version.cs` | `AppVersion.Version` — версия приложения для заголовка окна и `changelog.txt` |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
@@ -120,11 +119,11 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   `7z.exe` читает rar только в полной версии 7-Zip (`7za.exe` формата RAR не содержит).
 - **Даты в каталоге.** `Modified` — дата файла внутри архива, ровно как её печатает 7z (`Modified = …`), до секунды; у вложенных архивов — из листинга вложенного. Zip хранит локальное время,
   а rar/7z — UTC, и 7z переводит его в локальное по **текущему** смещению часового пояса (Win32 `FileTimeToLocalFileTime`): при скане зимой летние даты rar/7z на час раньше «истинных», и наоборот.
-  Так оставлено сознательно (берём ответ 7z как есть). `ArchiveCreated` — `File.GetCreationTime` файла-бандла (локальное, тот же формат), одинаковая у всех строк бандла, включая вложенные уровни.
+  Ответ 7z берётся как есть. `ArchiveCreated` — `File.GetCreationTime` файла-бандла (локальное, тот же формат), одинаковая у всех строк бандла, включая вложенные уровни.
   Она записывается при (пере)сканировании бандла; штамп бандла (размер + время записи) её не включает, поэтому у неизменённого бандла старое значение остаётся до пересканирования.
 - **Повторный Scan пропускает неизменённые бандлы:** таблица `Bundles` (`ArchivePath`, `Size`, `ModifiedTicks` = `LastWriteTimeUtc`) пишется в той же транзакции, что и строки
   (`ReplaceBundle(path, rows, BundleStamp)`; штамп снимается **до** чтения архива). Совпали размер и время — бандл не открывается, статус показывает число пропущенных.
-  Штамп пишет и хук установщика. Импорт CSV штамп бандла удаляет (бандл пересканируется), Clear очищает обе таблицы. Принудительного «Rescan all» нет (по решению пользователя).
+  Штамп пишет и хук установщика. Импорт CSV штамп бандла удаляет (бандл пересканируется), Clear очищает обе таблицы. Принудительного «Rescan all» нет.
 - Хук установщика: `Archive.ExtractSmart(..., CatalogCollector)` листит внешний и каждый вложенный архив **перед** распаковкой (вложенный затем удаляется);
   `Unpacker.UnpackAll` пишет результат в БД, ошибки каталога установку не ломают. Так список файлов полный и в режиме Partial (где `data`/`Runtime` не распаковываются).
 - БД: один писатель (общий `lock`), WAL; чтение — отдельными соединениями. Грид виртуальный: `DbRowSource` держит `long[] ids` (результат фильтра/сортировки)
@@ -141,7 +140,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - Пути к `7z.exe` и `UnRAR.exe` вычисляются от каталога сборки: `tools\7z\7z.exe`, `tools\WinRAR\UnRAR.exe`
   (в git каталог называется `WinRar` — регистр не важен на Windows).
 - Режимы установки: **Partial** (`InstallDufOnly = true`, по умолчанию — при распаковке пропускаются `data`, `Runtime`, `Documentation`, `Documents`, `Readme`, `ReadMe's`,
-  `Templates`, `Dokumentation`, список в `ExtractSmart`; исключаются на любой глубине: 7z `-xr!"name"`, UnRAR `-x"name" -x"*\name\*"` — без второго шаблона UnRAR пропускал только корневую папку, и rar с папкой-обёрткой распаковывались целиком; в выборке из 1892 реальных архивов `*.duf` внутри исключаемых папок не было) и **Full** (копируются и остальные корневые папки из `DazRootDirs`).
+  `Templates`, `Dokumentation`, список в `ExtractSmart`; исключаются на любой глубине: 7z `-xr!"name"`, UnRAR `-x"name" -x"*\name\*"` — второй шаблон нужен, чтобы пропускать папку не только в корне архива) и **Full** (копируются и остальные корневые папки из `DazRootDirs`).
 
 ## Подводные камни и особенности (важно при доработке)
 
@@ -159,33 +158,31 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   `FileSys.DirectoryDelete` при ошибке снимает ReadOnly со всего дерева и повторяет удаление. Установщик настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
   (`groupBox6`, `TabSettings.UseSpecificTempFolder/TempFolder`) на установку не влияет, хотя форма проверяет путь при уходе с вкладки (`CheckTempFolderForValidInput`).
   Эта настройка действует только в сканировании каталога (`CatalogScanner.GetTempRoot`): указанная папка, если режим включён и она существует,
-  иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Не вызываются нигде (заготовки очистки): `Globals.ClearTempFolder`, `Archive.ClearTemp`. По решению пользователя код и интерфейс не менялись.
+  иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Нигде не вызываются: `Globals.ClearTempFolder`, `Archive.ClearTemp`.
 - **Поля «Prefix to append to subfolders» и «Create root subfolder»** стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller`
-  (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`). Лишние ключи в `config.txt` (например, от старых версий) Json.NET игнорирует.
-  Наследия, которыми установка не пользуется: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries` (список только очищается при сохранении).
+  (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`). Лишние ключи в `config.txt` Json.NET игнорирует.
+  Установка не использует: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries` (список только очищается при сохранении).
 - **Эвристики определения типа/версии хрупкие** (подстроки в пути архива/папки): `DetectContentType` (порядок `else if` важен —
   например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray` и `\data\`), `InstallDuf` (папка `Characters`).
   Любая правка должна учитывать порядок проверок и регрессии на реальных архивах — автотестов нет.
   `GenesisVersion.Genesis_8_1` есть в enum и в `GetInstallDirByContentType`, но определение версии его не выставляет: имена с «8.1» / «81» / «8_1» считаются Genesis 8.
-  Узкие защиты от ложных срабатываний (на 5679 реальных путях различий 0): `IsBlackName` — `poser` должен начинать слово (`Composer` не блокируется, `ForPoser` блокируется, `PoserWord`);
+  Узкие защиты от ложных срабатываний: `IsBlackName` — `poser` должен начинать слово (`Composer` не блокируется, `ForPoser` блокируется, `PoserWord`);
   `IsGenesisX` — шаблоны `and N`, `and-N`, `andN` не должны начинаться внутри слова (`Hand 3D`, `Band3` не дают версию; `ContainsAtWordStart`). Остальные шаблоны **намеренно без границ слов**:
   реальные имена склеены (`G3FG8F`, `G8FG9F`, `SKBG8f`), границы потеряли бы вторую версию. `uvm` ищется где угодно намеренно: он отсекает и вложенные `…_UVMaps_….zip`
   (имён вложенных архивов в списках путей нет — проверять такие правки нужно распаковкой `ExtractSmart`, а не только по именам).
-  Правило `Ps` (имя оканчивается на `Ps`) не менялось: `Photoshop TIPs.zip` по-прежнему блокируется.
+  Правило `Ps` (имя оканчивается на `Ps`) блокирует и `Photoshop TIPs.zip`.
 - **Вложенность папок** проверяется через `FileSys.IsSubPath` (после родителя обязателен `\`) в `Archive.GetDufTopFolders` (чистка вложенных top-папок) и `Unpacker.IsNodeOfTopDir`
-  (какие корневые папки не копировать в режиме Full). Раньше было `StartsWith` по строке: «Hair\Short Curly» считалась вложенной в «Hair\Short» и терялась, а корневая `Props`
-  принималась за папку с `*.duf` из-за `Props Pack\…`. Теперь такие соседние top-папки доходят до `ConcatenateSibilFolders` и, имея общего родителя, заменяются им
-  (ставится вся папка родителя, как и для любых двух соседних top-папок). На 126 архивах `N:\DAZ_Unsorted\_Dress` результат не изменился (там такие пары убирались как подпапки папки продукта).
-  Слияние соседних папок (`ConcatenateSibilFolders`) может само выдать родителя и его подпапку одновременно (`Timeless Ballet` + `Timeless Ballet\Expressions`). Поэтому `Archive.RemoveNestedFolders`
+  (какие корневые папки не копировать в режиме Full). Сравнение по пути, не по префиксу строки: «Hair\Short Curly» не вложена в «Hair\Short», корневая `Props` не вложена в `Props Pack`.
+  Соседние top-папки с общим родителем заменяются им (`ConcatenateSibilFolders`: ставится вся папка родителя).
+  Слияние может выдать родителя и его подпапку одновременно (`Timeless Ballet` + `Timeless Ballet\Expressions`), поэтому `Archive.RemoveNestedFolders`
   (в любом порядке) вызывается и до слияния, и после него: иначе `Directory.Move` родителя уносит подпапку, и её установка падает с `DirectoryNotFoundException`.
 - **AccessDenied — общий ярлык для любого исключения в `Unpacker.InstallDuf`** (и для `CopyFailed`), поэтому настоящая причина только в логе: `Install: top folder '…' (exists: …), target '…' (exists: …),
   target parent '…' (exists: …), single version, версия, пол, поток` + стек; `AccessDenied: <архив>, top folder: …` пишет `UnpackAll`; ошибка копирования папки — `Copy: <источник> -> <цель>`.
-  Известная причина (воспроизведена на синтетическом дереве): вложенная пара top-папок, см. выше; при повторной установке ошибки нет, потому что целевая папка уже существует и ветка `Directory.Move` не выполняется (идёт копирование).
+  `DirectoryNotFoundException` на `Directory.Move` в логе — признак вложенной пары top-папок (см. выше). Если целевая папка уже существует, вместо `Directory.Move` идёт копирование, поэтому такая ошибка бывает только при первой установке.
 - **Вложенные архивы:** `ExtractSmart` в цикле распаковывает найденные внутри архивы в `destDir\Daz<N>`, удаляя исходный вложенный архив,
   и собирает общий список `dufRootInfo`/`rootDirs`. Корень вложенного архива `archiveRoot` (`FindRootDir(tempDir)`) не меняется, пока обрабатываются его top-папки:
   от него отсчитывается относительный путь top-папки, по которому определяются версия Genesis и пол (`FileSys.IsSubPath`; top-папка вне корня или пустой корень — берётся полный путь).
-  Корень самой top-папки (`FindRootDirFromTopDir`, переменная `topRootDir`) только пополняет `rootDirs`. Раньше для всех top-папок кроме первой отсчёт шёл от корня предыдущей
-  top-папки, и при более коротком пути получался `ArgumentOutOfRangeException` (весь бандл — FAIL).
+  Корень самой top-папки (`FindRootDirFromTopDir`, переменная `topRootDir`) только пополняет `rootDirs`.
 - **Коды возврата распаковщиков проверяются** (`Archive.RunExtractor`, запуск через общий `ArchiveLister.RunTool`, stdin закрыт — запрос пароля не вешает поток):
   0 — успех, 1 — предупреждение (`Log.Warning`, установка идёт дальше), 10 у UnRAR — «нечего распаковывать» (при Partial всё могло быть исключено), остальное — ошибка
   (`Log.Error` с кодом и хвостом вывода). Ошибка внешнего архива → `ExtractSmart` возвращает `FindFailReason.ArchiverError`; ошибка вложенного → он пропускается,
@@ -203,10 +200,9 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 - **Ошибки в рабочих потоках** гасятся: `Globals.ReportError(ex, false)` только пишет в лог. `AccessDenied` помечается в `Library.Skipped`
   и позволяет кнопку «Re-install access denied» (повторно добавляет такие архивы и жмёт Install).
 - **Размер окна:** `Form1` изменяемого размера (`MinimumSize` = размер дизайна), контролы вкладок Installer/Logs расставлены якорями (Anchor) в дизайнере,
-  Catalog растягивается через Dock/TableLayoutPanel. Разворачивание на весь экран — только системной кнопкой окна (собственного full screen нет, по просьбе пользователя).
+  Catalog растягивается через Dock/TableLayoutPanel. Разворачивание на весь экран — только системной кнопкой окна (собственного full screen нет).
 - **Вкладки:** порядок Settings, Installer, Catalog, Logs. Installer и Logs добавляются/убираются в `UpdateTabs` (когда есть хотя бы одна библиотека),
-  Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс,
-  поэтому после добавления Catalog старый сохранённый индекс может один раз открыть соседнюю вкладку.
+  Catalog есть всегда. Вкладки выбирай по ссылке (`tabControl.SelectedTab = tabPageLogs`), а не по индексу; `Config.TabNumber` хранит индекс вкладки.
 - **Локализация:** UI на английском, русский вариант не реализован. Комментарии в коде — английские.
 - **Кодировка исходников:** `*.cs` и `.csproj` — UTF-8 с BOM, CRLF; `.slnx` — UTF-8 без BOM; `_publish.bat` — без BOM, CRLF (перед правкой полагаться на хуки File Guard, см. глобальные правила).
 
