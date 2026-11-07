@@ -28,7 +28,8 @@ dotnet build DazUnpacker.slnx --configuration Debug '-p:Platform=Any CPU' -nolog
   `System.Data.SQLite.Core` (БД каталога; нативные `x86\`/`x64\SQLite.Interop.dll` копирует `.targets` транзитивного пакета `Stub.System.Data.SQLite.Core.NetFramework`).
   Пакеты восстанавливает `-restore` в глобальный кэш NuGet (нужен доступ к nuget.org). Старая папка `source/packages/` не используется (исключена из сборки
   через `DefaultItemExcludes`, в git не лежит) — её можно удалить.
-- Версия и описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) заданы в csproj; `AssemblyInfo.cs` нет.
+- Описание сборки (`Version`, `AssemblyTitle`, `Product`, `Copyright`) задано в csproj; `AssemblyInfo.cs` нет. Версия, которую видит пользователь, — `AppVersion.Version`
+  в `source/source/Version.cs` (добавляется к заголовку окна `Form1`: `… v1.3`); `<Version>` в csproj (1.0.0.0) с ней не синхронизирован и нигде не показывается.
 - Тестов в проекте нет. `source/_publish.bat` собирает Release (`dotnet build`) и пакует zip (без `config.txt`, `catalog.db*` и `app.log`);
   существующий `bin\Release` на время сборки откладывается в `bin\Release.bak` и возвращается после. Проверять bat нужно на копии репозитория, не на рабочем каталоге.
 - Релизная сборка блокируется запущенным Release-процессом пользователя — всегда собирай Debug (см. глобальные правила).
@@ -36,7 +37,7 @@ dotnet build DazUnpacker.slnx --configuration Debug '-p:Platform=Any CPU' -nolog
 ## Структура репозитория
 
 ```
-README.md, LICENSE, .gitignore
+README.md, changelog.txt, LICENSE, .gitignore
 source/
   DazUnpacker.slnx / .csproj    проект SDK-style: все *.cs и *.resx подхватываются по маске, в csproj их перечислять не нужно
   Properties/                   Resources, Settings (Settings пустой)
@@ -82,14 +83,14 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | Файл | Роль |
 |---|---|
 | `Program.cs` | Именованный Mutex `SuperDIM_mtx` (защита от двойного запуска), `Application.Run(new Form1())`; необработанные исключения (`Application.ThreadException`, `AppDomain.UnhandledException`) идут в лог и в MessageBox через `Globals.ReportError` |
-| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`; пачки архивов добавляются через `WithoutListRedraw` — `BeginUpdate`/`EndUpdate`, 5000 архивов: 3,5 с → 1,9 с), контекстное меню копирования (Copy / Copy All для `listBoxLog` и `listViewSkippedContent`), «Re-install access denied» (после добавления архивов переходит на вкладку Logs и сам жмёт Install) |
+| `Form1.cs` / `.Designer.cs` | UI и обработчики; вкладки: Settings, Installer, Catalog, Logs. Сборка `UnpackInfo`, запуск потока, drag&drop (рекурсивно навешивается на всё `tabPageInstaller`; пачки архивов добавляются через `WithoutListRedraw` — `BeginUpdate`/`EndUpdate`, 5000 архивов: 3,5 с → 1,9 с), контекстное меню копирования (Copy / Copy All для `listBoxLog` и `listViewSkippedContent`; «Copy full path» для `listViewContent`), «Re-install access denied» (после добавления архивов переходит на вкладку Logs и сам жмёт Install) |
 | `Unpacker.cs` | Оркестрация установки (`UnpackAll`), `UnpackInfo`, выбор целевой папки, эвристики: `DetectContentType` (подстроки в пути), `IsGenesisX`/`GetGenesisVersionsByName` (версия/пол по имени), `IsGenesisFilterAllowed` (учёт фильтра поколений) |
 | `Archive.cs` | Работа с архивами: `ExtractSmart` (ядро), `ExtractSingle(Zip/Rar)` — запуск `7z.exe`/`UnRAR.exe` с проверкой кода возврата, `GetDufTopFolders`/`ConcatenateSibilFolders` (какие папки считать «корнем контента»), `FindRootDir` по списку `DazRootDirs`, `IsBlackName` (отсев Poser/UVM/…Ps), `IsFollowingVolume` (тома 2…N многотомного RAR `name.partN.rar` не попадают в список установки: первый том распаковывает весь набор, остальные лишь распаковывали то же самое повторно), `PrepareTempDir`. Enum `FindFailReason`, класс `DufRootInfo` |
 | `Content.cs` | Enum'ы `GenesisVersion` ([Flags]), `GenesisGenders`, `ContentTypes`; добавление файлов в список (`AddFile/AddFolder/AddObject`; `AddFolder` обходит папку через `ArchiveLister.FindArchives`, недоступные подпапки пропускаются), `GetParentFolders` для combobox «Root folder» |
 | `Library.cs` | Статические вложенные фасады над контролами: `Content` (список архивов, колонки Prefix и Status), `Basic` (DAZ-библиотеки), `Install` (выбранная целевая библиотека), `Skipped` (список пропущенных + причина; потокобезопасное добавление через `BeginInvoke`) |
 | `Config.cs` | `Config.Storage` (`ConfigStorage` → `_TabSettings/_TabInstaller/_TabCatalog/_TabLog`) — сериализуемые настройки; `Config.Data` — пути к `7z.exe`/`UnRAR.exe` и `%Temp%\Daz`; `Init` (`LoadCommonData`, `LoadDefaults` — заполняет комбобоксы, `LoadStorage`, `ApplyStorage` форма←конфиг), `SaveConfig` форма→конфиг (вызывается в `FormClosing`), `LoadFiltersOnForm`/`SaveFiltersFromForm`/`GetGenesisVersionFilter` |
 | `FilterManager.cs` | Фильтры установки: `IFilter`, `DateFilter` (Before/After/Equal по CreationTime архива, сравнивается только дата без времени), `ContentFilter` (один выбранный `ContentTypes`), `FilterManager` (флаги включения + список). Полиморфно сериализуется Json.NET (`TypeNameHandling.Auto`) |
-| `FileSys.cs` | Файловые хелперы: `CopyFolderRecursively` (+`FsCopyStatus`; снимает ReadOnly с перезаписываемых файлов, ошибка одного файла не прерывает остальные, итог `CopyFailed`), `FileDelete` (снимает ReadOnly), `DirectoryDelete` (не бросает исключений), `EnumDirectory` (не используется: бросает исключение на недоступной подпапке), `GetParentDir`, `IsSubPath` (лежит ли папка внутри другой: после родителя обязателен `\`), `GetRelativeDir` (папка файла относительно корня, `null` если файл вне корня), `PathInsertPrefixToAllComponents`, `PathInsertPostfix`, `StripFilename`, `Unquote`, `FindFileNameAvailable`/`FindDirNameAvailable` |
+| `FileSys.cs` | Файловые хелперы: `CopyFolderRecursively` (+`FsCopyStatus`; снимает ReadOnly с перезаписываемых файлов, ошибка одного файла не прерывает остальные, итог `CopyFailed`), `FileDelete` (снимает ReadOnly), `DirectoryDelete` (не бросает исключений), `EnumDirectory` (не используется: бросает исключение на недоступной подпапке), `GetParentDir`, `IsSubPath` (лежит ли папка внутри другой: после родителя обязателен `\`), `GetRelativeDir` (папка файла относительно корня, `null` если файл вне корня), `PathInsertPrefixToAllComponents`, `StripFilename`; не используются: `PathInsertPostfix`, `Unquote`, `FindFileNameAvailable`/`FindDirNameAvailable` |
 | `Statistics.cs` | Счётчики `Total/Done` (Interlocked) и вывод в `labelProgress` через `BeginInvoke` |
 | `Logger.cs` | Статический `Log` (Info/Warning/Error/Trace), вывод в `app.log` и `listBoxLog`; потокобезопасный, `DisableCache(true)` => запись сразу |
 | `Globals.cs` | `AppDir`, `AppName`, `ReportError(ex, interactive, context)` (лог; MessageBox только при `interactive = true`), `FormatException`, `StringContains` (ignore-case), `OpenTextFile`, `ClearTempFolder` (не вызывается) |
@@ -99,6 +100,7 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
 | `CatalogRowSource.cs` | `ICatalogRowSource` для виртуального грида: `DbRowSource` (Id из БД + страницы по 100 строк, фоновые запросы) и `ListRowSource` (список в памяти) |
 | `CsvHelper.cs` | Экспорт/импорт каталога в CSV (UTF-8 BOM, RFC 4180); при импорте обязательны `FilePath` и `ArchivePath`, `Modified` и `ArchiveCreated` берутся, если есть (у старых файлов без них даты пустые) |
 | `Form1Catalog*.cs` | Вкладка Catalog: `Form1Catalog` (форма `TopLevel=false`, встроена в `tabPageCatalog`), `Form1CatalogGrid` (UserControl: виртуальный DataGridView, Copy, сортировка по заголовку), `Form1CatalogSearch` (ввод путей), `Form1CatalogResult` (3 списка результата; галочка «Unique archive» оставляет в первых двух только первую строку каждого архива, без учёта регистра пути, в конфиг не сохраняется) |
+| `Version.cs` | `AppVersion.Version` — версия приложения для заголовка окна и `changelog.txt` |
 | `FolderPicker.cs` | Диалог выбора папки через COM (IFileOpenDialog) |
 | `Geometry.cs` | Поиск контрола под курсором (для контекстного меню Copy) |
 | `ListViewColumnSorter.cs` | `IComparer` для сортировки `listViewSkippedContent` (глобальный класс без namespace) |
@@ -156,11 +158,11 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   а не копированием). Папка `Daz<N>` удаляется в `finally` лямбды `UnpackAll` при любом исходе (в том числе `ContentTypeUndefined`, `CriteriaNotMatch`, исключение);
   `FileSys.DirectoryDelete` при ошибке снимает ReadOnly со всего дерева и повторяет удаление. Установщик настройку временной папки не читает. Поэтому «Specific folder» на вкладке Settings
   (`groupBox6`, `TabSettings.UseSpecificTempFolder/TempFolder`) на установку не влияет, хотя форма проверяет путь при уходе с вкладки (`CheckTempFolderForValidInput`).
-  Эта настройка действует только в сканировании каталога (`CatalogScanner`, ~строка 84): указанная папка, если режим включён и она существует,
+  Эта настройка действует только в сканировании каталога (`CatalogScanner.GetTempRoot`): указанная папка, если режим включён и она существует,
   иначе `Config.Data.TempFolder` (`%Temp%\Daz`). Не вызываются нигде (заготовки очистки): `Globals.ClearTempFolder`, `Archive.ClearTemp`. По решению пользователя код и интерфейс не менялись.
-- **Вкладка Sort удалена** (вместе с `_TabSort`, `Exclusion`, `Library.Search/Exclude`). Её настройки установка не использовала. Живые поля «Prefix to append to subfolders»
-  и «Create root subfolder» стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller` (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`).
-  Старый ключ `TabSort` в `config.txt` Json.NET игнорирует. Остальные наследия: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries`.
+- **Поля «Prefix to append to subfolders» и «Create root subfolder»** стоят на вкладке Installer (панели `panel6`/`panel4`) и хранятся в `_TabInstaller`
+  (`UsePrefix/PrefixName/CreateRootSubfolder/RootSubfolder`). Лишние ключи в `config.txt` (например, от старых версий) Json.NET игнорирует.
+  Наследия, которыми установка не пользуется: `UseLanguageRu` (переключатель языка скрыт `panelLanguage.Visible = false`), `GarbageLibraries` (список только очищается при сохранении).
 - **Эвристики определения типа/версии хрупкие** (подстроки в пути архива/папки): `DetectContentType` (порядок `else if` важен —
   например, «Hair» vs «Chair», «Light» ловит «IRay»), `IsGenesisX`, `IsBlackName`, `GetDufTopFolders` (костыли для `Iray` и `\data\`), `InstallDuf` (папка `Characters`).
   Любая правка должна учитывать порядок проверок и регрессии на реальных архивах — автотестов нет.
@@ -218,3 +220,4 @@ buttonStart_Click  ->  собирает Unpacker.UnpackInfo из контрол�
   управлять через UI Automation (элементы ищутся по `Name`, перед кликом окно нужно активировать, `Microsoft.VisualBasic.Interaction.AppActivate`).
 - Если логика новой функции > ~500 строк — выносить в отдельную форму/класс с именем, начинающимся на `Form1…` (правило из глобальных инструкций).
 - Прежде чем добавлять код, проверяй существующие хелперы: `FileSys`, `Globals`, `Library.*`, `FilterManager`.
+- `changelog.txt` (английский, как README и интерфейс): заметные для пользователя изменения дописываются в раздел «Unreleased»; при выпуске раздел получает номер из `AppVersion.Version` и дату.
